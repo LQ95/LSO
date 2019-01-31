@@ -2,6 +2,6 @@
 
 int main(int argc,char **argv)
 {
-	ServerInit();
+	ClientInit();
 	return 0;
 }
