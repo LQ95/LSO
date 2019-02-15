@@ -2,6 +2,10 @@
 #include <netinet/ip.h>
 #include <stdio.h>
 #include <stdlib.h>
+typedef struct square{
+	int bombflag;
+}tile;
+typedef tile** Matrix;
 void Game();
 void ConnectToServer();
 void Signup();
