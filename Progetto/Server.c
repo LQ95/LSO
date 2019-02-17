@@ -17,3 +17,10 @@ void ServerGame(Matrix M,int time)
 	}
 	
 }
+
+void ServerInit()
+{
+	//the return type for this function probably needs to be different than void(maybe a custom defined sruct that holds all server data?)
+	//
+	
+}
