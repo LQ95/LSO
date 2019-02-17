@@ -6,7 +6,13 @@ typedef struct square{
 	int bombflag;
 }tile;
 typedef tile** Matrix;
-void Game();
+typedef struct P{
+	int position[1][1];
+	int speed;
+	int score;
+}Player;
+void ServerGame();
+void ClientGame();
 void ConnectToServer();
 void Signup();
 void Login();
