@@ -2,7 +2,8 @@
 
 int main(int argc,char **argv)
 {
-	ServerInit();
+	Serverdata GameServer;
+	GameServer=ServerInit();
 	return 0;
 }
 
@@ -18,11 +19,20 @@ void ServerGame(Matrix M,int time)
 	
 }
 
-void ServerInit()
+Serverdata ServerInit()
 {
-	//the return type for this function probably needs to be different than void(maybe a custom defined sruct that holds all server data?)
-	//
+	Serverdata data;
+	int sd;
+	struct sockaddr_in ServAddr;
+	//defines a socket and an address for the server,returns the serve data,after setting up the server;
+	ServAddr.sin_family=AF_INET;
+	ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	sd=socket(PF_INET,SOCK_STREAM,0);
+	data.socket_desc=sd;
+	data.address=ServAddr;
+	//Server setup here(binding,listening,etc)
 	
+	return ServAddr;	
 }
 
 int Login(char *user,char *psw)
