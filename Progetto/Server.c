@@ -57,29 +57,39 @@ void ServerLog(char *data)
 Matrix GenerateRandomMap(int height,int width)
 {
 	Matrix M;
-	int i;
+	int i=0,j,z=0;
 	M=malloc(height*sizeof(tile*));
-	for(i<width)
+	for(i<height)
 	{
 		M[i]=malloc(width*sizeof(tile));
 	}
-	
 	srand(time(NULL));
-	int seed=rand();
+	int seed;
 
 	int bit;
 	int *vec;
 	int i,size;
-	size=ceil(log2(seed));
-	vec=malloc(size*sizeof(int));
-	for(i=size;i>-1;i--)
+	while (size<height*width)
+		{
+			seed=rand();
+			size=ceil(log2(seed));
+			vec=malloc(size*sizeof(int));
+			for(i=size;i>-1;i--)
+				{
+					bit=1<<i;
+					//select every bit as the cycle goes on
+					bit=bit&seed;
+					if(bit) bit=1;
+					vec[i]=bit;
+				}
+		}
+	for(i=0;i<height;i++)
 	{
-		bit=1<<i;
-		//select every bit as the cycle goes on
-		bit=bit&seed;
-		if(bit) bit=1;
-		vec[i]=bit;
+		for(j=0;j<width;j++)
+			{
+				M[i][j].bombflag=vec[z];
+				z++;
+			}
 	}
-	
 	return M;
 }
