@@ -10,3 +10,8 @@ void ClientInit()
 {
 	
 }
+
+void ClientLoginPrompt()
+{
+	
+}

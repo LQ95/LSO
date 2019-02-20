@@ -24,3 +24,10 @@ void ServerInit()
 	//
 	
 }
+
+int Login(char *user,char *psw)
+{
+	//this routine looks up usernames and passwords after having them passed to it from the server
+	//returns 1 if login is successful,otherwise
+	
+}
