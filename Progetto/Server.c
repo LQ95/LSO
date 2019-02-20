@@ -31,3 +31,15 @@ int Login(char *user,char *psw)
 	//returns 1 if login is successful,otherwise
 	
 }
+
+void ServerLog(char *data)
+{
+	int fd,size;
+	size=sizeof(data);
+	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR);
+	if(write(fd,data,size)<0)
+	{
+		perror("errore nella compilazione del log");
+	}
+	close(fd);
+}

@@ -7,7 +7,7 @@
 //these are codes that the server sends the client 
 #define SESSION_END 3333
 #define LOGIN_OK 6666
-#fdefine SIGNUP_REQUEST 7777
+#fdefine SIGNUP_OK 7777
 //these are codes that the client sends the server in order to signal that it wants to make a move in the game 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
