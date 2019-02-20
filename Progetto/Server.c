@@ -31,8 +31,8 @@ Serverdata ServerInit()
 	data.socket_desc=sd;
 	data.address=ServAddr;
 	//Server setup here(binding,listening,etc)
-	
-	return ServAddr;	
+	bind(sd,(struct sockaddr *)ServAddr,sizeof(ServAddr));
+	return data;	
 }
 
 int Login(char *user,char *psw)
