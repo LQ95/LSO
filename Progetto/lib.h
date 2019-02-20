@@ -6,11 +6,12 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <math.h>
+#include <fcntl.h>
 //these are codes that the server sends the client 
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
 #define LOGIN_OK 6666
-#fdefine SIGNUP_OK 7777
+#define SIGNUP_OK 7777
 //these are codes that the client sends the server 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
@@ -18,7 +19,7 @@
 #define MOVE_DOWN 5200
 #define NULL_MOVE 3000
 #define LOGIN_REQUEST 4444
-#fdefine SIGNUP_REQUEST 5555
+#define SIGNUP_REQUEST 5555
 //this definition might probably need to be modified
 //as it is it's simply used as a return type for the ServerInit function to store server data 
 typedef struct serv{

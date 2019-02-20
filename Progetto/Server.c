@@ -2,6 +2,7 @@
 
 int main(int argc,char **argv)
 {
+	Matrix Map;
 	Serverdata GameServer;
 	GameServer=ServerInit();
 	return 0;
@@ -31,7 +32,7 @@ Serverdata ServerInit()
 	data.socket_desc=sd;
 	data.address=ServAddr;
 	//Server setup here(binding,listening,etc)
-	bind(sd,(struct sockaddr *)ServAddr,sizeof(ServAddr));
+	bind(sd,(struct sockaddr *)&ServAddr,sizeof(ServAddr));
 	return data;	
 }
 
@@ -57,18 +58,15 @@ void ServerLog(char *data)
 Matrix GenerateRandomMap(int height,int width)
 {
 	Matrix M;
-	int i=0,j,z=0;
+	int i,j,z=0;
 	M=malloc(height*sizeof(tile*));
-	for(i<height)
+	for(i=0;i<height;i++)
 	{
 		M[i]=malloc(width*sizeof(tile));
 	}
 	srand(time(NULL));
-	int seed;
-
-	int bit;
+	int bit,size,seed;
 	int *vec;
-	int i,size;
 	while (size<height*width)
 		{
 			seed=rand();
@@ -83,6 +81,7 @@ Matrix GenerateRandomMap(int height,int width)
 					vec[i]=bit;
 				}
 		}
+	
 	for(i=0;i<height;i++)
 	{
 		for(j=0;j<width;j++)
