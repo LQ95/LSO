@@ -53,3 +53,12 @@ void ServerLog(char *data)
 	}
 	close(fd);
 }
+
+Matrix GenerateRandomMap(int length,int width)
+{
+	srand(time(NULL));
+	seed=rand()
+	//the idea is to take the seeds bynary form,convert it into a matrix of zeroes and ones and convert that into a map
+	//TODO,also properly allocate the Matrix type map
+	
+}

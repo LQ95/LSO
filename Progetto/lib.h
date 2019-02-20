@@ -36,7 +36,7 @@ typedef struct P{
 	int score;
 	int ID;
 }Player;
-
+Matrix GenerateRandomMap();
 void ServerGame(Matrix M,int time);
 void ClientGame(Matrix M);
 void ConnectToServer(char *address);
