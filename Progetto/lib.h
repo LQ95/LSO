@@ -39,7 +39,7 @@ typedef struct P{
 
 void ServerGame(Matrix M,int time);
 void ClientGame(Matrix M);
-void ConnectToServer(char address);
+void ConnectToServer(char *address);
 void Signup();
 int Login(char *user,char *psw);
 void ClientLoginPrompt();
