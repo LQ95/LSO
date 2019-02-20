@@ -6,3 +6,7 @@
 # Executables
 *.exe
 *.out
+ 
+#Other
+*.sh
+*.bat
