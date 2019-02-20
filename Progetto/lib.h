@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <math.h>
 //these are codes that the server sends the client 
 #define SESSION_END 3333
+#define CONNECTION_OK 6666
 #define LOGIN_OK 6666
 #fdefine SIGNUP_OK 7777
-//these are codes that the client sends the server in order to signal that it wants to make a move in the game 
+//these are codes that the client sends the server 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
 #define MOVE_UP 5100
@@ -36,7 +38,7 @@ typedef struct P{
 	int score;
 	int ID;
 }Player;
-Matrix GenerateRandomMap();
+Matrix GenerateRandomMap(int height,int width);
 void ServerGame(Matrix M,int time);
 void ClientGame(Matrix M);
 void ConnectToServer(char *address);

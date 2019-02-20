@@ -38,7 +38,7 @@ Serverdata ServerInit()
 int Login(char *user,char *psw)
 {
 	//this routine looks up usernames and passwords after having them passed to it from the server
-	//returns 1 if login is successful,otherwise
+	//returns 1 if login is successful,otherwise it returns 0
 	
 }
 
@@ -53,12 +53,33 @@ void ServerLog(char *data)
 	}
 	close(fd);
 }
-
-Matrix GenerateRandomMap(int length,int width)
+	//This subroutine converts a random number into a binary number,and then generates a vector of zeroes and ones and converta that into a Matrix type map
+Matrix GenerateRandomMap(int height,int width)
 {
-	srand(time(NULL));
-	seed=rand()
-	//the idea is to take the seeds bynary form,convert it into a matrix of zeroes and ones and convert that into a map
-	//TODO,also properly allocate the Matrix type map
+	Matrix M;
+	int i;
+	M=malloc(height*sizeof(tile*));
+	for(i<width)
+	{
+		M[i]=malloc(width*sizeof(tile));
+	}
 	
+	srand(time(NULL));
+	int seed=rand();
+
+	int bit;
+	int *vec;
+	int i,size;
+	size=ceil(log2(seed));
+	vec=malloc(size*sizeof(int));
+	for(i=size;i>-1;i--)
+	{
+		bit=1<<i;
+		//select every bit as the cycle goes on
+		bit=bit&seed;
+		if(bit) bit=1;
+		vec[i]=bit;
+	}
+	
+	return M;
 }
