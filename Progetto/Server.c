@@ -5,10 +5,11 @@ int main(int argc,char **argv)
 	Matrix Map;
 	Serverdata GameServer;
 	GameServer=ServerInit();
+	listen(GameServer.sd,1);
 	return 0;
 }
 
-void ServerGame(Matrix M,int time)
+void ServerGame(Matrix M,int time,Serverdata Server)
 {
 	int session_status,gametime;
 	gametime=time;
@@ -27,12 +28,13 @@ Serverdata ServerInit()
 	struct sockaddr_in ServAddr;
 	//defines a socket and an address for the server,returns the serve data,after setting up the server;
 	ServAddr.sin_family=AF_INET;
+	ServAddr.sin_fport=htons(520);
 	ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	sd=socket(PF_INET,SOCK_STREAM,0);
-	data.socket_desc=sd;
-	data.address=ServAddr;
 	//Server setup here(binding,listening,etc)
 	bind(sd,(struct sockaddr *)&ServAddr,sizeof(ServAddr));
+	data.socket_desc=sd;
+	data.address=ServAddr;
 	return data;	
 }
 
