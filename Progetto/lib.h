@@ -38,7 +38,7 @@ typedef struct square{
 typedef tile **Matrix;
 
 typedef struct P{
-	int position[1][1];
+	int position[2];
 	int speed;
 	int score;
 	int ID;
@@ -63,4 +63,11 @@ void ShowPositions();
 Serverdata ServerInit();
 void ClientInit();
 void ServerLog(char *data);
+
+//PlayerList functions
+PlayerList CreateList();
+PlayerList insert();
+PlayerList eliminate();
+Player search();
+PlayerList FreeList();
 #endif
