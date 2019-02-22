@@ -1,3 +1,5 @@
+#ifndef GAME_LIB
+#define GAME_LIB
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -7,11 +9,13 @@
 #include <pthread.h>
 #include <math.h>
 #include <fcntl.h>
+
 //these are codes that the server sends the client 
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
 #define LOGIN_OK 6666
 #define SIGNUP_OK 7777
+
 //these are codes that the client sends the server 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
@@ -39,6 +43,12 @@ typedef struct P{
 	int score;
 	int ID;
 }Player;
+//seeing as there is the possibility of connecting players during the game,we need a data structure that can insert and remove an undertermined number of players
+typedef struct list{
+	Player P;
+	struct list *next;
+}PlayerList;
+
 Matrix GenerateRandomMap(int height,int width);
 void ServerGame(Matrix M,int time);
 void ClientGame(Matrix M);
@@ -53,3 +63,4 @@ void ShowPositions();
 Serverdata ServerInit();
 void ClientInit();
 void ServerLog(char *data);
+#endif
