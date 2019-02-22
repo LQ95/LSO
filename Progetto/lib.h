@@ -66,8 +66,8 @@ void ServerLog(char *data);
 
 //PlayerList functions
 PlayerList CreateList();
-PlayerList insert();
-PlayerList eliminate();
-Player search();
-PlayerList FreeList();
+PlayerList insert(Player P,PlayerList L);
+PlayerList eliminate(int ID,PlayerList L);
+Player search(int ID,,PlayerList L);
+PlayerList FreeList(PlayerList L);
 #endif
