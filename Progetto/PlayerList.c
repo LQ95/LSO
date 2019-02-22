@@ -1,6 +1,6 @@
 #include "lib.h"
 
-PlayerList CreateList()
+PlayerList CreateList(int sd)
 {
 	srand(time(NULL));
 	PlayerList L;
@@ -16,10 +16,11 @@ PlayerList CreateList()
 	L->score=0;
 	L->position[0]=0;
 	L->position[1]=0;
+	L->socket_desc=sd;
 	L->next=NULL;
 }
 
-PlayerList insert(Player P,PlayerList L)
+PlayerList insert(Player P,PlayerList L,int sd)
 {
 	
 }

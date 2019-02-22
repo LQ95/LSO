@@ -42,6 +42,7 @@ typedef struct P{
 	int speed;
 	int score;
 	int ID;
+	int socket_desc;
 }Player;
 //seeing as there is the possibility of connecting players during the game,we need a data structure that can insert and remove an undertermined number of players
 typedef struct list{
