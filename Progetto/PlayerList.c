@@ -18,21 +18,52 @@ PlayerList CreateList(int sd)
 	L->position[1]=0;
 	L->socket_desc=sd;
 	L->next=NULL;
+	return L;
 }
 
-PlayerList insert(Player P,PlayerList L,int sd)
+//a player is inserted into the list right after connection the the server, so all we know and need is his/her socket descriptor
+PlayerList insert(PlayerList L,int sd)
 {
+	PlayerList tmp=L;
+	while(tmp->next!=NULL )
+	{
+		tmp=tmp->next;
+	}
+	tmp->next=CreateList(sd);
+	return L;
+}
+
+PlayerList insertHead(PlayerList L,int sd)
+{
+	PlayerList tmp=CreateList(int sd);
+	tmp->next=L;
+	return tmp;
 	
 }
 
 PlayerList eliminate(int ID,PlayerList L)
 {
-	
+	if(L!=NULL)
+	{
+		if(L->next!=NULL)
+		{
+			PlayerList tmp;
+			if(L->next->ID==ID)
+				{
+					tmp=L->next;
+					L->next=tmp->next;
+					free(tmp);
+					return L;
+				}
+			else return eliminate(ID,L->next);
+		}
+	}
+	return L;
 }
 
-Player search(int IDnumber,PlayerList L)
+PlayerList search(int IDnumber,PlayerList L)
 {
-	PlayerList tmp=L
+	PlayerList tmp=L;
 	int found=0;
 	while(tmp!=NULL ù&&found==0)
 	{
@@ -43,7 +74,13 @@ Player search(int IDnumber,PlayerList L)
 	else return NULL;
 }
 
-PlayerList FreeList(PlayerList L)
+void FreeList(PlayerList L)
 {
-	
+	PlayerList tmp=L;
+	while(tmp->next!=NULL )
+	{
+		L=tmp;
+		tmp=tmp->next;
+		free(L);
+	}
 }
