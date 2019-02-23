@@ -62,7 +62,8 @@ void ServerLog(char *data)
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
 int **create_position_map()
 {
-	int **positions=calloc(sizeof(int*),10);
+    int x,y;
+    int **positions=calloc(sizeof(int*),10);
     int i=0;
     for(int i=0;i<10;i++){
         positions[i]=calloc(sizeof(int),10);
@@ -80,7 +81,7 @@ int CheckFree(int x,int y,int **position)
 	else return 0;
 }
 
-int CheckBomb(int[2] coord,int **map)
+int CheckBomb(int coord[2],int **map)
 {
 	if(map[coord[0]][coord[1]]==0) return 1;
 	else return 0;
@@ -90,71 +91,73 @@ int CheckBomb(int[2] coord,int **map)
 void ServerGame(int **board,PlayerList L)
 {
 	int session_status;
-	PlayerList tmp;
+	PlayerList tmp=L;
 	PlayerList P;
 	int **positions=create_position_map();
 	int nextmove;
+	char buf[1000];
 	while(session_status=SESSION_END)
 	{
 		//There will  be a game initialization subroutine right here later
 		while(tmp!=NULL)
 			{
 				P=tmp;
-				read(P->socket_desc,nextmove,sizeof(int));
+				read(P->P.socket_desc,buf,sizeof(int));
+				nextmove=atoi(buf);
 				switch(nextmove)
 				{
 					case NULL_MOVE:
 						break;
 					
 					case MOVE_LEFT:
-						if(CheckFree(P->position[0]-1,P->position[1],positions))
+						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions))
 							{
-								P->position[0]--;
-								positions[P->position[0]][P->position[1]]=P->ID;
+								P->P.position[0]--;
+								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							}
-						if(CheckBomb(P->position,board))
+						if(CheckBomb(P->P.position,board))
 							{
-								eliminate(P->ID,L);			
-								positions[P->position[0]][P->position[1]]=0;
+								eliminate(P->P.ID,L);			
+								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
 						break;
 					
 					case MOVE_RIGHT:
-						if(CheckFree(P->position[0]+1,P->position[1],positions))
+						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions))
 							{
-								P->position[0]++;
-								positions[P->position[0]][P->position[1]]=P->ID;
+								P->P.position[0]++;
+								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							}
-						if(CheckBomb(P->position,board))
+						if(CheckBomb(P->P.position,board))
 							{
-								eliminate(P->ID,L);			
-								positions[P->position[0]][P->position[1]]=0;
+								eliminate(P->P.ID,L);			
+								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
 						break;
 						
 					case MOVE_UP:
-						if(CheckFree(P->position[0],P->position[1]+1,positions))
+						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions))
 							{
-								P->position[1]++;
-								positions[P->position[0]][P->position[1]]=P->ID;
+								P->P.position[1]++;
+								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							}
-						if(CheckBomb(P->position,board))
+						if(CheckBomb(P->P.position,board))
 							{
-								eliminate(P->ID,L);			
-								positions[P->position[0]][P->position[1]]=0;
+								eliminate(P->P.ID,L);			
+								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
 						break;
 					
 					case MOVE_DOWN:
-						if(CheckFree(P->position[0],P->position[1]-1,positions))
+						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions))
 							{
-								P->position[1]--;
-								positions[P->position[0]][P->position[1]]=P->ID;
+								P->P.position[1]--;
+								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+							}
+						if(CheckBomb(P->P.position,board))
 							{
-						if(CheckBomb(P->position,board))
-							{
-								eliminate(P->ID,L);			
-								positions[P->position[0]][P->position[1]]=0;
+								eliminate(P->P.ID,L);			
+								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
 						break;						
 				}

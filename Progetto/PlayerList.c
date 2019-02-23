@@ -1,22 +1,20 @@
 #include "lib.h"
 
-PlayerList CreateList(int sd)
+PlayerList CreateList(int sd,int ID)
 {
 	srand(time(NULL));
 	PlayerList L;
 	int IDnumber;
-	L=malloc(sizeof(Player*));
-	IDnumber=rand();
-	while(search(IDnumber)!=NULL)
-	{
-		IDnumber=rand();
-	}
-	L->ID=IDnumber;
-	L->speed=0;
-	L->score=0;
-	L->position[0]=0;
-	L->position[1]=0;
-	L->socket_desc=sd;
+	L=malloc(sizeof(PlayerNode*));
+	if(ID!=0)IDnumber=rand();
+	else IDnumber=ID;
+
+	L->P.ID=IDnumber;
+	L->P.speed=0;
+	L->P.score=0;
+	L->P.position[0]=0;
+	L->P.position[1]=0;
+	L->P.socket_desc=sd;
 	L->next=NULL;
 	return L;
 }
@@ -24,18 +22,30 @@ PlayerList CreateList(int sd)
 //a player is inserted into the list right after connection the the server, so all we know and need is his/her socket descriptor
 PlayerList insert(PlayerList L,int sd)
 {
+	srand(time(NULL));	
 	PlayerList tmp=L;
+	int IDnum=rand();
 	while(tmp->next!=NULL )
 	{
 		tmp=tmp->next;
 	}
-	tmp->next=CreateList(sd);
+	while(search(IDnum,L)!=NULL)
+	{
+		IDnum=rand();
+	}
+	tmp->next=CreateList(sd,IDnum);
 	return L;
 }
 
 PlayerList insertHead(PlayerList L,int sd)
 {
-	PlayerList tmp=CreateList(int sd);
+	srand(time(NULL));
+	int IDnum=rand();
+	while(search(IDnum,L)!=NULL)
+	{
+		IDnum=rand();
+	}
+	PlayerList tmp=CreateList(sd,IDnum);
 	tmp->next=L;
 	return tmp;
 	
@@ -48,7 +58,7 @@ PlayerList eliminate(int ID,PlayerList L)
 		if(L->next!=NULL)
 		{
 			PlayerList tmp;
-			if(L->next->ID==ID)
+			if(L->next->P.ID==ID)
 				{
 					tmp=L->next;
 					L->next=tmp->next;
@@ -65,9 +75,9 @@ PlayerList search(int IDnumber,PlayerList L)
 {
 	PlayerList tmp=L;
 	int found=0;
-	while(tmp!=NULL ù&&found==0)
+	while(tmp!=NULL &&found==0)
 	{
-		if(tmp->ID ==IDnumber) found=1;
+		if(tmp->P.ID ==IDnumber) found=1;
 		tmp=tmp->next;
 	}
 	if(found) return tmp;

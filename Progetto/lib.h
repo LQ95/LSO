@@ -10,7 +10,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <sys/socket.h>
-
+#include <fcntl.h>
 //these are codes that the server sends the client 
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
@@ -40,14 +40,14 @@ typedef struct P{
 typedef struct list{
 	Player P;
 	struct list *next;
-}PlayerList;
-
+}PlayerNode;
+typedef PlayerNode *PlayerList;
 void ServerLog(char *data);
 //PlayerList functions
 PlayerList CreateList();
-PlayerList insert(Player P,PlayerList L);
+PlayerList insert(PlayerList L,int sd);
 PlayerList eliminate(int ID,PlayerList L);
-PlayerList search(int ID,,PlayerList L);
+PlayerList search(int ID,PlayerList L);
 void FreeList(PlayerList L);
 
 #define MAX 80
