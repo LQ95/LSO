@@ -16,6 +16,9 @@
 #define CONNECTION_OK 6666
 #define LOGIN_OK 6666
 #define SIGNUP_OK 7777
+#define MOVE_OK 1000
+#define SQUARE_OCCUPIED 1222
+#define ELIMINATED 3805
 //these are codes that the client sends the server 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
