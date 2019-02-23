@@ -76,15 +76,17 @@ int **create_position_map()
 
 int CheckFree(int x,int y,int **position)
 {
-	//WIP
+	if(position[x][y]==0) return 1;
+	else return 0;
 }
 
 int CheckBomb(int[2] coord,int **map)
 {
-	//WIP
+	if(map[coord[0]][coord[1]]==0) return 1;
+	else return 0;
 }
-//WIP
 
+//WIP
 void ServerGame(int **board,PlayerList L)
 {
 	int session_status;
