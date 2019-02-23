@@ -1,48 +1,45 @@
 #include "lib.h"
 
-int main(int argc,char **argv)
+int genseed(int sockfd)
 {
-	Matrix Map;
-	Serverdata GameServer;
-	GameServer=ServerInit();
-	listen(GameServer.sd,1);
-	return 0;
+    //Crea un seed per la tavola di gioco
+    srand(time(NULL));
+    int seed[1];
+    int n;
+    seed[0]=rand();
+    write(sockfd, seed, sizeof(seed));
+    printf("seed: %d\n",seed[0]);
+    return seed[0];
+
 }
 
-void ServerGame(Matrix M,int time,Serverdata Server)
-{
-	int session_status,gametime;
-	gametime=time;
-	//we probably need to have a thread that handles new connections in real time here
-	while(session_status!=SESSION_END)
-	{
-		
-	}
-	
+void print_board(int **board){
+    int i=0;
+    int j=0;
+    for(i=0;i<10;i++){
+        for(j=0;j<10;j++){
+            printf("|%d|",board[i][j]);
+        }
+        printf("\n");
+    }
 }
 
-Serverdata ServerInit()
-{
-	Serverdata data;
-	int sd;
-	struct sockaddr_in ServAddr;
-	//defines a socket and an address for the server,returns the serve data,after setting up the server;
-	ServAddr.sin_family=AF_INET;
-	ServAddr.sin_fport=htons(520);
-	ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	sd=socket(PF_INET,SOCK_STREAM,0);
-	//Server setup here(binding,listening,etc)
-	bind(sd,(struct sockaddr *)&ServAddr,sizeof(ServAddr));
-	data.socket_desc=sd;
-	data.address=ServAddr;
-	return data;	
-}
-
-int Login(char *user,char *psw)
-{
-	//this routine looks up usernames and passwords after having them passed to it from the server
-	//returns 1 if login is successful,otherwise it returns 0
-	
+int **create_board(int seed){
+    int **board=calloc(sizeof(int*),10);
+    int i=0;
+    for(int i=0;i<10;i++){
+        board[i]=calloc(sizeof(int),10);
+    }
+    //inserisco le mine a seconda del seed, 1 nella matrice rappresenta una mina
+    int x=0;
+    int y=0;
+    for(x=0;x<10;x++){
+        for(y=0;y<10;y++)
+                if((seed*x*y)%5==2)
+            board[x][y]=1;
+        }
+    //DEBUG print_board(board);
+    return board;
 }
 
 void ServerLog(char *data)
@@ -56,41 +53,47 @@ void ServerLog(char *data)
 	}
 	close(fd);
 }
-	//This subroutine converts a random number into a binary number,and then generates a vector of zeroes and ones and converta that into a Matrix type map
-Matrix GenerateRandomMap(int height,int width)
+
+int main()
 {
-	Matrix M;
-	int i,j,z=0;
-	M=malloc(height*sizeof(tile*));
-	for(i=0;i<height;i++)
-	{
-		M[i]=malloc(width*sizeof(tile));
-	}
-	srand(time(NULL));
-	int bit,size,seed;
-	int *vec;
-	while (size<height*width)
-		{
-			seed=rand();
-			size=ceil(log2(seed));
-			vec=malloc(size*sizeof(int));
-			for(i=size;i>-1;i--)
-				{
-					bit=1<<i;
-					//select every bit as the cycle goes on
-					bit=bit&seed;
-					if(bit) bit=1;
-					vec[i]=bit;
-				}
-		}
-	
-	for(i=0;i<height;i++)
-	{
-		for(j=0;j<width;j++)
-			{
-				M[i][j].bombflag=vec[z];
-				z++;
-			}
-	}
-	return M;
+    //Creazione della connesione TCP
+    int sockfd, connfd, len;
+    struct sockaddr_in servaddr, cli;
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("Fallita creazione socket\n");
+        exit(0);
+    }
+    else
+        printf("La creazione del socket ha avuto successo..\n");
+    bzero(&servaddr, sizeof(servaddr));
+
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(PORT);
+
+    if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
+        printf("socket bind fallito...\n");
+        exit(0);
+    }
+    else
+        printf("Socket bind ha avuto successo..\n");
+    if ((listen(sockfd, 5)) != 0) {
+        printf("Listen fallito...\n");
+        exit(0);
+    }
+    else
+        printf("Server listening..\n");
+    len = sizeof(cli);
+    connfd = accept(sockfd, (SA*)&cli, &len);
+    if (connfd < 0) {
+        printf("server acccept fallito..\n");
+        exit(0);
+    }
+    else
+        printf("server acccept avvenuto con sucesso...\n");
+    int seed=genseed(connfd);
+    int **board=create_board(seed);
+    close(sockfd);
 }

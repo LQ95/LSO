@@ -1,40 +1,41 @@
-#include "lib.h"
-
-int main(int argc,char **argv)
+void genrcv(int sockfd)
 {
-	int socket,port;
-	char *address;
-	socket=ClientInit();
-	if(argc>2)
-	ConnectToServer(argv[1],socket,argv[2]);
-	else
-	{
-		printf("please insert the IP or hostname,and port for the server you are interested in connecting to.")
-		scanf("%s",address);
-		scanf("%d",&port);
-		ConnectToServer(address,socket,port);
-	}
-	return 0;
+    //riceve il seed dal server per generare la board
+    int buff[MAX];
+    int n;
+    int seed=0;
+    read(sockfd, buff, sizeof(buff));
+    printf("seed: %d\n",buff[0]);
+
 }
 
-int ClientInit()
+int main()
 {
-	int sd;
-	sd=socket(PF_INET,SOCK_STREAM,0);
-	return sd;
-}
+    int sockfd, connfd;
+    struct sockaddr_in servaddr, cli;
 
-void ClientLoginPrompt()
-{
-	
-}
-int ConnectToServer(char *address,int socket,int port)
-{
-	int status
-	struct sockaddr_in ServAddress;
-	ServAddress.sin_family=AF_INET;
-	ServAddress.sin_port=port;
-	inet_aton(address,&ServAddress.sin_address);
-	status=connect(socket,(struct sockaddr *)&ServAddress,sizeof(ServAddress));
-	return status;
+    // socket create and varification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("Creazione del socket falli9ta...\n");
+        exit(0);
+    }
+    else
+        printf("Socket creato con successo..\n");
+    bzero(&servaddr, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    servaddr.sin_port = htons(PORT);
+
+    // connect the client socket to server socket
+    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
+        printf("connessione al server fallita...\n");
+        exit(0);
+    }
+    else
+        printf("connesso al server..\n");
+    genrcv(sockfd);
+    close(sockfd);
 }

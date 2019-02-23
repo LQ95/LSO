@@ -1,21 +1,21 @@
-#ifndef GAME_LIB
-#define GAME_LIB
-#include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
-#include <netinet/ip.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <stdio.h>
 #include <unistd.h>
-#include <pthread.h>
-#include <math.h>
-#include <fcntl.h>
+#include <time.h>
+#include <sys/types.h>
+#include <limits.h>
+#include <stdio.h>
+#include <sys/socket.h>
 
 //these are codes that the server sends the client 
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
 #define LOGIN_OK 6666
 #define SIGNUP_OK 7777
-
 //these are codes that the client sends the server 
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
@@ -24,18 +24,7 @@
 #define NULL_MOVE 3000
 #define LOGIN_REQUEST 4444
 #define SIGNUP_REQUEST 5555
-//this definition might probably need to be modified
-//as it is it's simply used as a return type for the ServerInit function to store server data 
-typedef struct serv{
-	int socket_desc;
-	struct sockaddr_in address;
-}Serverdata;
 
-typedef struct square{
-	int bombflag;
-}tile;
-
-typedef tile **Matrix;
 
 typedef struct P{
 	int position[2];
@@ -50,25 +39,14 @@ typedef struct list{
 	struct list *next;
 }PlayerList;
 
-Matrix GenerateRandomMap(int height,int width);
-void ServerGame(Matrix M,int time);
-void ClientGame(Matrix M);
-void ConnectToServer(char *address);
-void Signup();
-int Login(char *user,char *psw);
-void ClientLoginPrompt();
-void ShowOnline();
-void ShowTime();
-void ShowObstacles();
-void ShowPositions();
-Serverdata ServerInit();
-void ClientInit();
 void ServerLog(char *data);
-
 //PlayerList functions
 PlayerList CreateList();
 PlayerList insert(Player P,PlayerList L);
 PlayerList eliminate(int ID,PlayerList L);
 PlayerList search(int ID,,PlayerList L);
 void FreeList(PlayerList L);
-#endif
+
+#define MAX 80
+#define PORT 8080
+#define SA struct sockaddr
