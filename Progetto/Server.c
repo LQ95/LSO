@@ -106,38 +106,54 @@ void ServerGame(int **board,PlayerList L)
 					
 					case MOVE_LEFT:
 						if(CheckFree(P->position[0]-1,P->position[1],positions))
-							P->position[0]--;
-							positions[P->position[0]][P->position[1]]=P->ID;
+							{
+								P->position[0]--;
+								positions[P->position[0]][P->position[1]]=P->ID;
+							}
 						if(CheckBomb(P->position,board))
-							eliminate(P->ID,L);
-							positions[P->position[0]][P->position[1]]=0;
+							{
+								eliminate(P->ID,L);			
+								positions[P->position[0]][P->position[1]]=0;
+							}
 						break;
 					
 					case MOVE_RIGHT:
 						if(CheckFree(P->position[0]+1,P->position[1],positions))
-							P->position[0]++;
-							positions[P->position[0]][P->position[1]]=P->ID;
+							{
+								P->position[0]++;
+								positions[P->position[0]][P->position[1]]=P->ID;
+							}
 						if(CheckBomb(P->position,board))
-							eliminate(P->ID,L);
-							positions[P->position[0]][P->position[1]]=0;
+							{
+								eliminate(P->ID,L);			
+								positions[P->position[0]][P->position[1]]=0;
+							}
 						break;
 						
 					case MOVE_UP:
 						if(CheckFree(P->position[0],P->position[1]+1,positions))
-							P->position[1]++;
-							positions[P->position[0]][P->position[1]]=P->ID;
+							{
+								P->position[1]++;
+								positions[P->position[0]][P->position[1]]=P->ID;
+							}
 						if(CheckBomb(P->position,board))
-							eliminate(P->ID,L);
-							positions[P->position[0]][P->position[1]]=0;
+							{
+								eliminate(P->ID,L);			
+								positions[P->position[0]][P->position[1]]=0;
+							}
 						break;
 					
 					case MOVE_DOWN:
 						if(CheckFree(P->position[0],P->position[1]-1,positions))
-							P->position[1]--;
-							positions[P->position[0]][P->position[1]]=P->ID;
+							{
+								P->position[1]--;
+								positions[P->position[0]][P->position[1]]=P->ID;
+							{
 						if(CheckBomb(P->position,board))
-							eliminate(P->ID,L);			
-							positions[P->position[0]][P->position[1]]=0;
+							{
+								eliminate(P->ID,L);			
+								positions[P->position[0]][P->position[1]]=0;
+							}
 						break;						
 				}
 				tmp=tmp->next;
