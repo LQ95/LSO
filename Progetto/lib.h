@@ -25,7 +25,7 @@
 #define LOGIN_REQUEST 4444
 #define SIGNUP_REQUEST 5555
 
-
+//the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 typedef struct P{
 	int position[2];
 	int speed;

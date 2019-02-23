@@ -1,5 +1,11 @@
 #include "lib.h"
 
+int Login(char *user,char *psw)
+{
+	//this routine looks up usernames and passwords after having them passed to it from the server
+	//returns 1 if login is successful,otherwise it returns 0
+	
+}
 int genseed(int sockfd)
 {
     //Crea un seed per la tavola di gioco
@@ -52,6 +58,84 @@ void ServerLog(char *data)
 		perror("errore nella compilazione del log");
 	}
 	close(fd);
+}
+//this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
+int **create_position_map()
+{
+	int **positions=calloc(sizeof(int*),10);
+    int i=0;
+    for(int i=0;i<10;i++){
+        positions[i]=calloc(sizeof(int),10);
+    }
+	for(x=0;x<10;x++){
+		for(y=0;y<10;y++)
+						positions[x][y]=0;
+        }
+	return positions;
+}
+
+int CheckFree(int x,int y,int **position)
+{
+	//WIP
+}
+
+int CheckBomb(int[2] coord,int **map)
+{
+	//WIP
+}
+//WIP
+void ServerGame(int **board,PlayerList L)
+{
+	int session_status;
+	PlayerList tmp;
+	PlayerList P;
+	int **positions=create_position_map();
+	int nextmove;
+	while(session_status=SESSION_END)
+	{
+		//There will  be a game initialization subroutine right here later
+		while(tmp!=NULL)
+			{
+				P=tmp;
+				read(P->socket_desc,nextmove,sizeof(int));
+				switch(nextmove)
+				{
+					case NULL_MOVE:
+						break;
+					
+					case MOVE_LEFT:
+						if(CheckFree(P->position[0]-1,P->position[1],positions))
+							P->position[0]--;
+						if(CheckBomb(P->position,board))
+							eliminate(P->ID,L);
+						break;
+					
+					case MOVE_RIGHT:
+						if(CheckFree(P->position[0]+1,P->position[1],positions))
+							P->position[0]++;
+						if(CheckBomb(P->position,board))
+							eliminate(P->ID,L);
+						break;
+						
+					case MOVE_UP:
+						if(CheckFree(P->position[0],P->position[1]+1,positions))
+							P->position[1]++;
+						if(CheckBomb(P->position,board))
+							eliminate(P->ID,L);
+						break;
+					
+					case MOVE_DOWN:
+						if(CheckFree(P->position[0],P->position[1]-1,positions))
+							P->position[1]--;
+						if(CheckBomb(P->position,board))
+							eliminate(P->ID,L);						
+						break;						
+				}
+				tmp=tmp->next;
+			}
+		tmp=L;
+	}
+	
 }
 
 int main()
