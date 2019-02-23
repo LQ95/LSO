@@ -1,3 +1,4 @@
+#include "lib.h"
 void genrcv(int sockfd)
 {
     //riceve il seed dal server per generare la board

@@ -27,7 +27,7 @@
 #define NULL_MOVE 3000
 #define LOGIN_REQUEST 4444
 #define SIGNUP_REQUEST 5555
-
+/*
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 typedef struct P{
 	int position[2];
@@ -49,7 +49,7 @@ PlayerList insert(Player P,PlayerList L);
 PlayerList eliminate(int ID,PlayerList L);
 PlayerList search(int ID,,PlayerList L);
 void FreeList(PlayerList L);
-
+*/
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
