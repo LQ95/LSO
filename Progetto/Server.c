@@ -1,11 +1,11 @@
 #include "lib.h"
 
-int Login(char *user,char *psw)
+/*int Login(char *user,char *psw)
 {
 	//this routine looks up usernames and passwords after having them passed to it from the server
 	//returns 1 if login is successful,otherwise it returns 0
 	
-}
+}*/
 int genseed(int sockfd)
 {
     //Crea un seed per la tavola di gioco
@@ -47,7 +47,7 @@ int **create_board(int seed){
     //DEBUG print_board(board);
     return board;
 }
-
+/*
 void ServerLog(char *data)
 {
 	int fd,size;
@@ -167,7 +167,7 @@ void ServerGame(int **board,PlayerList L)
 	}
 	
 }
-
+*/
 int main()
 {
     //Creazione della connesione TCP
