@@ -90,9 +90,10 @@ int CheckBomb(int coord[2],int **map)
 }
 
 //WIP
+//it basically takes a list of players,and communicates with them for ever move that they make
 void ServerGame(int **board,PlayerList L)
 {
-	int session_status;
+	int session_status,eliminated=0;
 	PlayerList tmp=L;
 	PlayerList P;
 	int **positions=create_position_map();
@@ -129,8 +130,9 @@ void ServerGame(int **board,PlayerList L)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
-								eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
+								eliminated=1;
 							}
 						break;
 					
@@ -151,8 +153,9 @@ void ServerGame(int **board,PlayerList L)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
-								eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
+								eliminated=1;
 							}
 						break;
 						
@@ -173,8 +176,9 @@ void ServerGame(int **board,PlayerList L)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
-								eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
+								eliminated=1;
 							}
 						break;
 					
@@ -195,14 +199,17 @@ void ServerGame(int **board,PlayerList L)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
-								eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
+								eliminated=1;
 							}
 						break;						
 				}
-				tmp=tmp->next;
+				if(eliminated==0)tmp=tmp->next;
+				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one 
 			}
 		tmp=L;
+		if(L==NULL) session_status=SESSION_END;
 	}
 	
 }
