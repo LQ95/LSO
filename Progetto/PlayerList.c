@@ -61,6 +61,7 @@ PlayerList eliminate(int ID,PlayerList L)
 				{
 					tmp=L->next;
 					L->next=tmp->next;
+					close(L->P.socket_desc);
 					free(tmp);
 					return L;
 				}

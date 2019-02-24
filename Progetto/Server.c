@@ -59,6 +59,8 @@ void ServerLog(char *data)
 	}
 	close(fd);
 }
+
+//these subroutines handle the game itself
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
 int **create_position_map()
 {
@@ -96,7 +98,7 @@ void ServerGame(int **board,PlayerList L)
 	int **positions=create_position_map();
 	int nextmove;
 	char buf[1000];
-	while(session_status=SESSION_END)
+	while(session_status!=SESSION_END)
 	{
 		//There will  be a game initialization subroutine right here later
 		while(tmp!=NULL)
@@ -108,15 +110,25 @@ void ServerGame(int **board,PlayerList L)
 				{
 					case NULL_MOVE:
 						break;
-					
+					                                                               
 					case MOVE_LEFT:
 						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions))
 							{
 								P->P.position[0]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+								sprintf(buf, "%d", MOVE_OK);
+								write(P->P.socket_desc,buf,sizeof(int));
 							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,sizeof(int));
+							}
+			
 						if(CheckBomb(P->P.position,board))
 							{
+								sprintf(buf, "%d", ELIMINATED);
+								write(P->P.socket_desc,buf,sizeof(int));
 								eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
@@ -127,9 +139,18 @@ void ServerGame(int **board,PlayerList L)
 							{
 								P->P.position[0]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+								sprintf(buf, "%d", MOVE_OK);
+								write(P->P.socket_desc,buf,sizeof(int));
+							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,sizeof(int));
 							}
 						if(CheckBomb(P->P.position,board))
 							{
+								sprintf(buf, "%d", ELIMINATED);
+								write(P->P.socket_desc,buf,sizeof(int));
 								eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
@@ -140,9 +161,18 @@ void ServerGame(int **board,PlayerList L)
 							{
 								P->P.position[1]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+								sprintf(buf, "%d", MOVE_OK);
+								write(P->P.socket_desc,buf,sizeof(int));
+							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,sizeof(int));
 							}
 						if(CheckBomb(P->P.position,board))
 							{
+								sprintf(buf, "%d", ELIMINATED);
+								write(P->P.socket_desc,buf,sizeof(int));
 								eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
@@ -153,9 +183,18 @@ void ServerGame(int **board,PlayerList L)
 							{
 								P->P.position[1]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+								sprintf(buf, "%d", MOVE_OK);
+								write(P->P.socket_desc,buf,sizeof(int));
+							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,sizeof(int));
 							}
 						if(CheckBomb(P->P.position,board))
 							{
+								sprintf(buf, "%d", ELIMINATED);
+								write(P->P.socket_desc,buf,sizeof(int));
 								eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 							}
