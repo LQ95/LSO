@@ -10,7 +10,6 @@ PlayerList CreateList(int sd,int ID)
 	else IDnumber=ID;
 
 	L->P.ID=IDnumber;
-	L->P.speed=0;
 	L->P.score=0;
 	L->P.position[0]=0;
 	L->P.position[1]=0;

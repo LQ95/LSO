@@ -31,7 +31,6 @@
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 typedef struct P{
 	int position[2];
-	int speed;
 	int score;
 	int ID;
 	int socket_desc;
