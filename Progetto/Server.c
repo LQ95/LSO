@@ -62,30 +62,32 @@ void ServerLog(char *data)
 
 //these subroutines handle the game itself
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
-int **create_position_map()
+int **create_position_map(int width,int height)
 {
     int x,y;
-    int **positions=calloc(sizeof(int*),10);
+    int **positions=calloc(sizeof(int*),height);
     int i=0;
-    for(int i=0;i<10;i++){
-        positions[i]=calloc(sizeof(int),10);
+    for(int i=0;i<height;i++){
+        positions[i]=calloc(sizeof(int),width);
     }
-	for(x=0;x<10;x++){
-		for(y=0;y<10;y++)
+	for(x=0;x<width;x++){
+		for(y=0;y<height;y++)
 						positions[x][y]=0;
         }
 	return positions;
 }
 
-int CheckFree(int x,int y,int **position)
+int CheckFree(int x,int y,int **position,int width,int height)
 {
+	if((x>0 && y>0) && (x<width && y<height))
 	if(position[x][y]==0) return 1;
 	else return 0;
 }
 
 int CheckBomb(int coord[2],int **map)
 {
-	if(map[coord[0]][coord[1]]==0) return 1;
+	
+	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
 
@@ -135,16 +137,17 @@ PlayerList initPlayer(PlayerList L,int **positions)
 
 //WIP
 //it basically takes a list of players,and communicates with them for ever move that they make
-void ServerGame(int **board,PlayerList L)
+//the width and height parameters are meant to be same height and width measurements for the board
+void ServerGame(int **board,PlayerList L,int width, int height)
 {
 	int session_status,eliminated=0;
 	PlayerList tmp=L;
 	PlayerList P;
-	int **positions=create_position_map();
+	int **positions=create_position_map(width,height);
 	int nextmove;
 	char buf[1000];
-	positions=initPositions(L,board,positions,10,10);
-	board=initBombs(positions,board,10,10);
+	positions=initPositions(L,board,positions,width,height);
+	board=initBombs(positions,board,width,height);
 	tmp=initPlayer(L,positions);
 	while(session_status!=SESSION_END)
 	{
@@ -160,7 +163,7 @@ void ServerGame(int **board,PlayerList L)
 						break;
 					                                                               
 					case MOVE_LEFT:
-						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions))
+						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height))
 							{
 								P->P.position[0]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
@@ -184,7 +187,7 @@ void ServerGame(int **board,PlayerList L)
 						break;
 					
 					case MOVE_RIGHT:
-						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions))
+						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height))
 							{
 								P->P.position[0]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
@@ -207,7 +210,7 @@ void ServerGame(int **board,PlayerList L)
 						break;
 						
 					case MOVE_UP:
-						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions))
+						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height))
 							{
 								P->P.position[1]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
@@ -230,7 +233,7 @@ void ServerGame(int **board,PlayerList L)
 						break;
 					
 					case MOVE_DOWN:
-						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions))
+						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height))
 							{
 								P->P.position[1]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;

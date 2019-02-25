@@ -87,7 +87,7 @@ PlayerList search(int IDnumber,PlayerList L)
 int ListSize(PlayerList L)
 {
 		int s=0;
-		Playerlist tmp=L;
+		PlayerList tmp=L;
 		while(L!=NULL)
 		{
 			tmp=tmp->next;
