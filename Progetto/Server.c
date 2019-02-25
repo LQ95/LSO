@@ -124,7 +124,12 @@ int **initBombs(int **board,int **positions,int height,int width)
 PlayerList initPlayer(PlayerList L,int **positions)
 {
 	//tell players their own starting postions
-	
+	int size=ListSize(L);
+	while(size<0)
+	{
+		
+		size --;
+	}
 	return L;
 }
 

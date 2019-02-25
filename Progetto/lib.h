@@ -48,6 +48,7 @@ PlayerList insert(PlayerList L,int sd);
 PlayerList eliminate(int ID,PlayerList L);
 PlayerList search(int ID,PlayerList L);
 void FreeList(PlayerList L);
+int ListSize(PlayerList L);
 
 #define MAX 80
 #define PORT 8080

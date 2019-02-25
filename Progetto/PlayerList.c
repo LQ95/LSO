@@ -84,6 +84,17 @@ PlayerList search(int IDnumber,PlayerList L)
 	else return NULL;
 }
 
+int ListSize(PlayerList L)
+{
+		int s=0;
+		Playerlist tmp=L;
+		while(L!=NULL)
+		{
+			tmp=tmp->next;
+			s++;
+		}
+	return s;
+}
 void FreeList(PlayerList L)
 {
 	PlayerList tmp=L;
