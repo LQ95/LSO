@@ -41,7 +41,14 @@ int main()
     genrcv(sockfd);
     close(sockfd);
 }
+//the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 void ClientGame(int sd,int **board,int **positions)
 {
+	int game_status;
+	game_status=LOGIN_OK;
+	while(game_status!=SESSION_END)
+	{
+		
+	}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 }

@@ -89,6 +89,45 @@ int CheckBomb(int coord[2],int **map)
 	else return 0;
 }
 
+int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
+{
+	//assign starting positions to all players so that they can start the race 
+	PlayerList tmp=L;
+	int x,y; 
+	for(x=0;x<width;x++)
+		{
+			for(y=0;y<height;y++)
+				{
+					if (tmp!=NULL)
+					{
+						//position assignment here
+						tmp=tmp->next;
+					}						
+				}
+		}
+	return positions;
+}
+
+int **initBombs(int **board,int **positions,int height,int width)
+{
+	//repositions bombs after starting player positions have been given
+	int x,y; 
+	for(x=0;x<width;x++)
+		{
+			for(y=0;y<height;y++)
+				{
+					//bomb redistribution here 
+				}
+		}
+	return board;
+}
+PlayerList initPlayer(PlayerList L,int **positions)
+{
+	//tell players their own starting postions
+	
+	return L;
+}
+
 //WIP
 //it basically takes a list of players,and communicates with them for ever move that they make
 void ServerGame(int **board,PlayerList L)
@@ -99,9 +138,12 @@ void ServerGame(int **board,PlayerList L)
 	int **positions=create_position_map();
 	int nextmove;
 	char buf[1000];
+	positions=initPositions(L,board,positions,10,10);
+	board=initBombs(positions,board,10,10);
+	tmp=initPlayer(L,positions);
 	while(session_status!=SESSION_END)
 	{
-		//There will  be a game initialization subroutine right here later
+		
 		while(tmp!=NULL)
 			{
 				P=tmp;
