@@ -41,3 +41,7 @@ int main()
     genrcv(sockfd);
     close(sockfd);
 }
+void ClientGame(int sd,int **board,int **positions)
+{
+	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
+}
