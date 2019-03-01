@@ -142,7 +142,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 {
 	int session_status,eliminated=0;
 	PlayerList tmp=L;
-	PlayerList P;
+	PlayerList P,Dead;
 	int **positions=create_position_map(width,height);
 	int nextmove;
 	char buf[1000];
@@ -180,6 +180,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
@@ -203,6 +204,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
@@ -226,6 +228,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
@@ -249,11 +252,17 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
-						break;						
+						break;	
+				
+					case QUIT:
+						tmp=eliminate_disconnect(P->P.ID,L);
+						eliminated=1;
+						break;
 				}
 				if(eliminated==0)tmp=tmp->next;
 				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one 
@@ -261,7 +270,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 		tmp=L;
 		if(L==NULL) session_status=SESSION_END;
 	}
-	
+
 }
 
 int main()

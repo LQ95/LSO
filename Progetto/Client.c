@@ -46,9 +46,34 @@ void ClientGame(int sd,int **board,int **positions)
 {
 	int game_status;
 	game_status=LOGIN_OK;
+	char input;
+	char buf[BUFDIM];
+	char *answer;
 	while(game_status!=SESSION_END)
 	{
-		
+		switch(input)
+		{
+			case 'w':
+			sprintf(buf, "%d", MOVE_UP);
+			write(sd,buf,BUFDIM);
+			break;
+			
+			case 's':
+			sprintf(buf, "%d", MOVE_DOWN);
+			write(sd,buf,BUFDIM);
+			break;
+			
+			case 'a':
+			sprintf(buf, "%d", MOVE_LEFT);
+			write(sd,buf,BUFDIM);
+			break;
+			
+			case 'd':
+			sprintf(buf, "%d", MOVE_RIGHT);
+			write(sd,buf,BUFDIM);
+			break;
+
+		}
 	}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 }

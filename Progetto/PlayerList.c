@@ -21,18 +21,23 @@ PlayerList CreateList(int sd,int ID)
 //a player is inserted into the list right after connection the the server, so all we know and need is his/her socket descriptor
 PlayerList insert(PlayerList L,int sd)
 {
-	srand(time(NULL));	
-	PlayerList tmp=L;
+	srand(time(NULL));
 	int IDnum=rand();
-	while(tmp->next!=NULL )
-	{
-		tmp=tmp->next;
+	if(L!=NULL)
+	{	
+		PlayerList tmp=L;
+		
+		while(tmp->next!=NULL )
+		{
+			tmp=tmp->next;
+		}
+		while(search(IDnum,L)!=NULL)
+		{
+			IDnum=rand();
+		}
+		tmp->next=CreateList(sd,IDnum);
 	}
-	while(search(IDnum,L)!=NULL)
-	{
-		IDnum=rand();
-	}
-	tmp->next=CreateList(sd,IDnum);
+	else L=CreateList(sd,IDnum);
 	return L;
 }
 
@@ -61,7 +66,6 @@ PlayerList eliminate(int ID,PlayerList L)
 				{
 					tmp=L->next;
 					L->next=tmp->next;
-					close(L->P.socket_desc);
 					free(tmp);
 					return L;
 				}
@@ -71,6 +75,26 @@ PlayerList eliminate(int ID,PlayerList L)
 	return L;
 }
 
+PlayerList eliminate_disconnect(int ID,PlayerList L)
+{
+	if(L!=NULL)
+	{
+		if(L->next!=NULL)
+		{
+			PlayerList tmp;
+			if(L->next->P.ID==ID)
+				{
+					tmp=L->next;
+					L->next=tmp->next;
+					close(L->P.socket_desc);
+					free(tmp);
+					return L;
+				}
+			else return eliminate(ID,L->next);
+		}
+	}
+	return L;
+}
 PlayerList search(int IDnumber,PlayerList L)
 {
 	PlayerList tmp=L;
