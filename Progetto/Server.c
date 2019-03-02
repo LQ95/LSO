@@ -137,6 +137,7 @@ PlayerList initPlayer(PlayerList L,int **positions)
 //WIP
 //it basically takes a list of players,and communicates with them for ever move that they make
 //the width and height parameters are meant to be same height and width measurements for the board
+//PlayerList needs to be compiled and liked to this file for this function to work properly
 void ServerGame(int **board,PlayerList L,int width, int height)
 {
 	int session_status,eliminated=0;

@@ -54,6 +54,7 @@ void ClientGame(int sd,int **board,int **positions)
 	char *answer;
 	while(game_status!=SESSION_END)
 	{
+		input=getchar();
 		switch(input)
 		{
 			case 'w':
@@ -77,7 +78,7 @@ void ClientGame(int sd,int **board,int **positions)
 			break;
 
 		}
-
+	fflush(stdin);
 	}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 }
