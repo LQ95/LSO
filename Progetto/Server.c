@@ -122,14 +122,29 @@ int **initBombs(int **board,int **positions,int height,int width)
 		}
 	return board;
 }
-PlayerList initPlayer(PlayerList L,int **positions)
+PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
 {
 	//tell players their own starting postions
 	int size=ListSize(L);
+	PlayerList tmp;
+	tmp=L;
+	int x,y;
+	x=y=0;
 	while(size<0)
 	{
-		
-		size --;
+		if(x<width && y<height)
+			{
+				positions[x][y]=tmp->P.ID;
+				x=x+2;
+				size --;
+			}
+		else if(y<height)
+			{
+				y++;
+				if (x=width) x=1;
+				else x=0;
+			}
+		else size=-1;
 	}
 	return L;
 }
@@ -148,7 +163,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 	char buf[1000];
 	positions=initPositions(L,board,positions,width,height);
 	board=initBombs(positions,board,width,height);
-	tmp=initPlayer(L,positions);
+	tmp=initPlayer(L,positions,height,width);
 	while(session_status!=SESSION_END)
 	{
 		
@@ -262,6 +277,23 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 					case QUIT:
 						tmp=eliminate_disconnect(P->P.ID,L);
 						eliminated=1;
+						break;
+				}
+				
+				read(P->P.socket_desc,buf,sizeof(int));
+				nextmove=atoi(buf);
+				switch(nextmove)
+				{
+					case DISPLAY_USERS:
+						break;
+						
+					case DISPLAY_USER_LOCATIONS:
+						break;
+						
+					case DISPLAY_USER_DEATHS:
+						break;
+						
+					case NULL_MOVE:
 						break;
 				}
 				if(eliminated==0)tmp=tmp->next;

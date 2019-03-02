@@ -31,8 +31,8 @@
 #define SIGNUP_REQUEST 5555
 #define QUIT 434
 #define DISPLAY_USERS 1343
-#define DISPLAY_USER_LOCATIONS 1343
-#define DISPLAY_USER_DEATHS 1343
+#define DISPLAY_USER_LOCATIONS 1344
+#define DISPLAY_USER_DEATHS 1345
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 typedef struct P{
 	int position[2];
