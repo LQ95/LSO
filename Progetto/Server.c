@@ -179,120 +179,23 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
-<<<<<<< Updated upstream
 								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
-=======
 								tmp=eliminate(P->P.ID,L);
->>>>>>> Stashed changes
+								Dead=insert(Dead,P->P.socket_desc);
+								tmp=eliminate(P->P.ID,L);
+								Dead=insert(Dead,P->P.socket_desc);
+								tmp=eliminate(P->P.ID,L);
+								Dead=insert(Dead,P->P.socket_desc);
+								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
 
-					case MOVE_RIGHT:
-						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height))
-							{
-								P->P.position[0]++;
-								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-								sprintf(buf, "%d", MOVE_OK);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						if(CheckBomb(P->P.position,board))
-							{
-								sprintf(buf, "%d", ELIMINATED);
-								write(P->P.socket_desc,buf,sizeof(int));
-<<<<<<< Updated upstream
-								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
-=======
-								tmp=eliminate(P->P.ID,L);
->>>>>>> Stashed changes
-								positions[P->P.position[0]][P->P.position[1]]=0;
-								eliminated=1;
-							}
-						break;
-
-					case MOVE_UP:
-						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height))
-							{
-								P->P.position[1]++;
-								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-								sprintf(buf, "%d", MOVE_OK);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						if(CheckBomb(P->P.position,board))
-							{
-								sprintf(buf, "%d", ELIMINATED);
-								write(P->P.socket_desc,buf,sizeof(int));
-<<<<<<< Updated upstream
-								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
-=======
-								tmp=eliminate(P->P.ID,L);
->>>>>>> Stashed changes
-								positions[P->P.position[0]][P->P.position[1]]=0;
-								eliminated=1;
-							}
-						break;
-
-					case MOVE_DOWN:
-						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height))
-							{
-								P->P.position[1]--;
-								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-								sprintf(buf, "%d", MOVE_OK);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,sizeof(int));
-							}
-						if(CheckBomb(P->P.position,board))
-							{
-								sprintf(buf, "%d", ELIMINATED);
-								write(P->P.socket_desc,buf,sizeof(int));
-<<<<<<< Updated upstream
-								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
-								positions[P->P.position[0]][P->P.position[1]]=0;
-								eliminated=1;
-							}
-						break;	
-				
 					case QUIT:
 						tmp=eliminate_disconnect(P->P.ID,L);
 						eliminated=1;
-=======
-								tmp=eliminate(P->P.ID,L);
-								positions[P->P.position[0]][P->P.position[1]]=0;
-								eliminated=1;
-							}
->>>>>>> Stashed changes
-						break;
-				}
-				if(eliminated==0)tmp=tmp->next;
-				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
-			}
-		tmp=L;
-		if(L==NULL) session_status=SESSION_END;
-	}
-<<<<<<< Updated upstream
-
-=======
 */
->>>>>>> Stashed changes
 }
 
 int main()
