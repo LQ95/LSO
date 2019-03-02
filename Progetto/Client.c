@@ -39,6 +39,9 @@ int main()
     else
         printf("connesso al server..\n");
     genrcv(sockfd);
+    while(1){
+
+    }
     close(sockfd);
 }
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
@@ -57,23 +60,24 @@ void ClientGame(int sd,int **board,int **positions)
 			sprintf(buf, "%d", MOVE_UP);
 			write(sd,buf,BUFDIM);
 			break;
-			
+
 			case 's':
 			sprintf(buf, "%d", MOVE_DOWN);
 			write(sd,buf,BUFDIM);
 			break;
-			
+
 			case 'a':
 			sprintf(buf, "%d", MOVE_LEFT);
 			write(sd,buf,BUFDIM);
 			break;
-			
+
 			case 'd':
 			sprintf(buf, "%d", MOVE_RIGHT);
 			write(sd,buf,BUFDIM);
 			break;
 
 		}
+
 	}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 }

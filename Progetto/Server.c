@@ -4,16 +4,15 @@ int Login(char *user,char *psw)
 {
 	//this routine looks up usernames and passwords after having them passed to it from the server
 	//returns 1 if login is successful,otherwise it returns 0
-	
+
 }
-int genseed(int sockfd)
+int genseed()
 {
     //Crea un seed per la tavola di gioco
     srand(time(NULL));
     int seed[1];
     int n;
     seed[0]=rand();
-    write(sockfd, seed, sizeof(seed));
     printf("seed: %d\n",seed[0]);
     return seed[0];
 
@@ -86,16 +85,16 @@ int CheckFree(int x,int y,int **position,int width,int height)
 
 int CheckBomb(int coord[2],int **map)
 {
-	
+
 	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
 
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
 {
-	//assign starting positions to all players so that they can start the race 
+	//assign starting positions to all players so that they can start the race
 	PlayerList tmp=L;
-	int x,y; 
+	int x,y;
 	for(x=0;x<width;x++)
 		{
 			for(y=0;y<height;y++)
@@ -104,7 +103,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 					{
 						//position assignment here
 						tmp=tmp->next;
-					}						
+					}
 				}
 		}
 	return positions;
@@ -113,12 +112,12 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 int **initBombs(int **board,int **positions,int height,int width)
 {
 	//repositions bombs after starting player positions have been given
-	int x,y; 
+	int x,y;
 	for(x=0;x<width;x++)
 		{
 			for(y=0;y<height;y++)
 				{
-					//bomb redistribution here 
+					//bomb redistribution here
 				}
 		}
 	return board;
@@ -126,12 +125,12 @@ int **initBombs(int **board,int **positions,int height,int width)
 PlayerList initPlayer(PlayerList L,int **positions)
 {
 	//tell players their own starting postions
-	int size=ListSize(L);
+	/*int size=ListSize(L);
 	while(size<0)
 	{
-		
+
 		size --;
-	}
+	}*/
 	return L;
 }
 
@@ -140,7 +139,7 @@ PlayerList initPlayer(PlayerList L,int **positions)
 //the width and height parameters are meant to be same height and width measurements for the board
 void ServerGame(int **board,PlayerList L,int width, int height)
 {
-	int session_status,eliminated=0;
+	/*int session_status,eliminated=0;
 	PlayerList tmp=L;
 	PlayerList P,Dead;
 	int **positions=create_position_map(width,height);
@@ -151,7 +150,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 	tmp=initPlayer(L,positions);
 	while(session_status!=SESSION_END)
 	{
-		
+
 		while(tmp!=NULL)
 			{
 				P=tmp;
@@ -161,7 +160,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 				{
 					case NULL_MOVE:
 						break;
-					                                                               
+
 					case MOVE_LEFT:
 						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height))
 							{
@@ -175,18 +174,22 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								sprintf(buf, "%d", SQUARE_OCCUPIED);
 								write(P->P.socket_desc,buf,sizeof(int));
 							}
-			
+
 						if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+<<<<<<< Updated upstream
 								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
+=======
+								tmp=eliminate(P->P.ID,L);
+>>>>>>> Stashed changes
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-					
+
 					case MOVE_RIGHT:
 						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height))
 							{
@@ -204,13 +207,17 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+<<<<<<< Updated upstream
 								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
+=======
+								tmp=eliminate(P->P.ID,L);
+>>>>>>> Stashed changes
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-						
+
 					case MOVE_UP:
 						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height))
 							{
@@ -228,13 +235,17 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+<<<<<<< Updated upstream
 								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
+=======
+								tmp=eliminate(P->P.ID,L);
+>>>>>>> Stashed changes
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-					
+
 					case MOVE_DOWN:
 						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height))
 							{
@@ -252,6 +263,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
+<<<<<<< Updated upstream
 								Dead=insert(Dead,P->P.socket_desc);
 								tmp=eliminate(P->P.ID,L);			
 								positions[P->P.position[0]][P->P.position[1]]=0;
@@ -262,21 +274,32 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 					case QUIT:
 						tmp=eliminate_disconnect(P->P.ID,L);
 						eliminated=1;
+=======
+								tmp=eliminate(P->P.ID,L);
+								positions[P->P.position[0]][P->P.position[1]]=0;
+								eliminated=1;
+							}
+>>>>>>> Stashed changes
 						break;
 				}
 				if(eliminated==0)tmp=tmp->next;
-				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one 
+				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
 			}
 		tmp=L;
 		if(L==NULL) session_status=SESSION_END;
 	}
+<<<<<<< Updated upstream
 
+=======
+*/
+>>>>>>> Stashed changes
 }
 
 int main()
 {
     //Creazione della connesione TCP
     int sockfd, connfd, len;
+    int pid;
     struct sockaddr_in servaddr, cli;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -298,7 +321,10 @@ int main()
     }
     else
         printf("Socket bind ha avuto successo..\n");
-    if ((listen(sockfd, 5)) != 0) {
+    int seed[1];
+    seed[0]=genseed();
+    while (1){
+        if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
     }
@@ -310,9 +336,17 @@ int main()
         printf("server acccept fallito..\n");
         exit(0);
     }
-    else
+    else{
         printf("server acccept avvenuto con sucesso...\n");
-    int seed=genseed(connfd);
-    int **board=create_board(seed);
+        if((pid=fork())<0){
+            perror("fork");
+            exit(1);
+        }
+        else if(pid==0){
+            write(connfd, seed, sizeof(seed));
+        }
+    }
+    }
+    int **board=create_board(seed[0]);
     close(sockfd);
 }
