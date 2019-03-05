@@ -47,7 +47,7 @@ int main()
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 void ClientGame(int sd,int **board,int **positions)
 {
-	int game_status;
+	int game_status,displaysize;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
@@ -55,71 +55,79 @@ void ClientGame(int sd,int **board,int **positions)
 	while(game_status!=SESSION_END)
 	{
 		scanf(" %c",&input);
+		while ((getchar()) != '\n'); //this is used to clean stdin
 		switch(input)
 		{
 			case 'w':
 			sprintf(buf, "%d", MOVE_UP);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 
 			case 's':
 			sprintf(buf, "%d", MOVE_DOWN);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 
 			case 'a':
 			sprintf(buf, "%d", MOVE_LEFT);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 
 			case 'd':
 			sprintf(buf, "%d", MOVE_RIGHT);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			case 'm':
 			sprintf(buf, "%d", QUIT);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			case '0':
 			sprintf(buf, "%d", NULL_MOVE);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			default:
 			sprintf(buf, "%d", NULL_MOVE);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 		}
-		fflush(stdin);
+		
 		scanf(" %c",&input);
+		while ((getchar()) != '\n'); 
 		switch(input)
 		{
 			case '1':
 			sprintf(buf, "%d", DISPLAY_USERS);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			case '2':
 			sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			case '3':
 			sprintf(buf, "%d", DISPLAY_USER_DEATHS);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 			
 			
 			default:
 			sprintf(buf, "%d", NULL_MOVE);
-			write(sd,buf,BUFDIM);
+			write(sd,buf,SignalSize);
 			break;
 
 		}
-	fflush(stdin);
-	read(sd,buf,sizeof(int));
+	if(strcmp(buf,"3000")!=0)
+		{
+			read(sd,buf,DisplaySignalSize);
+			displaysize=atoi(buf);
+			read(sd,buf,displaysize) ;
+			printf("%s",buf);
+		}
+	read(sd,buf,SignalSize);
 	game_status=atoi(buf);
 	read(sd,buf,BUFDIM);
 	

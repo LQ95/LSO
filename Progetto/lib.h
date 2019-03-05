@@ -14,6 +14,12 @@
 #include <pthread.h>
 #define BUFDIM 1400
 
+//Signals 
+//keep every single one of these at the same length!
+#define SIGSIZE 4
+#define SignalSize sizeof(char)*SIGSIZE
+#define DISPLAYSIGSIZE 5
+#define DisplaySignalSize sizeof(char)*DISPLAYSIGSIZE
 //these are codes that the server sends the client
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
