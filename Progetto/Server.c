@@ -17,7 +17,17 @@ int genseed()
     return seed[0];
 
 }
+int sendseed(void *arg){
+    int *tmp=arg;
+    int connfd=tmp[0];
+    int seed[1];
+    seed[0]=tmp[1];
+    write(connfd, seed, sizeof(seed));
+    while(1){
 
+    }
+    return 0;
+}
 void print_board(int **board){
     int i=0;
     int j=0;
@@ -85,16 +95,16 @@ int CheckFree(int x,int y,int **position,int width,int height)
 
 int CheckBomb(int coord[2],int **map)
 {
-	
+
 	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
 
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
 {
-	//assign starting positions to all players so that they can start the race 
+	//assign starting positions to all players so that they can start the race
 	PlayerList tmp=L;
-	int x,y; 
+	int x,y;
 	for(x=0;x<width;x++)
 		{
 			for(y=0;y<height;y++)
@@ -103,7 +113,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 					{
 						//position assignment here
 						tmp=tmp->next;
-					}						
+					}
 				}
 		}
 	return positions;
@@ -112,12 +122,12 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 int **initBombs(int **board,int **positions,int height,int width)
 {
 	//repositions bombs after starting player positions have been given
-	int x,y; 
+	int x,y;
 	for(x=0;x<width;x++)
 		{
 			for(y=0;y<height;y++)
 				{
-					//bomb redistribution here 
+					//bomb redistribution here
 				}
 		}
 	return board;
@@ -166,7 +176,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 	tmp=initPlayer(L,positions,height,width);
 	while(session_status!=SESSION_END)
 	{
-		
+
 		while(tmp!=NULL)
 			{
 				P=tmp;
@@ -176,7 +186,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 				{
 					case NULL_MOVE:
 						break;
-					                                                               
+
 					case MOVE_LEFT:
 						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height))
 							{
@@ -190,18 +200,18 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								sprintf(buf, "%d", SQUARE_OCCUPIED);
 								write(P->P.socket_desc,buf,sizeof(int));
 							}
-			
+
 						if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
 								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-					
+
 					case MOVE_RIGHT:
 						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height))
 							{
@@ -220,12 +230,12 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
 								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-						
+
 					case MOVE_UP:
 						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height))
 							{
@@ -244,12 +254,12 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
 								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
 						break;
-					
+
 					case MOVE_DOWN:
 						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height))
 							{
@@ -268,36 +278,36 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,sizeof(int));
 								Dead=insert(Dead,P->P.socket_desc);
-								tmp=eliminate(P->P.ID,L);			
+								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
-						break;	
-				
+						break;
+
 					case QUIT:
 						tmp=eliminate_disconnect(P->P.ID,L);
 						eliminated=1;
 						break;
 				}
-				
+
 				read(P->P.socket_desc,buf,sizeof(int));
 				nextmove=atoi(buf);
 				switch(nextmove)
 				{
 					case DISPLAY_USERS:
 						break;
-						
+
 					case DISPLAY_USER_LOCATIONS:
 						break;
-						
+
 					case DISPLAY_USER_DEATHS:
 						break;
-						
+
 					case NULL_MOVE:
 						break;
 				}
 				if(eliminated==0)tmp=tmp->next;
-				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one 
+				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
 			}
 		tmp=L;
 		if(L==NULL) session_status=SESSION_END;
@@ -310,6 +320,7 @@ int main()
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
+    pthread_t tid;
     struct sockaddr_in servaddr, cli;
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -333,13 +344,14 @@ int main()
         printf("Socket bind ha avuto successo..\n");
     int seed[1];
     seed[0]=genseed();
-    while (1){
-        if ((listen(sockfd, 5)) != 0) {
+    if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
     }
     else
         printf("Server listening..\n");
+    while (1){
+
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
@@ -348,15 +360,14 @@ int main()
     }
     else{
         printf("server acccept avvenuto con sucesso...\n");
-        if((pid=fork())<0){
-            perror("fork");
-            exit(1);
+        int thread_sd[2];
+        thread_sd[0]=connfd;
+        thread_sd[1]=seed[0];
+        printf("%d %d\n",thread_sd[0],thread_sd[1]);
+        pthread_create(&tid,NULL,sendseed,thread_sd);
         }
-        else if(pid==0){
-            write(connfd, seed, sizeof(seed));
-        }
-    }
     }
     int **board=create_board(seed[0]);
     close(sockfd);
+    return 0;
 }

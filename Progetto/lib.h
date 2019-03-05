@@ -11,9 +11,10 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+#include <pthread.h>
 #define BUFDIM 1400
 
-//these are codes that the server sends the client 
+//these are codes that the server sends the client
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
 #define LOGIN_OK 6666
@@ -21,7 +22,7 @@
 #define MOVE_OK 1000
 #define SQUARE_OCCUPIED 1222
 #define ELIMINATED 3805
-//these are codes that the client sends the server 
+//these are codes that the client sends the server
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
 #define MOVE_UP 5100
