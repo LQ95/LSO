@@ -53,7 +53,7 @@ void ClientGame(int sd,int **board,int **positions)
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
-	char *answer;
+	char *answer=calloc(6,sizeof(char));
 	while(game_status!=SESSION_END)
 	{
 		scanf(" %c",&input);
@@ -99,44 +99,45 @@ void ClientGame(int sd,int **board,int **positions)
 			write(sd,buf,SignalSize);
 			break;
 		}
-		
-		scanf(" %c",&input);
-		while ((getchar()) != '\n'); 
-		switch(input)
+		read(sd,buf,SignalSize);
+		game_status=atoi(buf);
+		if(game_status!=ELIMINATED)
 		{
-			case '1':
-			sprintf(buf, "%d", DISPLAY_USERS);
-			write(sd,buf,SignalSize);
-			break;
+			scanf(" %c",&input);
+			while ((getchar()) != '\n'); 
+			switch(input)
+			{
+				case '1':
+				sprintf(buf, "%d", DISPLAY_USERS);
+				write(sd,buf,SignalSize);
+				break;
 			
-			case '2':
-			sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
-			write(sd,buf,SignalSize);
-			break;
+				case '2':
+				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
+				write(sd,buf,SignalSize);
+				break;
 			
-			case '3':
-			sprintf(buf, "%d", DISPLAY_USER_DEATHS);
-			write(sd,buf,SignalSize);
-			break;
+				case '3':
+				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
+				write(sd,buf,SignalSize);
+				break;
 			
 			
-			default:
-			sprintf(buf, "%d", NULL_MOVE);
-			write(sd,buf,SignalSize);
-			break;
+				default:
+				sprintf(buf, "%d", NULL_MOVE);
+				sprintf(answer, "%d", NULL_MOVE);
+				write(sd,buf,SignalSize);
+				break;
 
+			}
+		if(strcmp(answer,"3000")!=0)
+			{
+				read(sd,buf,DisplaySignalSize);
+				displaysize=atoi(buf);
+				read(sd,buf,displaysize) ;
+				printf("%s",buf);
+			}
 		}
-	if(strcmp(buf,"3000")!=0)
-		{
-			read(sd,buf,DisplaySignalSize);
-			displaysize=atoi(buf);
-			read(sd,buf,displaysize) ;
-			printf("%s",buf);
-		}
-	read(sd,buf,SignalSize);
-	game_status=atoi(buf);
-	read(sd,buf,BUFDIM);
-	
 	}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 }

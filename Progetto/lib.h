@@ -23,7 +23,7 @@
 //these are codes that the server sends the client
 #define SESSION_END 3333
 #define CONNECTION_OK 6666
-#define LOGIN_OK 6666
+#define LOGIN_OK 6767
 #define SIGNUP_OK 7777
 #define MOVE_OK 1000
 #define SQUARE_OCCUPIED 1222

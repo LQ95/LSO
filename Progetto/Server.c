@@ -240,20 +240,14 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 						break;
 
 					case MOVE_LEFT:
-						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height))
+						if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)  && CheckBomb(P->P.position,board)!=0)
 							{
 								P->P.position[0]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 								sprintf(buf, "%d", MOVE_OK);
 								write(P->P.socket_desc,buf,SignalSize);
 							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,SignalSize);
-							}
-
-						if(CheckBomb(P->P.position,board))
+						else if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,SignalSize);
@@ -262,22 +256,24 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,SignalSize);
+								break;
+							}
+
 						break;
 
 					case MOVE_RIGHT:
-						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height))
+						if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 							{
 								P->P.position[0]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 								sprintf(buf, "%d", MOVE_OK);
 								write(P->P.socket_desc,buf,SignalSize);
 							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,SignalSize);
-							}
-						if(CheckBomb(P->P.position,board))
+						else if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,SignalSize);
@@ -286,22 +282,23 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,SignalSize);
+								break;
+							}
 						break;
 
 					case MOVE_UP:
-						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height))
+						if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 							{
 								P->P.position[1]++;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 								sprintf(buf, "%d", MOVE_OK);
 								write(P->P.socket_desc,buf,SignalSize);
 							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,SignalSize);
-							}
-						if(CheckBomb(P->P.position,board))
+						else if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,SignalSize);
@@ -310,22 +307,24 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
 							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,SignalSize);
+								break;
+							}
+
 						break;
 
 					case MOVE_DOWN:
-						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height))
+						if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 							{
 								P->P.position[1]--;
 								positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 								sprintf(buf, "%d", MOVE_OK);
 								write(P->P.socket_desc,buf,SignalSize);
 							}
-						else
-							{
-								sprintf(buf, "%d", SQUARE_OCCUPIED);
-								write(P->P.socket_desc,buf,SignalSize);
-							}
-						if(CheckBomb(P->P.position,board))
+						else if(CheckBomb(P->P.position,board))
 							{
 								sprintf(buf, "%d", ELIMINATED);
 								write(P->P.socket_desc,buf,SignalSize);
@@ -333,6 +332,12 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 								tmp=eliminate(P->P.ID,L);
 								positions[P->P.position[0]][P->P.position[1]]=0;
 								eliminated=1;
+							}
+						else
+							{
+								sprintf(buf, "%d", SQUARE_OCCUPIED);
+								write(P->P.socket_desc,buf,SignalSize);
+								break;
 							}
 						break;
 
@@ -341,38 +346,41 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 						eliminated=1;
 						break;
 				}
-
-				read(P->P.socket_desc,buf,sizeof(int));
-				nextmove=atoi(buf);
-				switch(nextmove)
+				if(eliminated==0)
 				{
-					case DISPLAY_USERS:
-						//we get a string with a variating size from this subroutine
-						displaybuf=display(L,0,NULL,displaybuf);
-						sprintf(displaysize,"%lu",strlen(displaybuf));
+					read(P->P.socket_desc,buf,sizeof(int));
+					nextmove=atoi(buf);
+					switch(nextmove)
+					{
+						case DISPLAY_USERS:
+							//we get a string with a variating size from this subroutine
+							displaybuf=display(L,0,NULL,displaybuf);
+							sprintf(displaysize,"%lu",strlen(displaybuf));
 						// so we calculate it's size and send it back to the client along with the string itself
-						write(P->P.socket_desc,displaysize,DisplaySignalSize);
-						write(P->P.socket_desc,displaybuf,strlen(displaybuf));
-						break;
+							write(P->P.socket_desc,displaysize,DisplaySignalSize);
+							write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+							break;
 
-					case DISPLAY_USER_LOCATIONS:
-						displaybuf=display(L,0,NULL,displaybuf);
-						sprintf(displaysize,"%lu",strlen(displaybuf));
-						write(P->P.socket_desc,displaysize,DisplaySignalSize);
-						write(P->P.socket_desc,displaybuf,strlen(displaybuf));
-						break;
+						case DISPLAY_USER_LOCATIONS:
+							displaybuf=display(L,0,NULL,displaybuf);
+							sprintf(displaysize,"%lu",strlen(displaybuf));
+							write(P->P.socket_desc,displaysize,DisplaySignalSize);
+							write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+							break;
 
-					case DISPLAY_USER_DEATHS:
-						displaybuf=display(L,2,Dead,displaybuf);
-						sprintf(displaysize,"%lu",strlen(displaybuf));
-						write(P->P.socket_desc,displaysize,DisplaySignalSize);
-						write(P->P.socket_desc,displaybuf,strlen(displaybuf));
-						break;
+						case DISPLAY_USER_DEATHS:
+							displaybuf=display(L,2,Dead,displaybuf);
+							sprintf(displaysize,"%lu",strlen(displaybuf));
+							write(P->P.socket_desc,displaysize,DisplaySignalSize);
+							write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+							break;
 
-					case NULL_MOVE:
-						break;
+						case NULL_MOVE:
+							break;
+					}
+
+					tmp=tmp->next;
 				}
-				if(eliminated==0)tmp=tmp->next;
 				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
 			}
 		tmp=L;
