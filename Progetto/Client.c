@@ -45,9 +45,11 @@ int main()
     close(sockfd);
 }
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
+//the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
+//the ID variable is the client's Player ID in the current game(has to be sent from the server)
 void ClientGame(int sd,int **board,int **positions)
 {
-	int game_status,displaysize;
+	int game_status,displaysize,moveflag,ID;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
@@ -60,21 +62,25 @@ void ClientGame(int sd,int **board,int **positions)
 		{
 			case 'w':
 			sprintf(buf, "%d", MOVE_UP);
+			moveflag=0;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 's':
 			sprintf(buf, "%d", MOVE_DOWN);
+			moveflag=1;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 'a':
 			sprintf(buf, "%d", MOVE_LEFT);
+			moveflag=2;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 'd':
 			sprintf(buf, "%d", MOVE_RIGHT);
+			moveflag=3;
 			write(sd,buf,SignalSize);
 			break;
 			
