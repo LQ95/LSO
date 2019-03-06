@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <string.h>
 #define BUFDIM 1400
 
 //Signals 

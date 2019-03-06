@@ -1,5 +1,10 @@
 #include "lib.h"
-
+pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
+struct thread_data{
+    int seed;
+    int connfd;
+    FILE *db;
+};
 int Login(char *user,char *psw)
 {
 	//this routine looks up usernames and passwords after having them passed to it from the server
@@ -17,17 +22,46 @@ int genseed()
     return seed[0];
 
 }
+int login(int connfd){
+    char username[10];
+    char password[10];
+    write(connfd,username,sizeof(username));
+    write(connfd,password,sizeof(password));
+    FILE *fp=fopen("login_credentials.db","r");
+    fscanf(fp,"%s",username);
+    fscanf(fp,"%s",password);
+    fclose(fp);
+    printf("%s\n%s",username,password);
+}
 int sendseed(void *arg){
-    int *tmp=arg;
-    int connfd=tmp[0];
+    struct thread_data *tmp=arg;
+    int connfd=tmp->connfd;
     int seed[1];
-    seed[0]=tmp[1];
-    write(connfd, seed, sizeof(seed));
-    while(1){
-
+    seed[0]=tmp->seed;
+    printf("%d %d\n",connfd,seed[0]);
+    int choice[1];
+    read(connfd,choice,sizeof(choice));
+    //1=login 2=sign up
+    if(choice[0]==2){
+        char username[10];
+        char password[10];
+        read(connfd,username,sizeof(username));
+        read(connfd,password,sizeof(password));
+        pthread_mutex_lock(&sem);
+        FILE *fp=fopen("login_credentials.db","a");
+        fprintf(fp,"%s %s\n",username,password);
+        printf("new user created\n");
+        pthread_mutex_unlock(&sem);
+        fclose(fp);
     }
+    int login_successful=0;
+    while(!login_successful){
+        login_successful=login(connfd);
+    }
+    write(connfd, seed, sizeof(seed));
     return 0;
 }
+
 void print_board(int **board){
     int i=0;
     int j=0;
@@ -129,7 +163,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 
 int **initBombs(int **board,int **positions,int height,int width)
 {
-	//repositions bombs after starting player positions have been given,by eliminating any bombs that might have ended up in 
+	//repositions bombs after starting player positions have been given,by eliminating any bombs that might have ended up in
 	int x,y;
 	for(x=0;x<width;x++)
 		{
@@ -181,7 +215,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		//user list
 		while(tmp!=NULL)
 			{
-			
+
 			sprintf(entry,"Giocatore %d Id:%d \n",i,tmp->P.ID);
 			strcat(data,entry);
 			tmp=tmp->next;
@@ -195,7 +229,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		strcat(data,entry);
 		while(tmp!=NULL)
 			{
-			
+
 			sprintf(entry,"Player %d position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
 			strcat(data,entry);
 			tmp=tmp->next;
@@ -396,7 +430,13 @@ int main()
     int pid;
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
-
+    FILE *db;
+	db=fopen("login_credentials.db","r+");
+	if(!db){
+        printf("nessun utente registrato, creazione database\n");
+        db=fopen("login_credentials.db","w+");
+	}
+	fclose(db);
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
         printf("Fallita creazione socket\n");
@@ -434,11 +474,11 @@ int main()
     }
     else{
         printf("server acccept avvenuto con sucesso...\n");
-        int thread_sd[2];
-        thread_sd[0]=connfd;
-        thread_sd[1]=seed[0];
-        printf("%d %d\n",thread_sd[0],thread_sd[1]);
-        pthread_create(&tid,NULL,sendseed,thread_sd);
+        struct thread_data thread_sd;
+        thread_sd.connfd=connfd;
+        thread_sd.seed=seed[0];
+        //printf("%d %d\n",thread_sd[0],thread_sd[1]);
+        pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
     }
     int **board=create_board(seed[0]);
