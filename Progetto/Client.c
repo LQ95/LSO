@@ -33,10 +33,10 @@ int login2(int connfd){
     char pass[10];
     printf("nome utente: ");
     scanf("%s",username);
-    printf("password": );
+    printf("password:" );
     scanf("%s",pass);
     write(connfd,username,sizeof(username));
-    write(connfd,pass1,sizeof(pass));
+    write(connfd,pass,sizeof(pass));
     read(connfd,succ,sizeof(succ));
     return succ[0];
 }
@@ -177,27 +177,27 @@ void ClientGame(int sd,int **board,int **positions)
 		game_status=atoi(buf);
 		if(game_status!=ELIMINATED)
 		{
-			if (moveflag) position=UpdatePos(position,moveflag);
+			if (position==UpdatePos(position,moveflag));
 			scanf(" %c",&input);
-			while ((getchar()) != '\n'); 
+			while ((getchar()) != '\n');
 			switch(input)
 			{
 				case '1':
 				sprintf(buf, "%d", DISPLAY_USERS);
 				write(sd,buf,SignalSize);
 				break;
-			
+
 				case '2':
 				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
 				write(sd,buf,SignalSize);
 				break;
-			
+
 				case '3':
 				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
 				write(sd,buf,SignalSize);
 				break;
-			
-			
+
+
 				default:
 				sprintf(buf, "%d", NULL_MOVE);
 				sprintf(answer, "%d", NULL_MOVE);
@@ -214,4 +214,5 @@ void ClientGame(int sd,int **board,int **positions)
 			}
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
+}
 }
