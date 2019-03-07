@@ -179,6 +179,7 @@ PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
 	//tell players their own starting postions
 	int size=ListSize(L);
 	PlayerList P;
+	char buf[SIGSIZE];
 	int x,y;
 	x=y=0;
 	while(size<0)
@@ -189,6 +190,10 @@ PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
 				{
 				P->P.position[0]=x;
 				P->P.position[1]=y;
+				sprintf(buf, "%d", x);
+				write(sd,buf,SignalSize);
+				sprintf(buf, "%d", y);
+				write(sd,buf,SignalSize);
 				size--;
 				}
 				x++;

@@ -122,6 +122,10 @@ void ClientGame(int sd,int **board,int **positions)
 	char input;
 	char buf[BUFDIM];
 	char *answer=calloc(6,sizeof(char));
+	read(sd,buf,SignalSize);
+	position[0]=atoi(buf);
+	read(sd,buf,SignalSize);
+	position[1]=atoi(buf);
 	while(game_status!=SESSION_END)
 	{
 		scanf(" %c",&input);
