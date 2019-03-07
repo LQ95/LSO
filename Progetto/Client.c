@@ -177,7 +177,7 @@ void ClientGame(int sd,int **board,int **positions)
 		game_status=atoi(buf);
 		if(game_status!=ELIMINATED)
 		{
-			if (position==UpdatePos(position,moveflag));
+			if (moveflag!=0) position=UpdatePos(position,moveflag);
 			scanf(" %c",&input);
 			while ((getchar()) != '\n');
 			switch(input)
