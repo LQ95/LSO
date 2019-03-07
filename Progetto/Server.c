@@ -1,5 +1,6 @@
 #include "lib.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{
 	PlayerList L;
     int seed;
@@ -134,10 +135,10 @@ int CheckBomb(int coord[2],int **map)
 	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
-int checkWin(PlayerList L,int height,int width)
+int CheckWin(PlayerList L,int height,int width)
 {
-	PlayerList tmp=L;
-	return 0;
+	if(L->P.position[0]==height-1) return 1;
+	else return 0;
 }
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
 {
@@ -225,12 +226,12 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		//user list
 		while(tmp!=NULL)
 			{
-
-			sprintf(entry,"Giocatore %d Id:%d \n",i,tmp->P.ID);
-			strcat(data,entry);
-			tmp=tmp->next;
-			i++;
+				sprintf(entry,"Giocatore %d Id:%d \n",i,tmp->P.ID);
+				strcat(data,entry);
+				tmp=tmp->next;
+				i++;
 			}
+		return data;
 		}
 	else if (flag==1)
 		{
@@ -239,17 +240,26 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		strcat(data,entry);
 		while(tmp!=NULL)
 			{
-
-			sprintf(entry,"Player %d position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
-			strcat(data,entry);
-			tmp=tmp->next;
-			i++;
+				sprintf(entry,"Player %d position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
+				strcat(data,entry);
+				tmp=tmp->next;
+				i++;
 			}
 		return data;
 		}
 	else if (flag==2)
 		{
-		//user deaths
+		sprintf(entry,"User positions \n");
+		strcat(data,entry);
+		tmp=deaths;
+		while(tmp!=NULL)
+			{
+				sprintf(entry,"Player %d, dead at position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
+				strcat(data,entry);
+				tmp=tmp->next;
+				i++;
+			}
+		return data;
 		}
 	else sprintf(data," Error:invalid display function flag");
 	return data;
@@ -260,7 +270,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //PlayerList needs to be compiled and liked to this file for this function to work properly
 void ServerGame(int **board,PlayerList L,int width, int height)
 {
-	int session_status,eliminated=0;
+	int session_status,eliminated=0,gametime;
 	PlayerList tmp=L;
 	PlayerList P,Dead=NULL;
 	int **positions=create_position_map(width,height);
@@ -422,7 +432,7 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 						case NULL_MOVE:
 							break;
 					}
-
+					if (CheckWin(L,height,width)!=0) session_status=SESSION_END;
 					tmp=tmp->next;
 				}
 				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
