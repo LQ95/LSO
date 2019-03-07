@@ -91,12 +91,33 @@ int main()
     }
     close(sockfd);
 }
+
+int *UpdatePos(int *position,int moveflag)
+{
+	if (moveflag==MOVE_UP)
+	{
+		position[1]++;
+	}
+	else if (moveflag==MOVE_DOWN)
+	{
+		position[1]--;
+	}
+	else if (moveflag==MOVE_RIGHT)
+	{
+		position[0]++;
+	}
+	else if (moveflag==MOVE_LEFT)
+	{
+		position[0]--;
+	}
+	return position;
+}
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 void ClientGame(int sd,int **board,int **positions)
 {
-	int game_status,displaysize,moveflag,ID;
+	int game_status,displaysize,moveflag,ID,position[2]={0,0};
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
@@ -109,25 +130,25 @@ void ClientGame(int sd,int **board,int **positions)
 		{
 			case 'w':
 			sprintf(buf, "%d", MOVE_UP);
-			moveflag=0;
+			moveflag=MOVE_UP;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 's':
 			sprintf(buf, "%d", MOVE_DOWN);
-			moveflag=1;
+			moveflag=MOVE_DOWN;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 'a':
 			sprintf(buf, "%d", MOVE_LEFT);
-			moveflag=2;
+			moveflag=MOVE_LEFT;
 			write(sd,buf,SignalSize);
 			break;
 
 			case 'd':
 			sprintf(buf, "%d", MOVE_RIGHT);
-			moveflag=3;
+			moveflag=MOVE_RIGHT;
 			write(sd,buf,SignalSize);
 			break;
 
@@ -138,15 +159,46 @@ void ClientGame(int sd,int **board,int **positions)
 
 			case '0':
 			sprintf(buf, "%d", NULL_MOVE);
+			moveflag=0;
 			write(sd,buf,SignalSize);
 			break;
 
 			default:
 			sprintf(buf, "%d", NULL_MOVE);
+			moveflag=0;
 			write(sd,buf,SignalSize);
 			break;
 		}
-
+		read(sd,buf,SignalSize);
+		game_status=atoi(buf);
+		if(game_status!=ELIMINATED)
+		{
+			if (moveflag) position=UpdatePos(position,moveflag);
+			scanf(" %c",&input);
+			while ((getchar()) != '\n'); 
+			switch(input)
+			{
+				case '1':
+				sprintf(buf, "%d", DISPLAY_USERS);
+				write(sd,buf,SignalSize);
+				break;
+			
+				case '2':
+				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
+				write(sd,buf,SignalSize);
+				break;
+			
+				case '3':
+				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
+				write(sd,buf,SignalSize);
+				break;
+			
+			
+				default:
+				sprintf(buf, "%d", NULL_MOVE);
+				sprintf(answer, "%d", NULL_MOVE);
+				write(sd,buf,SignalSize);
+				break;
 
 			}
 		if(strcmp(answer,"3000")!=0)
