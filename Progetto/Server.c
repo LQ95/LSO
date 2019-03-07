@@ -1,6 +1,7 @@
 #include "lib.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 struct thread_data{
+	PlayerList L;
     int seed;
     int connfd;
     FILE *db;
@@ -482,6 +483,7 @@ int main()
         struct thread_data thread_sd;
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
+		thread_sd.L=CreateList(connfd ,0);;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
