@@ -29,6 +29,7 @@
 #define MOVE_OK 1000
 #define SQUARE_OCCUPIED 1222
 #define ELIMINATED 3805
+#define WIN 3883
 //these are codes that the client sends the server
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000
@@ -37,7 +38,7 @@
 #define NULL_MOVE 3000
 #define LOGIN_REQUEST 4444
 #define SIGNUP_REQUEST 5555
-#define QUIT 434
+#define QUIT 4345
 #define DISPLAY_USERS 1343
 #define DISPLAY_USER_LOCATIONS 1344
 #define DISPLAY_USER_DEATHS 1345

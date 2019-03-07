@@ -134,7 +134,11 @@ int CheckBomb(int coord[2],int **map)
 	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
-
+int checkWin(PlayerList L,int height,int width)
+{
+	PlayerList tmp=L;
+	return 0;
+}
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
 {
 	//assign starting positions to all players so that they can start the race
