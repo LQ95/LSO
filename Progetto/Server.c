@@ -196,9 +196,9 @@ PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
 				P->P.position[0]=x;
 				P->P.position[1]=y;
 				sprintf(buf, "%d", x);
-				write(sd,buf,SignalSize);
+				write(P.P->socket_desc,buf,SignalSize);
 				sprintf(buf, "%d", y);
-				write(sd,buf,SignalSize);
+				write(P.P->socket_desc,buf,SignalSize);
 				size--;
 				}
 				x++;

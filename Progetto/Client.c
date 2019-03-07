@@ -117,7 +117,7 @@ int *UpdatePos(int *position,int moveflag)
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 void ClientGame(int sd,int **board,int **positions)
 {
-	int game_status,displaysize,moveflag,ID,position[2]={0,0};
+	int game_status,displaysize,moveflag,ID,*position;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
