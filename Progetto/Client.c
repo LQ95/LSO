@@ -122,6 +122,7 @@ void ClientGame(int sd,int **board,int **positions)
 	char input;
 	char buf[BUFDIM];
 	char *answer=calloc(6,sizeof(char));
+	position=malloc(sizeof(int)*2);
 	read(sd,buf,SignalSize);
 	position[0]=atoi(buf);
 	read(sd,buf,SignalSize);
