@@ -2,7 +2,9 @@
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{
+	int **posmap;
 	PlayerList L;
+	PlayerList Dead;
     int seed;
     int connfd;
     FILE *db;
@@ -37,7 +39,7 @@ int login(int connfd){
 }
 int sendseed(void *arg){
     struct thread_data *tmp=arg;
-	PlayerList P=tmp.L;
+	PlayerList P=tmp->L;
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
@@ -62,7 +64,6 @@ int sendseed(void *arg){
         login_successful=login(connfd);
     }
     write(connfd, seed, sizeof(seed));
-	int **positions=create_position_map(width,height);
     return 0;
 }
 
@@ -114,6 +115,8 @@ int main()
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
+	int width,height;
+	width=height=10;
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -143,13 +146,18 @@ int main()
     else
         printf("Socket bind ha avuto successo..\n");
     int seed[1];
+	PlayerList Players;        //we declare a list that is shared among every thread that is created after the connection
+	int **positions=create_position_map(width,height);
     seed[0]=genseed();
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
     }
-    else
+    else           //the server sets up the game after the first successful connection
+	{
         printf("Server listening..\n");
+		gametime==rand()%MAXGAMETIME;
+	}
     while (1){
 
     len = sizeof(cli);
@@ -163,7 +171,8 @@ int main()
         struct thread_data thread_sd;
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
-		thread_sd.L=CreateList(connfd ,0);;
+		thread_sd.L=insert(Players,connfd);
+		thread_sd.posmap=positions;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }

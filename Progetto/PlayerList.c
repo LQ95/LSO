@@ -128,4 +128,5 @@ void FreeList(PlayerList L)
 		tmp=tmp->next;
 		free(L);
 	}
+	free(tmp);
 }

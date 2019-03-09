@@ -15,6 +15,7 @@
 #include <string.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
+int gametime; // globaò variable,shared among every thread
 //Signals 
 //keep every single one of these at the same length!
 #define SIGSIZE 4
@@ -65,6 +66,7 @@ PlayerList eliminate_disconnect(int ID,PlayerList L);
 PlayerList search(int ID,PlayerList L);
 void FreeList(PlayerList L);
 int ListSize(PlayerList L);
+
 //ServerGame functions
 int **create_position_map(int width,int height);
 int CheckFree(int x,int y,int **position,int width,int height);
@@ -74,7 +76,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 int **initBombs(int **board,int **positions,int height,int width);
 PlayerList initPlayer(PlayerList L,int **positions,int height,int width);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
-void ServerGame(int **board,int **positions,PlayerList L,int width, int height);
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead);
 
 #define MAX 80
 #define PORT 8080
