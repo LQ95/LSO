@@ -184,7 +184,7 @@ PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
 {
 	//tell players their own starting postions
 	int size=ListSize(L);
-	PlayerList P;
+	PlayerList P=L;
 	char buf[SIGSIZE];
 	int x,y;
 	x=y=0;
@@ -270,20 +270,24 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //PlayerList needs to be compiled and liked to this file for this function to work properly
 void ServerGame(int **board,PlayerList L,int width, int height)
 {
+	srand(time(NULL));
 	int session_status,eliminated=0,gametime;
 	PlayerList tmp=L;
 	PlayerList P,Dead=NULL;
+	gametime=rand()%MAXGAMETIME;
 	int **positions=create_position_map(width,height);
 	int nextmove;
 	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
 	char *displaybuf;
+	//initialization routines
 	positions=initPositions(L,board,positions,width,height);
 	board=initBombs(positions,board,width,height);
 	tmp=initPlayer(L,positions,height,width);
+	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{
 
-		while(tmp!=NULL)
+		while(tmp!=NULL &&session_status!=SESSION_END)
 			{
 				P=tmp;
 				read(P->P.socket_desc,buf,SignalSize);
@@ -432,13 +436,20 @@ void ServerGame(int **board,PlayerList L,int width, int height)
 						case NULL_MOVE:
 							break;
 					}
-					if (CheckWin(L,height,width)!=0) session_status=SESSION_END;
+					if (CheckWin(P,height,width)!=0 || gametime<=0) session_status=SESSION_END;
 					tmp=tmp->next;
+					gametime--;
+					if (gametime<=0) session_status=SESSION_END;
 				}
-				else eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
+				else{
+					eliminated=0;            //the reason for the use of this variable is that when a player gets eliminated the list will automatically point to the next one,so we don't need to refer to the next one
+					gametime--;
+					if (gametime<=0) session_status=SESSION_END;
+				}
 			}
 		tmp=L;
-		if(L==NULL) session_status=SESSION_END;
+		gametime--;
+		if(L==NULL || gametime<=0) session_status=SESSION_END;
 	}
 
 }

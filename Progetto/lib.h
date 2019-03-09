@@ -14,7 +14,7 @@
 #include <pthread.h>
 #include <string.h>
 #define BUFDIM 1400
-
+#define MAXGAMETIME 4000
 //Signals 
 //keep every single one of these at the same length!
 #define SIGSIZE 4
@@ -42,6 +42,7 @@
 #define DISPLAY_USERS 1343
 #define DISPLAY_USER_LOCATIONS 1344
 #define DISPLAY_USER_DEATHS 1345
+#define DISPLAY_REMAINING_TIME 1346
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 typedef struct P{
 	int position[2];

@@ -112,10 +112,24 @@ int *UpdatePos(int *position,int moveflag)
 	}
 	return position;
 }
+
+void print_gamepos(int width,int height,int *position)
+{
+	int x,y;
+	for(x=0;x<width;x++)
+	{
+		for(x=0;x<height;x++)
+		{
+			printf(". ");
+			if(x==position[0] && y==position[1])printf(".■");
+		}
+		printf("\n");
+	}
+}
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
-void ClientGame(int sd,int **board,int **positions)
+void ClientGame(int sd,int width,int height)
 {
 	int game_status,displaysize,moveflag,ID,*position;
 	game_status=LOGIN_OK;
@@ -215,5 +229,6 @@ void ClientGame(int sd,int **board,int **positions)
 			}
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
-}
+	print_gamepos(width,height,position);
+	}
 }
