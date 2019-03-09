@@ -37,6 +37,7 @@ int login(int connfd){
 }
 int sendseed(void *arg){
     struct thread_data *tmp=arg;
+	PlayerList P=tmp.L;
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
@@ -61,6 +62,7 @@ int sendseed(void *arg){
         login_successful=login(connfd);
     }
     write(connfd, seed, sizeof(seed));
+	int **positions=create_position_map(width,height);
     return 0;
 }
 
@@ -268,14 +270,13 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //it basically takes a list of players,and communicates with them for ever move that they make
 //the width and height parameters are meant to be same height and width measurements for the board
 //PlayerList needs to be compiled and liked to this file for this function to work properly
-void ServerGame(int **board,PlayerList L,int width, int height)
+void ServerGame(int **board,int **positions,PlayerList L,int width, int height)
 {
 	srand(time(NULL));
 	int session_status,eliminated=0,gametime;
 	PlayerList tmp=L;
 	PlayerList P,Dead=NULL;
 	gametime=rand()%MAXGAMETIME;
-	int **positions=create_position_map(width,height);
 	int nextmove;
 	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
 	char *displaybuf;
