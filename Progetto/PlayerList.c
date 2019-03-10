@@ -124,7 +124,7 @@ int ListSize(PlayerList L)
 {
 		int s=0;
 		PlayerList tmp=L;
-		while(L!=NULL)
+		while(tmp!=NULL)
 		{
 			tmp=tmp->next;
 			s++;

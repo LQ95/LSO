@@ -13,7 +13,6 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <string.h>
-#include <arpa/inet.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
 int gametime; // globaò variable,shared among every thread
@@ -69,7 +68,7 @@ PlayerList eliminate_disconnect(int ID,PlayerList L);
 PlayerList search(int ID,PlayerList L);
 void FreeList(PlayerList L);
 int ListSize(PlayerList L);
-
+PlayerList searchbySD(int sd,PlayerList L);
 //ServerGame functions
 int **create_position_map(int width,int height);
 int CheckFree(int x,int y,int **position,int width,int height);
