@@ -108,6 +108,19 @@ PlayerList search(int IDnumber,PlayerList L)
 	else return NULL;
 }
 
+PlayerList searchbySD(int sd,PlayerList L)
+{
+	PlayerList tmp=L;
+	int found=0;
+	while(tmp!=NULL &&found==0)
+	{
+		if(tmp->P.socket_desc==sd) found=1;
+		tmp=tmp->next;
+	}
+	if(found) return tmp;
+	else return NULL;
+}
+
 int ListSize(PlayerList L)
 {
 		int s=0;
