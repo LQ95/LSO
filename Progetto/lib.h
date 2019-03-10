@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <string.h>
+#include <arpa/inet.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
 int gametime; // globaò variable,shared among every thread
@@ -58,6 +59,8 @@ typedef struct list{
 }PlayerNode;
 typedef PlayerNode *PlayerList;
 void ServerLog(char *data);
+int **create_board(int seed);
+
 //PlayerList functions
 PlayerList CreateList();
 PlayerList insert(PlayerList L,int sd);
