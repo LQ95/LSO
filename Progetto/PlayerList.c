@@ -5,10 +5,9 @@ PlayerList CreateList(int sd,int ID)
 	srand(time(NULL));
 	PlayerList L;
 	int IDnumber;
-	L=malloc(sizeof(PlayerNode*));
+	L=malloc(sizeof(PlayerNode));
 	if(ID!=0)IDnumber=rand();
 	else IDnumber=ID;
-
 	L->P.ID=IDnumber;
 	L->P.score=0;
 	L->P.position[0]=0;
@@ -22,24 +21,24 @@ PlayerList CreateList(int sd,int ID)
 PlayerList insert(PlayerList L,int sd)
 {
 	srand(time(NULL));
-	int IDnum=rand();
+	int IDnum=rand()%50000;
+	PlayerList tmp=L;
 	if(L!=NULL)
 	{	
-		PlayerList tmp=L;
-		
 		while(tmp->next!=NULL )
 		{
 			tmp=tmp->next;
 		}
 		while(search(IDnum,L)!=NULL)
 		{
-			IDnum=rand();
+			IDnum=IDnum+111;
 		}
 		tmp->next=CreateList(sd,IDnum);
+		return L;
 	}
 	else L=CreateList(sd,IDnum);
 	return L;
-}
+}  
 
 PlayerList insertHead(PlayerList L,int sd)
 {
