@@ -38,9 +38,11 @@ int CheckWin(PlayerList L,int height,int width)
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
 {
 	//assign starting positions to all players so that they can start the race
+	//tell players their own starting postions
 	int size=ListSize(L);
 	PlayerList tmp;
 	tmp=L;
+	char buf[SIGSIZE];
 	int x,y;
 	x=y=0;
 	while(size<0)
@@ -48,8 +50,16 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 		if(x<width && y<height)
 			{
 				positions[x][y]=tmp->P.ID;
+				P->P.position[0]=x;
+				P->P.position[1]=y;
+				printf("arriva qui,scrivo su %d\n",P->P.socket_desc);
+				sprintf(buf, "%d", x);
+				write(P->P.socket_desc,buf,SignalSize);
+				sprintf(buf, "%d", y);
+				write(P->P.socket_desc,buf,SignalSize);
 				x=x+2;
 				size--;
+				tmp=tmp->next;
 			}
 		else if(y<height)
 			{
@@ -74,39 +84,6 @@ int **initBombs(int **board,int **positions,int height,int width)
 				}
 		}
 	return board;
-}
-
-PlayerList initPlayer(PlayerList L,int **positions,int height,int width)
-{
-	//tell players their own starting postions
-	int size=ListSize(L);
-	PlayerList P=L;
-	char buf[SIGSIZE];
-	int x,y;
-	x=y=0;
-	while(size<0)
-	{
-		if(x<width && y<height)
-			{
-				if((P=search(positions[x][y],L))!=NULL)
-				{
-				P->P.position[0]=x;
-				P->P.position[1]=y;
-				sprintf(buf, "%d", x);
-				write(P->P.socket_desc,buf,SignalSize);
-				sprintf(buf, "%d", y);
-				write(P->P.socket_desc,buf,SignalSize);
-				size--;
-				}
-				x++;
-			}
-		else if(y<height)
-			{
-				y++;
-			}
-		else size=-1;
-	}
-	return L;
 }
 
 char *display(PlayerList L,int flag,PlayerList deaths,char *data)

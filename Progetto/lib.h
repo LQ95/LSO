@@ -76,7 +76,6 @@ int CheckBomb(int coord[2],int **map);
 int CheckWin(PlayerList L,int height,int width);
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width);
 int **initBombs(int **board,int **positions,int height,int width);
-PlayerList initPlayer(PlayerList L,int **positions,int height,int width);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead);
 
