@@ -45,14 +45,13 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 	char buf[SIGSIZE];
 	int x,y;
 	x=y=0;
-	while(size<0)
+	while(size>0)
 	{
 		if(x<width && y<height)
 			{
-				positions[x][y]=tmp->P.ID;
+				positions[x][y]=P->P.ID;
 				P->P.position[0]=x;
 				P->P.position[1]=y;
-				printf("arriva qui,scrivo su %d\n",P->P.socket_desc);
 				sprintf(buf, "%d", x);
 				write(P->P.socket_desc,buf,SignalSize);
 				sprintf(buf, "%d", y);
