@@ -192,7 +192,7 @@ void ClientGame(int sd,int width,int height)
 		game_status=atoi(buf);
 		if(game_status!=ELIMINATED)
 		{
-			if (moveflag!=0) position=UpdatePos(position,moveflag);
+			if (moveflag!=0 && game_status!=SQUARE_OCCUPIED) position=UpdatePos(position,moveflag);
 			scanf(" %c",&input);
 			while ((getchar()) != '\n');
 			switch(input)

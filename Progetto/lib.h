@@ -80,6 +80,10 @@ PlayerList initPlayer(PlayerList L,int **positions,int height,int width);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead);
 
+//Client functions 
+int *UpdatePos(int *position,int moveflag);
+void print_gamepos(int width,int height,int *position);
+
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
