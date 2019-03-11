@@ -226,6 +226,7 @@ void ClientGame(int sd,int width,int height)
 				displaysize=atoi(buf);
 				read(sd,buf,displaysize) ;
 				printf("%s",buf);
+				sprintf(answer, "%d", MOVE_OK);
 			}
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
