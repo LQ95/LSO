@@ -166,6 +166,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 				case MOVE_LEFT:
 					if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)  && CheckBomb(P->P.position,board)!=0)
 						{
+							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]--;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
@@ -191,6 +192,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 				case MOVE_RIGHT:
 					if(CheckFree(P->P.position[0]+1,P->P.position[1],positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 						{
+							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]++;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
@@ -216,6 +218,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 				case MOVE_UP:
 					if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 						{
+							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[1]++;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
@@ -241,6 +244,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 				case MOVE_DOWN:
 					if(CheckFree(P->P.position[0],P->P.position[1]-1,positions,width,height)&& CheckBomb(P->P.position,board)!=0)
 						{
+							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[1]--;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
