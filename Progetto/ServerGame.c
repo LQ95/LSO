@@ -112,7 +112,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		strcat(data,entry);
 		while(tmp!=NULL)
 			{
-				sprintf(entry,"Player %d position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
+				sprintf(entry,"Player %d position:%d,%d \n",i,tmp->P.position[0],tmp->P.position[1]);
 				strcat(data,entry);
 				tmp=tmp->next;
 				i++;
@@ -126,7 +126,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		tmp=deaths;
 		while(tmp!=NULL)
 			{
-				sprintf(entry,"Player %d, dead at position:%d,&d \n",i,tmp->P.position[0],tmp->P.position[1]);
+				sprintf(entry,"Player %d, dead at position:%d,%&d \n",i,tmp->P.position[0],tmp->P.position[1]);
 				strcat(data,entry);
 				tmp=tmp->next;
 				i++;
@@ -153,7 +153,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 	//these will be moved somewhere else
 	//positions=initPositions(L,board,positions,width,height);
 	//board=initBombs(positions,board,width,height);
-	//tmp=initPlayer(L,positions,height,width);
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{
