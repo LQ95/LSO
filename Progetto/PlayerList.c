@@ -101,7 +101,7 @@ PlayerList search(int IDnumber,PlayerList L)
 	while(tmp!=NULL &&found==0)
 	{
 		if(tmp->P.ID ==IDnumber) found=1;
-		tmp=tmp->next;
+		else tmp=tmp->next;
 	}
 	if(found) return tmp;
 	else return NULL;
@@ -114,7 +114,7 @@ PlayerList searchbySD(int sd,PlayerList L)
 	while(tmp!=NULL &&found==0)
 	{
 		if(tmp->P.socket_desc==sd) found=1;
-		tmp=tmp->next;
+		else tmp=tmp->next;
 	}
 	if(found) return tmp;
 	else return NULL;
