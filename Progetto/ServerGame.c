@@ -156,7 +156,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{
-		read(P->P.socket_desc,buf,SignalSize);
+		read(P->P.socket_desc,buf,SignalSize);  //leaving a  note for the future.this read() call does not work,because apparently every socket that it is called on is empty,at least in the context of the debugging done so far
 		nextmove=atoi(buf);
 		switch(nextmove)
 			{

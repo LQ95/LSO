@@ -137,7 +137,8 @@ void ClientGame(int sd,int width,int height)
 	char buf[BUFDIM];
 	char *answer=calloc(6,sizeof(char));
 	position=malloc(sizeof(int)*2);
-	read(sd,buf,SignalSize);
+	read(sd,buf,SignalSize); //leaving a  note for the future.this read() call does not work,because apparently every socket that it is called on is empty,at least in the context of the debugging done so far
+	nextmove=atoi(buf);
 	position[0]=atoi(buf);
 	read(sd,buf,SignalSize);
 	position[1]=atoi(buf);
