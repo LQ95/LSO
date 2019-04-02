@@ -131,7 +131,7 @@ void print_gamepos(int width,int height,int *position)
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 void ClientGame(int sd,int width,int height)
 {
-	int game_status,displaysize,moveflag,ID,*position;
+	int game_status,displaysize,moveflag,ID,*position,nextmove;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];

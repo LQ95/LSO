@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <pthread.h>
 #include <string.h>
+#include <arpa/inet.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
 int gametime; // globaò variable,shared among every thread

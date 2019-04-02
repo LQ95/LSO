@@ -40,8 +40,8 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
 	int size=ListSize(L);
-	PlayerList tmp;
-	tmp=L;
+	PlayerList P;
+	P=L;
 	char buf[SIGSIZE];
 	int x,y;
 	x=y=0;
@@ -58,7 +58,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 				write(P->P.socket_desc,buf,SignalSize);
 				x=x+2;
 				size--;
-				tmp=tmp->next;
+				P=P->next;
 			}
 		else if(y<height)
 			{
@@ -126,7 +126,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 		tmp=deaths;
 		while(tmp!=NULL)
 			{
-				sprintf(entry,"Player %d, dead at position:%d,%&d \n",i,tmp->P.position[0],tmp->P.position[1]);
+				sprintf(entry,"Player %d, dead at position:%d,%d \n",i,tmp->P.position[0],tmp->P.position[1]);
 				strcat(data,entry);
 				tmp=tmp->next;
 				i++;
