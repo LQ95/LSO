@@ -274,7 +274,9 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 			}
 		if(eliminated==0)
 			{
-				read(P->P.socket_desc,buf,sizeof(int));
+				sprintf(buf, "%d", LOGIN_OK);
+				write(P->P.socket_desc,buf,SignalSize);
+				read(P->P.socket_desc,buf,SignalSize);
 				nextmove=atoi(buf);
 				switch(nextmove)
 				{
