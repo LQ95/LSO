@@ -161,6 +161,8 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 		switch(nextmove)
 			{
 				case NULL_MOVE:
+					sprintf(buf, "%d", LOGIN_OK);
+					write(P->P.socket_desc,buf,SignalSize);
 					break;
 
 				case MOVE_LEFT:
@@ -271,11 +273,13 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 					tmp=eliminate_disconnect(P->P.ID,L);
 					eliminated=1;
 					break;
+				default:
+					sprintf(buf, "%d", LOGIN_OK);
+					write(P->P.socket_desc,buf,SignalSize);
+					break;
 			}
 		if(eliminated==0)
 			{
-				sprintf(buf, "%d", LOGIN_OK);
-				write(P->P.socket_desc,buf,SignalSize);
 				read(P->P.socket_desc,buf,SignalSize);
 				nextmove=atoi(buf);
 				switch(nextmove)
