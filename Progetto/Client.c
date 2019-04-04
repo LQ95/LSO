@@ -1,96 +1,5 @@
 #include "lib.h"
 #include "scan_int/scan_int.h"
-void genrcv(int sockfd)
-{
-    //riceve il seed dal server per generare la board
-    int buff[1];
-    int seed=0;
-    read(sockfd, buff, sizeof(buff));
-    printf("seed: %d\n",buff[0]);
-
-}
-
-void sign_up(int connfd){
-    char username[10];
-    char pass1[10];
-    char pass2[10];
-    printf("Nome Utente: ");
-    scanf("%s",username);
-    do{
-        printf("Password: ");
-        scanf("%s",pass1);
-        printf("Reinserire Password: ");
-        scanf("%s",pass2);
-    }
-    while((strcmp(pass1,pass2))!=0);
-    write(connfd,username,sizeof(username));
-    write(connfd,pass1,sizeof(pass1));
-    return;
-    }
-int login2(int connfd){
-    int succ[1];
-    char username[10];
-    char pass[10];
-    printf("nome utente: ");
-    scanf("%s",username);
-    printf("password:" );
-    scanf("%s",pass);
-    write(connfd,username,sizeof(username));
-    write(connfd,pass,sizeof(pass));
-    read(connfd,succ,sizeof(succ));
-    return succ[0];
-}
-int login(int connfd){
-    int choice[1];
-    printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
-    choice[0]=scan_int(1,2);
-    write(connfd,choice,sizeof(choice));
-    if(choice[0]==2)
-        sign_up(connfd);
-    else if(choice[0]==1){
-        int succ_login=0;
-        while(!succ_login){
-            succ_login=login2(connfd);
-        }
-    }
-    return 1;
-
-}
-
-int main()
-{
-    int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
-
-    // socket create and varification
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        printf("Creazione del socket fallita...\n");
-        exit(0);
-    }
-    else
-        printf("Socket creato con successo..\n");
-    bzero(&servaddr, sizeof(servaddr));
-
-    // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    servaddr.sin_port = htons(PORT);
-
-    // connect the client socket to server socket
-    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
-        printf("connessione al server fallita...\n");
-        exit(0);
-    }
-    else
-        printf("connesso al server..\n");
-        login(sockfd);
-    //genrcv(sockfd);
-    while(1){
-
-    }
-    close(sockfd);
-}
 
 int *UpdatePos(int *position,int moveflag)
 {
@@ -120,8 +29,8 @@ void print_gamepos(int width,int height,int *position)
 	{
 		for(x=0;x<height;x++)
 		{
-			printf(". ");
 			if(x==position[0] && y==position[1])printf(".■");
+			else printf(". ");
 		}
 		printf("\n");
 	}
@@ -234,3 +143,96 @@ void ClientGame(int sd,int width,int height)
 	print_gamepos(width,height,position);
 	}
 }
+
+void genrcv(int sockfd)
+{
+    //riceve il seed dal server per generare la board
+    int buff[1];
+    int seed=0;
+    read(sockfd, buff, sizeof(buff));
+    printf("seed: %d\n",buff[0]);
+
+}
+
+void sign_up(int connfd){
+    char username[10];
+    char pass1[10];
+    char pass2[10];
+    printf("Nome Utente: ");
+    scanf("%s",username);
+    do{
+        printf("Password: ");
+        scanf("%s",pass1);
+        printf("Reinserire Password: ");
+        scanf("%s",pass2);
+    }
+    while((strcmp(pass1,pass2))!=0);
+    write(connfd,username,sizeof(username));
+    write(connfd,pass1,sizeof(pass1));
+    return;
+    }
+int login2(int connfd){
+    int succ[1];
+    char username[10];
+    char pass[10];
+    printf("nome utente: ");
+    scanf("%s",username);
+    printf("password:" );
+    scanf("%s",pass);
+    write(connfd,username,sizeof(username));
+    write(connfd,pass,sizeof(pass));
+    read(connfd,succ,sizeof(succ));
+    return succ[0];
+}
+int login(int connfd){
+    int choice[1];
+    printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
+    choice[0]=scan_int(1,2);
+    write(connfd,choice,sizeof(choice));
+    if(choice[0]==2)
+        sign_up(connfd);
+    else if(choice[0]==1){
+        int succ_login=0;
+        while(!succ_login){
+            succ_login=login2(connfd);
+        }
+    }
+    return 1;
+
+}
+
+int main()
+{
+    int sockfd, connfd;
+    struct sockaddr_in servaddr, cli;
+
+    // socket create and varification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("Creazione del socket fallita...\n");
+        exit(0);
+    }
+    else
+        printf("Socket creato con successo..\n");
+    bzero(&servaddr, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    servaddr.sin_port = htons(PORT);
+
+    // connect the client socket to server socket
+    if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
+        printf("connessione al server fallita...\n");
+        exit(0);
+    }
+    else
+        printf("connesso al server..\n");
+        login(sockfd);
+    //genrcv(sockfd);
+    while(1){
+
+    }
+    close(sockfd);
+}
+

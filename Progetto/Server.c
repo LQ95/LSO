@@ -38,8 +38,11 @@ int login(int connfd){
     printf("%s\n%s",username,password);
 }
 int sendseed(void *arg){
+	int **board,**positions;
     struct thread_data *tmp=arg;
 	PlayerList P=tmp->L;
+	PlayerList Deaths=tmp->Dead;
+	positions=tmp->posmap;
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
@@ -146,7 +149,7 @@ int main()
     else
         printf("Socket bind ha avuto successo..\n");
     int seed[1];
-	PlayerList Players;        //we declare a list that is shared among every thread that is created after the connection
+	PlayerList Players,Deaths;        //we declare a list that is shared among every thread that is created after the connection
 	int **positions=create_position_map(width,height);
     seed[0]=genseed();
     if ((listen(sockfd, 5)) != 0) {
@@ -172,6 +175,7 @@ int main()
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
 		thread_sd.L=insert(Players,connfd);
+		thread_sd.Dead=Deaths;
 		thread_sd.posmap=positions;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
