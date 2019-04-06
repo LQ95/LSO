@@ -37,7 +37,7 @@ int login(int connfd){
     fclose(fp);
     printf("%s\n%s",username,password);
 }
-int sendseed(void *arg){
+void *sendseed(void *arg){
 	int **board,**positions;
     struct thread_data *tmp=arg;
 	PlayerList P=tmp->L;
@@ -67,7 +67,6 @@ int sendseed(void *arg){
         login_successful=login(connfd);
     }
     write(connfd, seed, sizeof(seed));
-    return 0;
 }
 
 void print_board(int **board){
