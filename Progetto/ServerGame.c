@@ -79,7 +79,12 @@ int **initBombs(int **board,int **positions,int height,int width)
 		{
 			for(y=0;y<height;y++)
 				{
-					if (positions[x][y]!=0) board[x][y]=0;
+					if (positions[x][y]!=0) 
+						{
+						board[x][y]=0;
+						if(x<width-1) board[x+1][y]=0;
+						if(y<height-1)board[x][y+1]=0;						
+						}
 				}
 		}
 	return board;
@@ -173,6 +178,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
+							break;
 						}
 					else if(CheckBomb(P->P.position,board)==0)
 						{
@@ -182,6 +188,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							eliminated=1;
+							break;
 						}
 					else
 						{
@@ -199,6 +206,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
+							break;
 						}
 					else if(CheckBomb(P->P.position,board)==0)
 						{
@@ -208,6 +216,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							eliminated=1;
+							break;
 						}
 					else
 						{
@@ -225,6 +234,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
+							break;
 						}
 					else if(CheckBomb(P->P.position,board)==0)
 						{
@@ -234,6 +244,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							eliminated=1;
+							break;
 						}
 					else
 						{
@@ -251,6 +262,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
+							break;
 						}
 					else if(CheckBomb(P->P.position,board)==0)
 						{
@@ -260,6 +272,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							eliminated=1;
+							break;
 						}
 					else
 						{

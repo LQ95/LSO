@@ -110,16 +110,19 @@ void ClientGame(int sd,int width,int height)
 			{
 				case '1':
 				sprintf(buf, "%d", DISPLAY_USERS);
+				sprintf(answer, "%d", DISPLAY_USERS);
 				write(sd,buf,SignalSize);
 				break;
 
 				case '2':
 				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
+				sprintf(answer, "%d", DISPLAY_USER_LOCATIONS);
 				write(sd,buf,SignalSize);
 				break;
 
 				case '3':
 				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
+				sprintf(answer, "%d", DISPLAY_USER_DEATHS);
 				write(sd,buf,SignalSize);
 				break;
 
@@ -140,6 +143,7 @@ void ClientGame(int sd,int width,int height)
 				sprintf(answer, "%d", MOVE_OK);
 			}
 		}
+		else game_status=SESSIOM_END;
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	print_gamepos(width,height,position);
 	}
