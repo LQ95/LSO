@@ -19,7 +19,7 @@ int **create_position_map(int width,int height)
 
 int CheckFree(int x,int y,int **position,int width,int height)
 {
-	if((x>0 && y>0) && (x<width && y<height))
+	if((x>=0 && y>=0) && (x<width && y<height))
 	if(position[x][y]==0) return 1;
 	else return 0;
 }
@@ -294,7 +294,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 						break;
 
 					case DISPLAY_USER_LOCATIONS:
-						displaybuf=display(L,0,NULL,displaybuf);
+						displaybuf=display(L,1,NULL,displaybuf);
 						sprintf(displaysize,"%lu",strlen(displaybuf));
 						write(P->P.socket_desc,displaysize,DisplaySignalSize);
 						write(P->P.socket_desc,displaybuf,strlen(displaybuf));

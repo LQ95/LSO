@@ -40,19 +40,19 @@ void print_gamepos(int width,int height,int *position)
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 void ClientGame(int sd,int width,int height)
 {
-	int game_status,displaysize,moveflag,ID,*position,nextmove;
+	int game_status,displaysize,moveflag,ID,*position;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
 	char *answer=calloc(6,sizeof(char));
 	position=malloc(sizeof(int)*2);
 	read(sd,buf,SignalSize); //leaving a  note for the future.this read() call does not work,because apparently every socket that it is called on is empty,at least in the context of the debugging done so far
-	nextmove=atoi(buf);
 	position[0]=atoi(buf);
 	read(sd,buf,SignalSize);
 	position[1]=atoi(buf);
 	while(game_status!=SESSION_END)
 	{
+		printf("\nnext move:");
 		scanf(" %c",&input);
 		while ((getchar()) != '\n'); //this is used to clean stdin
 		switch(input)
@@ -102,6 +102,7 @@ void ClientGame(int sd,int width,int height)
 		game_status=atoi(buf);
 		if(game_status!=ELIMINATED)
 		{
+			printf("\ndisplay options:");
 			if (moveflag!=0 && game_status!=SQUARE_OCCUPIED) position=UpdatePos(position,moveflag);
 			scanf(" %c",&input);
 			while ((getchar()) != '\n');
