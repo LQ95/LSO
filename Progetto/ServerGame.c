@@ -174,7 +174,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
 						}
-					else if(CheckBomb(P->P.position,board))
+					else if(CheckBomb(P->P.position,board)==0)
 						{
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
@@ -200,7 +200,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
 						}
-					else if(CheckBomb(P->P.position,board))
+					else if(CheckBomb(P->P.position,board)==0)
 						{
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
@@ -226,7 +226,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
 						}
-					else if(CheckBomb(P->P.position,board))
+					else if(CheckBomb(P->P.position,board)==0)
 						{
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
@@ -252,7 +252,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", MOVE_OK);
 							write(P->P.socket_desc,buf,SignalSize);
 						}
-					else if(CheckBomb(P->P.position,board))
+					else if(CheckBomb(P->P.position,board)==0)
 						{
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
