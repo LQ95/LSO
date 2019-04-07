@@ -46,6 +46,7 @@ void *sendseed(void *arg){
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
+	insert(P,connfd);
     printf("%d %d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
@@ -151,6 +152,7 @@ int main()
 	PlayerList Players,Deaths;        //we declare a list that is shared among every thread that is created after the connection
 	int **positions=create_position_map(width,height);
     seed[0]=genseed();
+	int **board=create_board(seed[0]);
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
@@ -173,14 +175,13 @@ int main()
         struct thread_data thread_sd;
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
-		thread_sd.L=insert(Players,connfd);
+		thread_sd.L=Players;
 		thread_sd.Dead=Deaths;
 		thread_sd.posmap=positions;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
     }
-    int **board=create_board(seed[0]);
     close(sockfd);
     return 0;
 }
