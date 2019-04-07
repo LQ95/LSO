@@ -46,7 +46,6 @@ void *sendseed(void *arg){
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
-	insert(P,connfd);
     printf("%d %d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
@@ -170,6 +169,7 @@ int main()
         printf("server acccept fallito..\n");
         exit(0);
     }
+	Player=insert(P,connfd);
     else{
         printf("server acccept avvenuto con sucesso...\n");
         struct thread_data thread_sd;
