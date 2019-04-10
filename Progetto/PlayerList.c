@@ -116,7 +116,7 @@ PlayerList searchbySD(int sd,PlayerList L)
 		if(tmp->P.socket_desc==sd) found=1;
 		else tmp=tmp->next;
 	}
-	if(found) return tmp;
+	if(found==1) return tmp;
 	else return NULL;
 }
 

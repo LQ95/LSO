@@ -147,7 +147,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //PlayerList needs to be compiled and linked to this file for this function to work properly
 //L is the PlayerList shared among ALL threads
 //P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead)
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead,int *GameTime)
 {
 	int session_status,eliminated=0;
 	PlayerList tmp=L;
@@ -185,8 +185,8 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
 							Dead=insert(Dead,P->P.socket_desc);
-							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
+							tmp=eliminate(P->P.ID,L);
 							eliminated=1;
 							break;
 						}
@@ -213,8 +213,8 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
 							Dead=insert(Dead,P->P.socket_desc);
-							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
+							tmp=eliminate(P->P.ID,L);
 							eliminated=1;
 							break;
 						}
@@ -241,8 +241,8 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
 							Dead=insert(Dead,P->P.socket_desc);
-							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
+							tmp=eliminate(P->P.ID,L);
 							eliminated=1;
 							break;
 						}
@@ -269,8 +269,8 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 							sprintf(buf, "%d", ELIMINATED);
 							write(P->P.socket_desc,buf,SignalSize);
 							Dead=insert(Dead,P->P.socket_desc);
-							tmp=eliminate(P->P.ID,L);
 							positions[P->P.position[0]][P->P.position[1]]=0;
+							tmp=eliminate(P->P.ID,L);
 							eliminated=1;
 							break;
 						}
@@ -323,9 +323,9 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,in
 					case NULL_MOVE:
 						break;
 				}
-				if (CheckWin(P,height,width)!=0 || gametime<=0) session_status=SESSION_END;
-				gametime--;
-				if (gametime<=0) session_status=SESSION_END;
+				if (CheckWin(P,height,width)!=0 || *GameTime<=0) session_status=SESSION_END;
+				*GameTime--;
+				if (*GameTime<=0) session_status=SESSION_END;
 			}
 		else session_status=SESSION_END;
 				

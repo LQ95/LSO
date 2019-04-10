@@ -16,7 +16,6 @@
 #include <arpa/inet.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
-int gametime; // globaò variable,shared among every thread
 //Signals 
 //keep every single one of these at the same length!
 #define SIGSIZE 4
@@ -78,7 +77,7 @@ int CheckWin(PlayerList L,int height,int width);
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width);
 int **initBombs(int **board,int **positions,int height,int width);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead);
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead,int *GameTime);
 
 //Client functions 
 int *UpdatePos(int *position,int moveflag);

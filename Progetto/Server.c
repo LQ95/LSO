@@ -7,6 +7,7 @@ struct thread_data{
 	PlayerList Dead;
     int seed;
     int connfd;
+	int *GameTime;
     FILE *db;
 };
 int Login(char *user,char *psw)
@@ -39,10 +40,12 @@ int login(int connfd){
 }
 void *sendseed(void *arg){
 	int **board,**positions;
+	int *GlobalGameTime;
     struct thread_data *tmp=arg;
 	PlayerList P=tmp->L;
 	PlayerList Deaths=tmp->Dead;
 	positions=tmp->posmap;
+	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
     int seed[1];
     seed[0]=tmp->seed;
@@ -152,6 +155,7 @@ int main()
 	int **positions=create_position_map(width,height);
     seed[0]=genseed();
 	int **board=create_board(seed[0]);
+	int *GlobalGametime;
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
@@ -159,7 +163,7 @@ int main()
     else           //the server sets up the game after the first successful connection
 	{
         printf("Server listening..\n");
-		gametime==rand()%MAXGAMETIME;
+		*GlobalGametime==rand()%MAXGAMETIME;
 	}
     while (1){
 
