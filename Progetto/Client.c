@@ -143,7 +143,7 @@ void ClientGame(int sd,int width,int height)
 				sprintf(answer, "%d", MOVE_OK);
 			}
 		}
-		else game_status=SESSIOM_END;
+		else game_status=SESSION_END;
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	print_gamepos(width,height,position);
 	}

@@ -173,9 +173,9 @@ int main()
         printf("server acccept fallito..\n");
         exit(0);
     }
-	Player=insert(P,connfd);
     else{
-        printf("server acccept avvenuto con sucesso...\n");
+        printf("server acccept avvenuto con sucsesso...\n");
+	Players=insert(Players,connfd);
         struct thread_data thread_sd;
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
