@@ -163,8 +163,8 @@ int main()
     else           //the server sets up the game after the first successful connection
 	{
         printf("Server listening..\n");
-		*GlobalGametime==rand()%MAXGAMETIME;
 	}
+	*GlobalGametime==rand()%MAXGAMETIME;
     while (1){
 
     len = sizeof(cli);
