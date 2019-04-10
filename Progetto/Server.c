@@ -182,6 +182,7 @@ int main()
 		thread_sd.L=Players;
 		thread_sd.Dead=Deaths;
 		thread_sd.posmap=positions;
+		thread_sd.GameTime=GlobalGametime;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }

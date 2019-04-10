@@ -147,7 +147,7 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //PlayerList needs to be compiled and linked to this file for this function to work properly
 //L is the PlayerList shared among ALL threads
 //P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead,int *GameTime)
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime)
 {
 	int session_status,eliminated=0;
 	PlayerList tmp=L;

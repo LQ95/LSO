@@ -77,7 +77,7 @@ int CheckWin(PlayerList L,int height,int width);
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width);
 int **initBombs(int **board,int **positions,int height,int width);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,int gametime,PlayerList P,PlayerList Dead,int *GameTime);
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime);
 
 //Client functions 
 int *UpdatePos(int *position,int moveflag);
