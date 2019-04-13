@@ -25,6 +25,7 @@ int *UpdatePos(int *position,int moveflag)
 void print_gamepos(int width,int height,int *position)
 {
 	int x,y;
+	printf("x:%d y:%d\n",position[0],position[1]);	
 	for(x=0;x<width;x++)
 	{
 		for(x=0;x<height;x++)
@@ -45,6 +46,7 @@ void ClientGame(int sd,int width,int height)
 	char input;
 	char buf[BUFDIM];
 	char *answer=calloc(6,sizeof(char));
+	char GameOverMsg[35];
 	position=malloc(sizeof(int)*2);
 	read(sd,buf,SignalSize); //leaving a  note for the future.this read() call does not work,because apparently every socket that it is called on is empty,at least in the context of the debugging done so far
 	position[0]=atoi(buf);
@@ -100,7 +102,7 @@ void ClientGame(int sd,int width,int height)
 		}
 		read(sd,buf,SignalSize);
 		game_status=atoi(buf);
-		if(game_status!=ELIMINATED)
+		if(game_status!=ELIMINATED && game_status!=WIN)
 		{
 			printf("\ndisplay options:");
 			if (moveflag!=0 && game_status!=SQUARE_OCCUPIED) position=UpdatePos(position,moveflag);
@@ -147,6 +149,8 @@ void ClientGame(int sd,int width,int height)
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	print_gamepos(width,height,position);
 	}
+//printf("%s",ameOverMsg);
+return;
 }
 
 void genrcv(int sockfd)

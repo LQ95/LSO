@@ -20,7 +20,9 @@ int **create_position_map(int width,int height)
 int CheckFree(int x,int y,int **position,int width,int height)
 {
 	if((x>=0 && y>=0) && (x<width && y<height))
-	if(position[x][y]==0) return 1;
+			{
+				if(position[x][y]==0) return 1;
+			}
 	else return 0;
 }
 
@@ -32,7 +34,7 @@ int CheckBomb(int coord[2],int **map)
 }
 int CheckWin(PlayerList L,int height,int width)
 {
-	if(L->P.position[0]==height-1) return 1;
+	if(L->P.position[0]>=width-1) return 1;
 	else return 0;
 }
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
