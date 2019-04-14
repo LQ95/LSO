@@ -145,11 +145,26 @@ void ClientGame(int sd,int width,int height)
 				sprintf(answer, "%d", MOVE_OK);
 			}
 		}
-		else game_status=SESSION_END;
+		else 
+		{
+			if(game_status==ELIMINATED)
+				{
+					sprintf(GameOverMsg, "\nYou died! \n");
+				}
+			else if(game_status==WIN)
+				{
+					sprintf(GameOverMsg, "\nYou Win! \n");
+				}
+			else
+				{
+					sprintf(GameOverMsg, "\nGame Over \n");
+				}
+			game_status=SESSION_END;
+		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	print_gamepos(width,height,position);
 	}
-//printf("%s",ameOverMsg);
+printf("%s",GameOverMsg);
 return;
 }
 
