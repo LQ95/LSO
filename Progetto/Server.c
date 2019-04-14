@@ -10,12 +10,7 @@ struct thread_data{
 	int *GameTime;
     FILE *db;
 };
-int Login(char *user,char *psw)
-{
-	//this routine looks up usernames and passwords after having them passed to it from the server
-	//returns 1 if login is successful,otherwise it returns 0
 
-}
 int genseed()
 {
     //Crea un seed per la tavola di gioco
@@ -27,17 +22,30 @@ int genseed()
     return seed[0];
 
 }
+
 int login(int connfd){
     char username[10];
     char password[10];
-    write(connfd,username,sizeof(username));
-    write(connfd,password,sizeof(password));
+    char point_user[10];
+    char point_pass[10];
+    read(connfd,username,sizeof(username));
+    read(connfd,password,sizeof(password));
     FILE *fp=fopen("login_credentials.db","r");
-    fscanf(fp,"%s",username);
-    fscanf(fp,"%s",password);
+
+    while(fgets(point_user,sizeof(point_user),fp)) {
+        fgets(point_pass,sizeof(point_pass),fp);
+        point_user[strcspn(point_user, "\n")] = 0;
+        point_pass[strcspn(point_pass, "\n")] = 0;
+        //printf("String: %s compare: %d",point_user,strcmp(username,point_user));
+        if(strcmp(username,point_user)==0 && strcmp(password,point_pass)==0){
+            fclose(fp);
+            return 1;
+            }
+    }
     fclose(fp);
-    printf("%s\n%s",username,password);
+    return 0;
 }
+
 void *sendseed(void *arg){
 	int **board,**positions;
 	int *GlobalGameTime;
@@ -48,28 +56,31 @@ void *sendseed(void *arg){
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
     int seed[1];
+    int login_successful=0;
     seed[0]=tmp->seed;
-    printf("%d %d\n",connfd,seed[0]);
+    //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
     //1=login 2=sign up
     if(choice[0]==2){
         char username[10];
         char password[10];
+        pthread_mutex_lock(&sem);
         read(connfd,username,sizeof(username));
         read(connfd,password,sizeof(password));
-        pthread_mutex_lock(&sem);
         FILE *fp=fopen("login_credentials.db","a");
-        fprintf(fp,"%s %s\n",username,password);
+        fprintf(fp,"%s\n%s\n",username,password);
         printf("new user created\n");
         pthread_mutex_unlock(&sem);
         fclose(fp);
     }
-    int login_successful=0;
-    while(!login_successful){
+    else {
         login_successful=login(connfd);
+        if(login_successful){
+            printf("login avvenuto\n");
+            }
     }
-    write(connfd, seed, sizeof(seed));
+    //write(connfd, seed, sizeof(seed));
 }
 
 void print_board(int **board){
@@ -120,8 +131,8 @@ int main()
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
-	int width,height;
-	width=height=10;
+    int width,height;
+    width=height=10;
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -151,20 +162,13 @@ int main()
     else
         printf("Socket bind ha avuto successo..\n");
     int seed[1];
-	PlayerList Players,Deaths;        //we declare a list that is shared among every thread that is created after the connection
-	int **positions=create_position_map(width,height);
     seed[0]=genseed();
-	int **board=create_board(seed[0]);
-	int *GlobalGametime;
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
     }
-    else           //the server sets up the game after the first successful connection
-	{
+    else
         printf("Server listening..\n");
-	}
-	*GlobalGametime==rand()%MAXGAMETIME;
     while (1){
 
     len = sizeof(cli);
@@ -174,19 +178,26 @@ int main()
         exit(0);
     }
     else{
-        printf("server acccept avvenuto con sucsesso...\n");
-	Players=insert(Players,connfd);
+        printf("server acccept avvenuto con sucesso...\n");
+        PlayerList Players=NULL;
+        PlayerList Deaths=NULL;
+        int **positions=create_position_map(width,height);
+        int **board=create_board(seed[0]);
+        int *GlobalGametime;
         struct thread_data thread_sd;
+        *GlobalGametime==rand()%MAXGAMETIME;
+        Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
-		thread_sd.L=Players;
-		thread_sd.Dead=Deaths;
-		thread_sd.posmap=positions;
-		thread_sd.GameTime=GlobalGametime;
+        thread_sd.L=Players;
+        thread_sd.Dead=Deaths;
+        thread_sd.posmap=positions;
+        thread_sd.GameTime=GlobalGametime;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
     }
+    int **board=create_board(seed[0]);
     close(sockfd);
-    return 0;
+return 0;
 }

@@ -1,173 +1,6 @@
 #include "lib.h"
 #include "scan_int/scan_int.h"
 
-int *UpdatePos(int *position,int moveflag)
-{
-	if (moveflag==MOVE_UP)
-	{
-		position[1]++;
-	}
-	else if (moveflag==MOVE_DOWN)
-	{
-		position[1]--;
-	}
-	else if (moveflag==MOVE_RIGHT)
-	{
-		position[0]++;
-	}
-	else if (moveflag==MOVE_LEFT)
-	{
-		position[0]--;
-	}
-	return position;
-}
-
-void print_gamepos(int width,int height,int *position)
-{
-	int x,y;
-	printf("x:%d y:%d\n",position[0],position[1]);	
-	for(x=0;x<width;x++)
-	{
-		for(x=0;x<height;x++)
-		{
-			if(x==position[0] && y==position[1])printf(".■");
-			else printf(". ");
-		}
-		printf("\n");
-	}
-}
-//the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
-//the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
-//the ID variable is the client's Player ID in the current game(has to be sent from the server)
-void ClientGame(int sd,int width,int height)
-{
-	int game_status,displaysize,moveflag,ID,*position;
-	game_status=LOGIN_OK;
-	char input;
-	char buf[BUFDIM];
-	char *answer=calloc(6,sizeof(char));
-	char GameOverMsg[35];
-	position=malloc(sizeof(int)*2);
-	read(sd,buf,SignalSize); //leaving a  note for the future.this read() call does not work,because apparently every socket that it is called on is empty,at least in the context of the debugging done so far
-	position[0]=atoi(buf);
-	read(sd,buf,SignalSize);
-	position[1]=atoi(buf);
-	while(game_status!=SESSION_END)
-	{
-		printf("\nnext move:");
-		scanf(" %c",&input);
-		while ((getchar()) != '\n'); //this is used to clean stdin
-		switch(input)
-		{
-			case 'w':
-			sprintf(buf, "%d", MOVE_UP);
-			moveflag=MOVE_UP;
-			write(sd,buf,SignalSize);
-			break;
-
-			case 's':
-			sprintf(buf, "%d", MOVE_DOWN);
-			moveflag=MOVE_DOWN;
-			write(sd,buf,SignalSize);
-			break;
-
-			case 'a':
-			sprintf(buf, "%d", MOVE_LEFT);
-			moveflag=MOVE_LEFT;
-			write(sd,buf,SignalSize);
-			break;
-
-			case 'd':
-			sprintf(buf, "%d", MOVE_RIGHT);
-			moveflag=MOVE_RIGHT;
-			write(sd,buf,SignalSize);
-			break;
-
-			case 'm':
-			sprintf(buf, "%d", QUIT);
-			write(sd,buf,SignalSize);
-			break;
-
-			case '0':
-			sprintf(buf, "%d", NULL_MOVE);
-			moveflag=0;
-			write(sd,buf,SignalSize);
-			break;
-
-			default:
-			sprintf(buf, "%d", NULL_MOVE);
-			moveflag=0;
-			write(sd,buf,SignalSize);
-			break;
-		}
-		read(sd,buf,SignalSize);
-		game_status=atoi(buf);
-		if(game_status!=ELIMINATED && game_status!=WIN)
-		{
-			printf("\ndisplay options:");
-			if (moveflag!=0 && game_status!=SQUARE_OCCUPIED) position=UpdatePos(position,moveflag);
-			scanf(" %c",&input);
-			while ((getchar()) != '\n');
-			switch(input)
-			{
-				case '1':
-				sprintf(buf, "%d", DISPLAY_USERS);
-				sprintf(answer, "%d", DISPLAY_USERS);
-				write(sd,buf,SignalSize);
-				break;
-
-				case '2':
-				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
-				sprintf(answer, "%d", DISPLAY_USER_LOCATIONS);
-				write(sd,buf,SignalSize);
-				break;
-
-				case '3':
-				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
-				sprintf(answer, "%d", DISPLAY_USER_DEATHS);
-				write(sd,buf,SignalSize);
-				break;
-
-
-				default:
-				sprintf(buf, "%d", NULL_MOVE);
-				sprintf(answer, "%d", NULL_MOVE);
-				write(sd,buf,SignalSize);
-				break;
-
-			}
-		if(strcmp(answer,"3000")!=0)
-			{
-				read(sd,buf,DisplaySignalSize);
-				displaysize=atoi(buf);
-				read(sd,buf,displaysize) ;
-				printf("%s",buf);
-				sprintf(answer, "%d", MOVE_OK);
-			}
-		}
-		else 
-		{
-			if(game_status==ELIMINATED)
-				{
-					sprintf(GameOverMsg, "\nYou died! \n");
-				}
-			else if(game_status==WIN)
-				{
-					sprintf(GameOverMsg, "\nYou Win! \n");
-				}
-			else
-				{
-					sprintf(GameOverMsg, "\nGame Over \n");
-				}
-			game_status=SESSION_END;
-		}
-	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
-	print_gamepos(width,height,position);
-	}
-printf("%s",GameOverMsg);
-return;
-}
-
 void genrcv(int sockfd)
 {
     //riceve il seed dal server per generare la board
@@ -205,7 +38,7 @@ int login2(int connfd){
     scanf("%s",pass);
     write(connfd,username,sizeof(username));
     write(connfd,pass,sizeof(pass));
-    read(connfd,succ,sizeof(succ));
+    //read(connfd,succ,sizeof(succ));
     return succ[0];
 }
 int login(int connfd){
@@ -217,9 +50,9 @@ int login(int connfd){
         sign_up(connfd);
     else if(choice[0]==1){
         int succ_login=0;
-        while(!succ_login){
+        //while(!succ_login){
             succ_login=login2(connfd);
-        }
+        //}
     }
     return 1;
 
@@ -254,9 +87,8 @@ int main()
         printf("connesso al server..\n");
         login(sockfd);
     //genrcv(sockfd);
-    while(1){
+    /*while(1){
 
-    }
+    }*/
     close(sockfd);
 }
-
