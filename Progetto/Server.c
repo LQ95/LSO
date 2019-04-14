@@ -36,7 +36,6 @@ int login(int connfd){
         fgets(point_pass,sizeof(point_pass),fp);
         point_user[strcspn(point_user, "\n")] = 0;
         point_pass[strcspn(point_pass, "\n")] = 0;
-        //printf("String: %s compare: %d",point_user,strcmp(username,point_user));
         if(strcmp(username,point_user)==0 && strcmp(password,point_pass)==0){
             fclose(fp);
             return 1;
@@ -44,6 +43,20 @@ int login(int connfd){
     }
     fclose(fp);
     return 0;
+}
+
+void sign_up(int connfd){
+    char username[10];
+        char password[10];
+        pthread_mutex_lock(&sem);
+        read(connfd,username,sizeof(username));
+        read(connfd,password,sizeof(password));
+        FILE *fp=fopen("login_credentials.db","a");
+        fprintf(fp,"%s\n%s\n",username,password);
+        printf("new user created\n");
+        pthread_mutex_unlock(&sem);
+        fclose(fp);
+        return;
 }
 
 void *sendseed(void *arg){
@@ -56,31 +69,28 @@ void *sendseed(void *arg){
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
     int seed[1];
-    int login_successful=0;
+    int login_successful[1];
     seed[0]=tmp->seed;
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
     //1=login 2=sign up
     if(choice[0]==2){
-        char username[10];
-        char password[10];
-        pthread_mutex_lock(&sem);
-        read(connfd,username,sizeof(username));
-        read(connfd,password,sizeof(password));
-        FILE *fp=fopen("login_credentials.db","a");
-        fprintf(fp,"%s\n%s\n",username,password);
-        printf("new user created\n");
-        pthread_mutex_unlock(&sem);
-        fclose(fp);
+        sign_up(connfd);
+        sendseed(arg);
     }
     else {
-        login_successful=login(connfd);
-        if(login_successful){
-            printf("login avvenuto\n");
+        do{
+        login_successful[0]=login(connfd);
+        pthread_mutex_lock(&sem);
+        write(connfd,login_successful,sizeof(login_successful));
+        pthread_mutex_unlock(&sem);
             }
+        while(!login_successful[0]);
     }
-    //write(connfd, seed, sizeof(seed));
+    pthread_mutex_lock(&sem);
+    write(connfd, seed, sizeof(seed));
+    pthread_mutex_unlock(&sem);
 }
 
 void print_board(int **board){
@@ -197,7 +207,6 @@ int main()
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
     }
-    int **board=create_board(seed[0]);
     close(sockfd);
 return 0;
 }

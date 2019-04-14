@@ -28,7 +28,7 @@ void sign_up(int connfd){
     write(connfd,pass1,sizeof(pass1));
     return;
     }
-int login2(int connfd){
+int login(int connfd){
     int succ[1];
     char username[10];
     char pass[10];
@@ -38,23 +38,31 @@ int login2(int connfd){
     scanf("%s",pass);
     write(connfd,username,sizeof(username));
     write(connfd,pass,sizeof(pass));
-    //read(connfd,succ,sizeof(succ));
+    read(connfd,succ,sizeof(succ));
     return succ[0];
 }
-int login(int connfd){
+int menu(int connfd){
     int choice[1];
+    int seed[1];
     printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
     choice[0]=scan_int(1,2);
     write(connfd,choice,sizeof(choice));
-    if(choice[0]==2)
+    if(choice[0]==2){
         sign_up(connfd);
+        printf("Nuovo utente Registrato!\n\n");
+        menu(connfd);
+    }
+
     else if(choice[0]==1){
         int succ_login=0;
-        //while(!succ_login){
-            succ_login=login2(connfd);
-        //}
+        succ_login=login(connfd);
+        while(!succ_login){
+            printf("login errato\n");
+            succ_login=login(connfd);
+        }
     }
-    return 1;
+    read(connfd, seed, sizeof(seed));
+    return seed[0];
 
 }
 
@@ -85,10 +93,7 @@ int main()
     }
     else
         printf("connesso al server..\n");
-        login(sockfd);
-    //genrcv(sockfd);
-    /*while(1){
-
-    }*/
+        int seed=menu(sockfd);
+    printf("seed:%d\n", seed);
     close(sockfd);
 }
