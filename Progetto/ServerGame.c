@@ -183,6 +183,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
 									eliminated=1;
+									*GameTime=0;
 								}
 							else 
 								{
@@ -220,6 +221,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
 									eliminated=1;
+									*GameTime=0;
 								}
 							else 
 								{
@@ -257,6 +259,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
 									eliminated=1;
+									*GameTime=0;
 								}
 							else 
 								{
@@ -294,6 +297,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
 									eliminated=1;
+									*GameTime=0;
 								}
 							else 
 								{
