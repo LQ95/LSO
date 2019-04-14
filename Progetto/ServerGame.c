@@ -34,7 +34,7 @@ int CheckBomb(int coord[2],int **map)
 }
 int CheckWin(PlayerList L,int height,int width)
 {
-	if(L->P.position[0]>=width-1) return 1;
+	if(L->P.position[1]>=width-1) return 1;
 	else return 0;
 }
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
