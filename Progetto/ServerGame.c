@@ -42,6 +42,7 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
 	int size=ListSize(L);
+	int nwrite;
 	PlayerList P;
 	P=L;
 	char buf[SIGSIZE];
@@ -55,9 +56,17 @@ int **initPositions(PlayerList L,int **board,int **positions,int height,int widt
 				P->P.position[0]=x;
 				P->P.position[1]=y;
 				sprintf(buf, "%d", x);
-				write(P->P.socket_desc,buf,SignalSize);
+				if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+					{
+						perror("write 1:");
+						exit(-1);
+					}
 				sprintf(buf, "%d", y);
-				write(P->P.socket_desc,buf,SignalSize);
+				if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+					{
+						perror("write 2:");
+						exit(-1);
+					}
 				x=x+2;
 				size--;
 				P=P->next;
@@ -160,6 +169,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 	//these will be moved somewhere else
 	//positions=initPositions(L,board,positions,width,height);
 	//board=initBombs(positions,board,width,height);
+	//printf("entro \n ");
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{

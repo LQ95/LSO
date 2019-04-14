@@ -71,6 +71,7 @@ void *sendseed(void *arg){
     int seed[1];
     int login_successful[1];
     seed[0]=tmp->seed;
+    board=create_board(seed[0]);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
@@ -91,6 +92,9 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd, seed, sizeof(seed));
     pthread_mutex_unlock(&sem);
+    positions=initPositions(P,board,positions,10,10);
+    board=initBombs(board,positions,10,10);
+    ServerGame(board,positions,P,10,10,searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
 void print_board(int **board){
@@ -179,6 +183,10 @@ int main()
     }
     else
         printf("Server listening..\n");
+    PlayerList Players=NULL;
+    PlayerList Deaths=NULL;
+    int **positions=create_position_map(width,height);
+    int *GlobalGametime=malloc(sizeof(int));
     while (1){
 
     len = sizeof(cli);
@@ -188,12 +196,7 @@ int main()
         exit(0);
     }
     else{
-        printf("server acccept avvenuto con sucesso...\n");
-        PlayerList Players=NULL;
-        PlayerList Deaths=NULL;
-        int **positions=create_position_map(width,height);
-        int **board=create_board(seed[0]);
-        int *GlobalGametime;
+        printf("server accept avvenuto con successo...\n");
         struct thread_data thread_sd;
         *GlobalGametime==rand()%MAXGAMETIME;
         Players=insert(Players,connfd);

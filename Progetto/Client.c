@@ -266,5 +266,6 @@ int main()
         printf("connesso al server..\n");
         int seed=menu(sockfd);
     printf("seed:%d\n", seed);
+    ClientGame(sockfd,10,10);
     close(sockfd);
 }
