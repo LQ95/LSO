@@ -25,9 +25,9 @@ void print_gamepos(int width,int height,int *position)
 {
 	int x,y;
         printf("x:%d y:%d\n",position[0],position[1]);
-	for(y=height;y>-1;y--)
+	for(x=0;x<width;x++)
 	{
-		for(x=0;x<width;x++)
+		for(y=0;y<height;y++)
 		{
 			if(x==position[0] && y==position[1])printf(".■");
 			else printf(". ");
