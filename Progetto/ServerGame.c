@@ -375,7 +375,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 					case NULL_MOVE:
 						break;
 				}
-				*GameTime=*GameTime-1;
+				*GameTime=(*GameTime)-1;
 				if (*GameTime<=0) session_status=SESSION_END;
 			}
 		else session_status=SESSION_END;

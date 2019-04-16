@@ -198,7 +198,7 @@ int main()
     else{
         printf("server accept avvenuto con successo...\n");
         struct thread_data thread_sd;
-        *GlobalGametime==rand()%MAXGAMETIME;
+        *GlobalGametime=rand()%MAXGAMETIME;
         Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
