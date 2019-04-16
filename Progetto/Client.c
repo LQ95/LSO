@@ -24,7 +24,7 @@ int *UpdatePos(int *position,int moveflag)
 void print_gamepos(int width,int height,int *position)
 {
 	int x,y;
-        printf("x:%d y:%d\n",position[0],position[1]);		
+        printf("x:%d y:%d\n",position[0],position[1]);
 	for(x=0;x<width;x++)
 	{
 		for(y=0;y<height;y++)
@@ -148,7 +148,7 @@ void ClientGame(int sd,int width,int height)
 				sprintf(answer, "%d", MOVE_OK);
 			}
 		}
-	else 
+	else
 		{
 		if(game_status==ELIMINATED)
 			{
@@ -201,6 +201,7 @@ void sign_up(int connfd){
     }
 int login(int connfd){
     int succ[1];
+    succ[0]=0;
     char username[10];
     char pass[10];
     printf("nome utente: ");
@@ -221,20 +222,15 @@ int menu(int connfd){
     if(choice[0]==2){
         sign_up(connfd);
         printf("Nuovo utente Registrato!\n\n");
-        menu(connfd);
     }
-
-    else if(choice[0]==1){
-        int succ_login=0;
+    int succ_login=0;
+    succ_login=login(connfd);
+    while(!succ_login){
+        printf("login errato\n");
         succ_login=login(connfd);
-        while(!succ_login){
-            printf("login errato\n");
-            succ_login=login(connfd);
         }
-    }
     read(connfd, seed, sizeof(seed));
     return seed[0];
-
 }
 
 int main()

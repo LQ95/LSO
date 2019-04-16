@@ -48,13 +48,11 @@ int login(int connfd){
 void sign_up(int connfd){
     char username[10];
         char password[10];
-        pthread_mutex_lock(&sem);
         read(connfd,username,sizeof(username));
         read(connfd,password,sizeof(password));
         FILE *fp=fopen("login_credentials.db","a");
         fprintf(fp,"%s\n%s\n",username,password);
         printf("new user created\n");
-        pthread_mutex_unlock(&sem);
         fclose(fp);
         return;
 }
@@ -70,6 +68,7 @@ void *sendseed(void *arg){
     int connfd=tmp->connfd;
     int seed[1];
     int login_successful[1];
+    login_successful[0]=0;
     seed[0]=tmp->seed;
     board=create_board(seed[0]);
     //printf("%d%d\n",connfd,seed[0]);
@@ -78,17 +77,14 @@ void *sendseed(void *arg){
     //1=login 2=sign up
     if(choice[0]==2){
         sign_up(connfd);
-        sendseed(arg);
     }
-    else {
-        do{
+    while(!login_successful[0]){
         login_successful[0]=login(connfd);
         pthread_mutex_lock(&sem);
         write(connfd,login_successful,sizeof(login_successful));
         pthread_mutex_unlock(&sem);
             }
-        while(!login_successful[0]);
-    }
+
     pthread_mutex_lock(&sem);
     write(connfd, seed, sizeof(seed));
     pthread_mutex_unlock(&sem);
