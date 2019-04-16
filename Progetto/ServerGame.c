@@ -34,7 +34,7 @@ int CheckBomb(int coord[2],int **map)
 }
 int CheckWin(PlayerList L,int height,int width)
 {
-	if(L->P.position[1]>=width-1) return 1;
+	if(L->P.position[0]>=width-1) return 1;
 	else return 0;
 }
 int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
@@ -156,24 +156,20 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //it basically takes a list of players,and communicates with them for ever move that they make
 //the width and height parameters are meant to be same height and width measurements for the board
 //PlayerList needs to be compiled and linked to this file for this function to work properly
+//the initialization routines(initPositions and initBombs) need to be executed before this function is called
 //L is the PlayerList shared among ALL threads
 //P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime)
 {
-	int session_status,eliminated=0;
+	int session_status,eliminated=0,nread;
 	PlayerList tmp=L;
 	int nextmove;
 	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
 	char *displaybuf;
-	//initialization routines
-	//these will be moved somewhere else
-	//positions=initPositions(L,board,positions,width,height);
-	//board=initBombs(positions,board,width,height);
-	//printf("entro \n ");
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{
-		read(P->P.socket_desc,buf,SignalSize);  
+		nread=read(P->P.socket_desc,buf,SignalSize);  
 		nextmove=atoi(buf);
 		switch(nextmove)
 			{
@@ -183,7 +179,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 					break;
 
 				case MOVE_LEFT:
-					if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)!=0 && CheckBomb(P->P.position,board)!=0)
+					if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)!=0  && CheckBomb(P->P.position,board)!=0)
 						{
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]--;
@@ -345,7 +341,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 			}
 		if(eliminated==0)
 			{
-				read(P->P.socket_desc,buf,SignalSize);
+				nread=read(P->P.socket_desc,buf,SignalSize);
 				nextmove=atoi(buf);
 				switch(nextmove)
 				{
@@ -378,7 +374,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 				*GameTime=(*GameTime)-1;
 				if (*GameTime<=0) session_status=SESSION_END;
 			}
-		else session_status=SESSION_END;
-				
+		else session_status=SESSION_END;			
 	}
 }
