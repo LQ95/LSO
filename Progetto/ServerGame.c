@@ -128,55 +128,70 @@ char * display(PlayerList L, int flag, PlayerList deaths, char * data) {
 //it basically takes a list of players,and communicates with them for ever move that they make
 //the width and height parameters are meant to be same height and width measurements for the board
 //PlayerList needs to be compiled and linked to this file for this function to work properly
-//the initialization routines(initPositions and initBombs) need to be executed before this function is called
 //L is the PlayerList shared among ALL threads
 //P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
-void ServerGame(int ** board, int ** positions, PlayerList L, int width, int height, PlayerList P, PlayerList Dead, int * GameTime) {
-  int session_status, eliminated = 0, nread;
-  PlayerList tmp = L;
-  int nextmove;
-  char buf[BUFDIM], displaysize[DISPLAYSIGSIZE];
-  char * displaybuf;
-  session_status = LOGIN_OK;
-  while (session_status != SESSION_END) {
-    nread = read(P - > P.socket_desc, buf, SignalSize);
-    nextmove = atoi(buf);
-    switch (nextmove) {
-    case NULL_MOVE:
-      sprintf(buf, "%d", LOGIN_OK);
-      write(P - > P.socket_desc, buf, SignalSize);
-      break;
 
-    case MOVE_LEFT:
-      if (CheckFree(P - > P.position[0] - 1, P - > P.position[1], positions, width, height) != 0 && CheckBomb(P - > P.position, board) != 0) {
-        positions[P - > P.position[0]][P - > P.position[1]] = 0;
-        P - > P.position[0]--;
-        positions[P - > P.position[0]][P - > P.position[1]] = P - > P.ID;
-        if (CheckWin(P, height, width) == 1) {
-          sprintf(buf, "%d", WIN);
-          write(P - > P.socket_desc, buf, SignalSize);
-          eliminated = 1;
-          * GameTime = 0;
-        } else {
-          sprintf(buf, "%d", MOVE_OK);
-          write(P - > P.socket_desc, buf, SignalSize);
-        }
-        break;
-      } else if (CheckBomb(P - > P.position, board) == 0) {
-        sprintf(buf, "%d", ELIMINATED);
-        write(P - > P.socket_desc, buf, SignalSize);
-        Dead = insert(Dead, P - > P.socket_desc);
-        positions[P - > P.position[0]][P - > P.position[1]] = 0;
-        tmp = eliminate(P - > P.ID, L);
-        eliminated = 1;
-        break;
-      } else {
-        sprintf(buf, "%d", SQUARE_OCCUPIED);
-        write(P - > P.socket_desc, buf, SignalSize);
-        break;
-      }
-      break;
+void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime)
+{
+	int session_status,eliminated=0;
+	PlayerList tmp=L;
+	int nextmove;
+	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
+	char *displaybuf;
+	//initialization routines
+	//these will be moved somewhere else
+	//positions=initPositions(L,board,positions,width,height);
+	//board=initBombs(positions,board,width,height);
+	//printf("entro \n ");
+	session_status=LOGIN_OK;
+	while(session_status!=SESSION_END)
+	{
+		read(P->P.socket_desc,buf,SignalSize);  
+		nextmove=atoi(buf);
+		switch(nextmove)
+			{
+				case NULL_MOVE:
+					sprintf(buf, "%d", LOGIN_OK);
+					write(P->P.socket_desc,buf,SignalSize);
+					break;
 
+				case MOVE_LEFT:
+					if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)!=0 && CheckBomb(P->P.position,board)!=0)
+						{
+							positions[P->P.position[0]][P->P.position[1]]=0;
+							P->P.position[0]--;
+							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
+							if (CheckWin(P,height,width)==1)
+								{
+									sprintf(buf, "%d", WIN);
+									write(P->P.socket_desc,buf,SignalSize);
+									eliminated=1;
+									*GameTime=0;
+								}
+							else 
+								{
+									sprintf(buf, "%d", MOVE_OK);
+									write(P->P.socket_desc,buf,SignalSize);
+								}
+							break;
+						}
+					else if(CheckBomb(P->P.position,board)==0)
+						{
+							sprintf(buf, "%d", ELIMINATED);
+							write(P->P.socket_desc,buf,SignalSize);
+							Dead=insert(Dead,P->P.socket_desc);
+							positions[P->P.position[0]][P->P.position[1]]=0;
+							tmp=eliminate(P->P.ID,L);
+							eliminated=1;
+							break;
+						}
+					else
+						{
+							sprintf(buf, "%d", SQUARE_OCCUPIED);
+							write(P->P.socket_desc,buf,SignalSize);
+							break;
+						}
+					break;
     case MOVE_RIGHT:
       if (CheckFree(P - > P.position[0] + 1, P - > P.position[1], positions, width, height) != 0 && CheckBomb(P - > P.position, board) != 0) {
         positions[P - > P.position[0]][P - > P.position[1]] = 0;
@@ -267,27 +282,29 @@ void ServerGame(int ** board, int ** positions, PlayerList L, int width, int hei
       }
       break;
 
-    case QUIT:
-      tmp = eliminate_disconnect(P - > P.ID, L);
-      eliminated = 1;
-      break;
-    default:
-      sprintf(buf, "%d", LOGIN_OK);
-      write(P - > P.socket_desc, buf, SignalSize);
-      break;
-    }
-    if (eliminated == 0) {
-      nread = read(P - > P.socket_desc, buf, SignalSize);
-      nextmove = atoi(buf);
-      switch (nextmove) {
-      case DISPLAY_USERS:
-        //we get a string with a variating size from this subroutine
-        displaybuf = display(L, 0, NULL, displaybuf);
-        sprintf(displaysize, "%lu", strlen(displaybuf));
-        // so we calculate it's size and send it back to the client along with the string itself
-        write(P - > P.socket_desc, displaysize, DisplaySignalSize);
-        write(P - > P.socket_desc, displaybuf, strlen(displaybuf));
-        break;
+				case QUIT:
+					tmp=eliminate_disconnect(P->P.ID,L);
+					eliminated=1;
+					break;
+				default:
+					sprintf(buf, "%d", LOGIN_OK);
+					write(P->P.socket_desc,buf,SignalSize);
+					break;
+			}
+		if(eliminated==0)
+			{
+				read(P->P.socket_desc,buf,SignalSize);
+				nextmove=atoi(buf);
+				switch(nextmove)
+				{
+					case DISPLAY_USERS:
+						//we get a string with a variating size from this subroutine
+						displaybuf=display(L,0,NULL,displaybuf);
+						sprintf(displaysize,"%lu",strlen(displaybuf));
+						// so we calculate it's size and send it back to the client along with the string itself
+						write(P->P.socket_desc,displaysize,DisplaySignalSize);
+						write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+						break;
 
       case DISPLAY_USER_LOCATIONS:
         displaybuf = display(L, 1, NULL, displaybuf);
@@ -303,11 +320,13 @@ void ServerGame(int ** board, int ** positions, PlayerList L, int width, int hei
         write(P - > P.socket_desc, displaybuf, strlen(displaybuf));
         break;
 
-      case NULL_MOVE:
-        break;
-      }
-      * GameTime = ( * GameTime) - 1;
-      if ( * GameTime <= 0) session_status = SESSION_END;
-    } else session_status = SESSION_END;
-  }
+					case NULL_MOVE:
+						break;
+				}
+				*GameTime=(*GameTime)-1;
+				if (*GameTime<=0) session_status=SESSION_END;
+			}
+		else session_status=SESSION_END;
+				
+	}
 }
