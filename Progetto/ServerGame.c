@@ -37,68 +37,35 @@ int CheckWin(PlayerList L,int height,int width)
 	if(L->P.position[0]>=width-1) return 1;
 	else return 0;
 }
-int **initPositions(PlayerList L,int **board,int **positions,int height,int width)
+int **initPositions(int **board,int **positions,int height,int width,PlayerList P)
 {
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
-	int size=ListSize(L);
+	srand(time(NULL));	
 	int nwrite;
-	PlayerList P;
-	P=L;
 	char buf[SIGSIZE];
 	int x,y;
-	x=y=0;
-	while(size>0)
-	{
-		if(x<width && y<height)
-			{
-				positions[x][y]=P->P.ID;
-				P->P.position[0]=x;
-				P->P.position[1]=y;
-				sprintf(buf, "%d", x);
-				if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
-					{
-						perror("write 1:");
-						exit(-1);
-					}
-				sprintf(buf, "%d", y);
-				if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
-					{
-						perror("write 2:");
-						exit(-1);
-					}
-				x=x+2;
-				size--;
-				P=P->next;
-			}
-		else if(y<height)
-			{
-				y++;
-				if (x=width) x=1;
-				else x=0;
-			}
-		else size=-1;
-	}
-	return positions;
-}
-
-int **initBombs(int **board,int **positions,int height,int width)
-{
-	//repositions bombs after starting player positions have been given,by eliminating any bombs that might have ended up in
-	int x,y;
-	for(x=0;x<width;x++)
+	x=0;
+	y=rand()%height;
+	positions[x][y]=P->P.ID;
+	P->P.position[0]=x;
+	P->P.position[1]=y;
+	sprintf(buf, "%d", x);
+	if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
 		{
-			for(y=0;y<height;y++)
-				{
-					if (positions[x][y]!=0) 
-						{
-						board[x][y]=0;
-						if(x<width-1) board[x+1][y]=0;
-						if(y<height-1)board[x][y+1]=0;						
-						}
-				}
+			perror("write 1:");
+			exit(-1);
 		}
-	return board;
+	sprintf(buf, "%d", y);
+	if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+			{
+				perror("write 2:");
+				exit(-1);
+			}
+	board[x][y]=0;
+	if(x<width-1) board[x+1][y]=0;
+	if(y<height-1)board[x][y+1]=0;
+	return positions;
 }
 
 char *display(PlayerList L,int flag,PlayerList deaths,char *data)

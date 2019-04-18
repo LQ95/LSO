@@ -74,8 +74,7 @@ int **create_position_map(int width,int height);
 int CheckFree(int x,int y,int **position,int width,int height);
 int CheckBomb(int coord[2],int **map);
 int CheckWin(PlayerList L,int height,int width);
-int **initPositions(PlayerList L,int **board,int **positions,int height,int width);
-int **initBombs(int **board,int **positions,int height,int width);
+int **initPositions(int **board,int **positions,int height,int width,PlayerList P);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime);
 
