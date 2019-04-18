@@ -158,38 +158,6 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data)
 //PlayerList needs to be compiled and linked to this file for this function to work properly
 //L is the PlayerList shared among ALL threads
 //P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
-<<<<<<< HEAD
-
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime)
-{
-	int session_status,eliminated=0;
-	PlayerList tmp=L;
-	int nextmove;
-	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
-	char *displaybuf;
-	//initialization routines
-	//these will be moved somewhere else
-	//positions=initPositions(L,board,positions,width,height);
-	//board=initBombs(positions,board,width,height);
-	//printf("entro \n ");
-	session_status=LOGIN_OK;
-	while(session_status!=SESSION_END)
-	{
-		read(P->P.socket_desc,buf,SignalSize);  
-		nextmove=atoi(buf);
-		switch(nextmove)
-			{
-				case NULL_MOVE:
-					sprintf(buf, "%d", LOGIN_OK);
-					write(P->P.socket_desc,buf,SignalSize);
-					break;
-
-				case MOVE_LEFT:
-					if(CheckFree(P->P.position[0]-1,P->P.position[1],positions,width,height)!=0 && CheckBomb(P->P.position,board)!=0)
-						{
-							positions[P->P.position[0]][P->P.position[1]]=0;
-							P->P.position[0]--;
-=======
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime)
 {
 	int session_status,eliminated=0,nread;
@@ -252,7 +220,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 						{
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]++;
->>>>>>> parent of 97d3783... Reformatted the code
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
 							if (CheckWin(P,height,width)==1)
 								{
@@ -285,39 +252,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 							break;
 						}
 					break;
-<<<<<<< HEAD
-    case MOVE_RIGHT:
-      if (CheckFree(P - > P.position[0] + 1, P - > P.position[1], positions, width, height) != 0 && CheckBomb(P - > P.position, board) != 0) {
-        positions[P - > P.position[0]][P - > P.position[1]] = 0;
-        P - > P.position[0]++;
-        positions[P - > P.position[0]][P - > P.position[1]] = P - > P.ID;
-        if (CheckWin(P, height, width) == 1) {
-          sprintf(buf, "%d", WIN);
-          write(P - > P.socket_desc, buf, SignalSize);
-          eliminated = 1;
-          * GameTime = 0;
-        } else {
-          sprintf(buf, "%d", MOVE_OK);
-          write(P - > P.socket_desc, buf, SignalSize);
-        }
-        break;
-      } else if (CheckBomb(P - > P.position, board) == 0) {
-        sprintf(buf, "%d", ELIMINATED);
-        write(P - > P.socket_desc, buf, SignalSize);
-        Dead = insert(Dead, P - > P.socket_desc);
-        positions[P - > P.position[0]][P - > P.position[1]] = 0;
-        tmp = eliminate(P - > P.ID, L);
-        eliminated = 1;
-        break;
-      } else {
-        sprintf(buf, "%d", SQUARE_OCCUPIED);
-        write(P - > P.socket_desc, buf, SignalSize);
-        break;
-      }
-      break;
-=======
->>>>>>> parent of 97d3783... Reformatted the code
-
 				case MOVE_UP:
 					if(CheckFree(P->P.position[0],P->P.position[1]+1,positions,width,height)!=0 && CheckBomb(P->P.position,board)!=0)
 						{
@@ -405,11 +339,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 			}
 		if(eliminated==0)
 			{
-<<<<<<< HEAD
-				read(P->P.socket_desc,buf,SignalSize);
-=======
 				nread=read(P->P.socket_desc,buf,SignalSize);
->>>>>>> parent of 97d3783... Reformatted the code
 				nextmove=atoi(buf);
 				switch(nextmove)
 				{
@@ -442,11 +372,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 				*GameTime=(*GameTime)-1;
 				if (*GameTime<=0) session_status=SESSION_END;
 			}
-<<<<<<< HEAD
-		else session_status=SESSION_END;
-				
-=======
 		else session_status=SESSION_END;			
->>>>>>> parent of 97d3783... Reformatted the code
 	}
 }
