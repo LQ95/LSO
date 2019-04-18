@@ -21,6 +21,24 @@ int *UpdatePos(int *position,int moveflag)
 	return position;
 }
 
+void PrintStatus(int status)
+{
+int statuses[]={SESSION_END,MOVE_OK,SQUARE_OCCUPIED,ELIMINATED,WIN};
+if(status==statuses[0])
+	{
+		printf("The session has ended\n");
+	}
+else if(status==statuses[2])
+	{
+		printf("You cannot move there\n");
+	}
+else if(status==statuses[3])
+	{
+		printf("An anti-tank mine just blew up under your car.\n");
+	}
+else return;
+}
+
 void print_gamepos(int width,int height,int *position)
 {
 	int x,y;
@@ -55,7 +73,7 @@ void ClientGame(int sd,int width,int height)
 	while(game_status!=SESSION_END)
 	{
 		printf("\nnext move:");
-		scanf(" %c",&input);
+		input=getchar();
 		while ((getchar()) != '\n'); //this is used to clean stdin
 		switch(input)
 		{
@@ -102,13 +120,14 @@ void ClientGame(int sd,int width,int height)
 		}
 		read(sd,buf,SignalSize);
 		game_status=atoi(buf);
-		printf("\nstatus %d display options:",game_status);
+		PrintStatus(game_status);
 		printf("\n");
 		sprintf(answer, "%d", NULL_MOVE);
 		if(game_status!=ELIMINATED && game_status!=WIN)
 		{
 			if (moveflag!=0 && game_status!=SQUARE_OCCUPIED) position=UpdatePos(position,moveflag);
-			scanf(" %c",&input);
+			printf("\ndisplay options:");
+			input=getchar();
 			while ((getchar()) != '\n');
 			switch(input)
 			{
