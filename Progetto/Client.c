@@ -185,6 +185,7 @@ void ClientGame(int sd,int width,int height)
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
+	//TODO reads that read an array of positions
 	print_gamepos(width,height,position);
 	}
 printf("\n%s\n",GameOverMsg);

@@ -337,6 +337,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 						break;
 				}
 				*GameTime=(*GameTime)-1;
+				//TODO writes that send an array of positions
 				if (*GameTime<=0) session_status=SESSION_END;
 			}
 		else session_status=SESSION_END;			
