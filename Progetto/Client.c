@@ -149,6 +149,11 @@ void ClientGame(int sd,int width,int height)
 				write(sd,buf,SignalSize);
 				break;
 
+				case '4':
+				sprintf(buf, "%d", DISPLAY_REMAINING_TIME);
+				sprintf(answer, "%d", DISPLAY_REMAINING_TIME);
+				write(sd,buf,SignalSize);
+				break;
 
 				default:
 				sprintf(buf, "%d", NULL_MOVE);

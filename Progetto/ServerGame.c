@@ -333,6 +333,9 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 						write(P->P.socket_desc,displaybuf,strlen(displaybuf));
 						break;
 
+					case DISPLAY_REMAINING_TIME:
+						break;
+						
 					case NULL_MOVE:
 						break;
 				}
