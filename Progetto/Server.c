@@ -67,13 +67,13 @@ void *sendseed(void *arg){
 	PlayerList Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
-	int dim=tmp->dim;
     int connfd=tmp->connfd;
-    int seed[1];
+    int seeddim[2];
+	seeddim[1]=tmp->dim;
     int login_successful[1];
     login_successful[0]=0;
-    seed[0]=tmp->seed;
-    board=create_board(seed[0],dim);
+    seeddim[0]=tmp->seed;
+    board=create_board(seeddim[0],seeddim[1]);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
@@ -89,10 +89,10 @@ void *sendseed(void *arg){
             }
 
     pthread_mutex_lock(&sem);
-    write(connfd, seed, sizeof(seed));
+    write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=initPositions(board,positions,dim,dim,searchbySD(connfd,P));
-    ServerGame(board,positions,P,dim,dim,searchbySD(connfd,P),Deaths,GlobalGameTime);
+    positions=initPositions(board,positions,seeddim[0],searchbySD(connfd,P),connfd);
+    ServerGame(board,positions,P,seeddim[0],seeddim[0],searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
 void print_board(int **board){

@@ -83,9 +83,12 @@ int login(int connfd){
     read(connfd,succ,sizeof(succ));
     return succ[0];
 }
-int menu(int connfd){
+int *menu(int connfd){
     int choice[1];
     int seed[1];
+    int dim[1];
+    int *out;
+    out=malloc(sizeof(int)*2);
     printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
     choice[0]=scan_int(1,2);
     write(connfd,choice,sizeof(choice));
@@ -99,8 +102,8 @@ int menu(int connfd){
         printf("login errato\n");
         succ_login=login(connfd);
         }
-    read(connfd, seed, sizeof(seed));
-    return seed[0];
+    read(connfd, out, sizeof(out));
+    return out;
 }
 
 int main()
@@ -130,8 +133,10 @@ int main()
     }
     else
         printf("connesso al server..\n");
-        int seed=menu(sockfd);
-    printf("seed:%d\n", seed);
-    ClientGame(sockfd,10,10);
+        int *seeddim;
+        seeddim=menu(sockfd);
+    printf("seed:%d\n", seeddim[0]);
+    printf("dimension:%d\n", seeddim[1]);
+    ClientGame(sockfd,seeddim[1],seeddim[1]);
     close(sockfd);
 }

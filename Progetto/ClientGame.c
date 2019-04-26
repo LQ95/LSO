@@ -17,7 +17,7 @@ else if(status==statuses[3])
 else return;
 }
 
-void ClientGame(int sd,int width,int height)
+void ClientGame(int sd,int dim)
 {
 	int game_status,displaysize,moveflag,ID,*position;
 	game_status=LOGIN_OK;
@@ -152,7 +152,7 @@ void ClientGame(int sd,int width,int height)
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
 	//TODO reads that read an array of positions
-	print_gamepos(width,height,position);
+	print_gamepos(dim,dim,position);
 	}
 printf("\n%s\n",GameOverMsg);
 return;

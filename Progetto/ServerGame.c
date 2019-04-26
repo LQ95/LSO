@@ -36,16 +36,18 @@ int CheckWin(PlayerList L,int height,int width)
 	if(L->P.position[0]>=width-1) return 1;
 	else return 0;
 }
-int **initPositions(int **board,int **positions,int height,int width,PlayerList P)
+int **initPositions(int **board,int **positions,int dim,PlayerList P,int connfd)
 {
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
+	int n_players=ListSize(P);
+	if(n_players<dim--){
 	srand(time(NULL));
 	int nwrite;
 	char buf[SIGSIZE];
 	int x,y;
 	x=0;
-	y=rand()%height;
+	y=n_players;
 	positions[x][y]=P->P.ID;
 	P->P.position[0]=x;
 	P->P.position[1]=y;
@@ -62,8 +64,12 @@ int **initPositions(int **board,int **positions,int height,int width,PlayerList 
 				exit(-1);
 			}
 	board[x][y]=0;
-	if(x<width-1) board[x+1][y]=0;
-	if(y<height-1)board[x][y+1]=0;
+	if(x<dim-1) board[x+1][y]=0;
+	if(y<dim-1)board[x][y+1]=0;
+	}
+	else{
+        close(connfd);
+	}
 	return positions;
 }
 
