@@ -1,17 +1,16 @@
 #include "lib.h"
-
 //these subroutines handle the game itself
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
-int **create_position_map(int width,int height)
+int **create_position_map(int dim)
 {
     int x,y;
-    int **positions=calloc(sizeof(int*),height);
+    int **positions=calloc(sizeof(int*),dim);
     int i=0;
-    for(int i=0;i<height;i++){
-        positions[i]=calloc(sizeof(int),width);
+    for(int i=0;i<dim;i++){
+        positions[i]=calloc(sizeof(int),dim);
     }
-	for(x=0;x<width;x++){
-		for(y=0;y<height;y++)
+	for(x=0;x<dim;x++){
+		for(y=0;y<dim;y++)
 						positions[x][y]=0;
         }
 	return positions;
@@ -41,7 +40,7 @@ int **initPositions(int **board,int **positions,int height,int width,PlayerList 
 {
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
-	srand(time(NULL));	
+	srand(time(NULL));
 	int nwrite;
 	char buf[SIGSIZE];
 	int x,y;
@@ -135,7 +134,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END)
 	{
-		nread=read(P->P.socket_desc,buf,SignalSize);  
+		nread=read(P->P.socket_desc,buf,SignalSize);
 		nextmove=atoi(buf);
 		switch(nextmove)
 			{
@@ -157,7 +156,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									eliminated=1;
 									*GameTime=0;
 								}
-							else 
+							else
 								{
 									sprintf(buf, "%d", MOVE_OK);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -195,7 +194,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									eliminated=1;
 									*GameTime=0;
 								}
-							else 
+							else
 								{
 									sprintf(buf, "%d", MOVE_OK);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -232,7 +231,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									eliminated=1;
 									*GameTime=0;
 								}
-							else 
+							else
 								{
 									sprintf(buf, "%d", MOVE_OK);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -270,7 +269,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 									eliminated=1;
 									*GameTime=0;
 								}
-							else 
+							else
 								{
 									sprintf(buf, "%d", MOVE_OK);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -335,7 +334,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 
 					case DISPLAY_REMAINING_TIME:
 						break;
-						
+
 					case NULL_MOVE:
 						break;
 				}
@@ -343,6 +342,6 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 				//TODO writes that send an array of positions
 				if (*GameTime<=0) session_status=SESSION_END;
 			}
-		else session_status=SESSION_END;			
+		else session_status=SESSION_END;
 	}
 }

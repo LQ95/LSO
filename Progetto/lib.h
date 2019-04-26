@@ -14,9 +14,11 @@
 #include <pthread.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include <limits.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
-//Signals 
+//Signals
 //keep every single one of these at the same length!
 #define SIGSIZE 4
 #define SignalSize sizeof(char)*SIGSIZE
@@ -58,7 +60,7 @@ typedef struct list{
 }PlayerNode;
 typedef PlayerNode *PlayerList;
 void ServerLog(char *data);
-int **create_board(int seed);
+int **create_board(int seed,int dim);
 
 //PlayerList functions
 PlayerList CreateList();
@@ -70,7 +72,7 @@ void FreeList(PlayerList L);
 int ListSize(PlayerList L);
 PlayerList searchbySD(int sd,PlayerList L);
 //ServerGame functions
-int **create_position_map(int width,int height);
+int **create_position_map(int dim);
 int CheckFree(int x,int y,int **position,int width,int height);
 int CheckBomb(int coord[2],int **map);
 int CheckWin(PlayerList L,int height,int width);
@@ -78,9 +80,10 @@ int **initPositions(int **board,int **positions,int height,int width,PlayerList 
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime);
 
-//Client functions 
+//Client functions
 int *UpdatePos(int *position,int moveflag);
 void print_gamepos(int width,int height,int *position);
+void ClientGame(int sd,int width,int height);
 
 #define MAX 80
 #define PORT 8080

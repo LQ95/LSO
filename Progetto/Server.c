@@ -1,4 +1,5 @@
 #include "lib.h"
+#include "scan_int/scan_int.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{
@@ -8,6 +9,7 @@ struct thread_data{
     int seed;
     int connfd;
 	int *GameTime;
+	int dim;
     FILE *db;
 };
 
@@ -65,12 +67,13 @@ void *sendseed(void *arg){
 	PlayerList Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
+	int dim=tmp->dim;
     int connfd=tmp->connfd;
     int seed[1];
     int login_successful[1];
     login_successful[0]=0;
     seed[0]=tmp->seed;
-    board=create_board(seed[0]);
+    board=create_board(seed[0],dim);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     read(connfd,choice,sizeof(choice));
@@ -88,8 +91,8 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd, seed, sizeof(seed));
     pthread_mutex_unlock(&sem);
-    positions=initPositions(board,positions,10,10,searchbySD(connfd,P));
-    ServerGame(board,positions,P,10,10,searchbySD(connfd,P),Deaths,GlobalGameTime);
+    positions=initPositions(board,positions,dim,dim,searchbySD(connfd,P));
+    ServerGame(board,positions,P,dim,dim,searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
 void print_board(int **board){
@@ -103,11 +106,11 @@ void print_board(int **board){
     }
 }
 
-int **create_board(int seed){
-    int **board=calloc(sizeof(int*),10);
+int **create_board(int seed,int dim){
+    int **board=calloc(sizeof(int*),dim);
     int i=0;
     for(int i=0;i<10;i++){
-        board[i]=calloc(sizeof(int),10);
+        board[i]=calloc(sizeof(int),dim);
     }
     //inserisco le mine a seconda del seed, 1 nella matrice rappresenta una mina
     int x=0;
@@ -140,8 +143,9 @@ int main()
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
-    int width,height;
-    width=height=10;
+    printf("selezionare dimensione griglia (min:10)\n");
+    int dim=scan_int(10,INT_MAX);
+    dim++;
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -180,7 +184,7 @@ int main()
         printf("Server listening..\n");
     PlayerList Players=NULL;
     PlayerList Deaths=NULL;
-    int **positions=create_position_map(width,height);
+    int **positions=create_position_map(dim);
     int *GlobalGametime=malloc(sizeof(int));
     while (1){
 
@@ -201,6 +205,7 @@ int main()
         thread_sd.Dead=Deaths;
         thread_sd.posmap=positions;
         thread_sd.GameTime=GlobalGametime;
+        thread_sd.dim=dim;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
         }
