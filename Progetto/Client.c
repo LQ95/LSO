@@ -1,49 +1,11 @@
-#include "lib.h"
+#include "lib_client.h"
 #include "scan_int/scan_int.h"
 
-int *UpdatePos(int *position,int moveflag)
-{
-	if (moveflag==MOVE_UP)
-	{
-		position[1]++;
-	}
-	else if (moveflag==MOVE_DOWN)
-	{
-		position[1]--;
-	}
-	else if (moveflag==MOVE_RIGHT)
-	{
-		position[0]++;
-	}
-	else if (moveflag==MOVE_LEFT)
-	{
-		position[0]--;
-	}
-	return position;
-}
-
-
-
-void print_gamepos(int width,int height,int *position)
-{
-	int x,y;
-        printf("x:%d y:%d\n",position[0],position[1]);
-	for(y=height;y>-1;y--)
-	{
-		for(x=0;x<width;x++)
-		{
-			if(x==position[0] && y==position[1])printf(".■");
-			else printf(". ");
-		}
-		printf("\n");
-	}
-}
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 
-void genrcv(int sockfd)
-{
+void genrcv(int sockfd){
     //riceve il seed dal server per generare la board
     int buff[1];
     int seed=0;
@@ -69,6 +31,7 @@ void sign_up(int connfd){
     write(connfd,pass1,sizeof(pass1));
     return;
     }
+
 int login(int connfd){
     int succ[1];
     succ[0]=0;
@@ -83,6 +46,7 @@ int login(int connfd){
     read(connfd,succ,sizeof(succ));
     return succ[0];
 }
+
 int *menu(int connfd){
     int choice[1];
     int seed[1];
@@ -106,11 +70,9 @@ int *menu(int connfd){
     return out;
 }
 
-int main()
-{
+int main(){
     int sockfd, connfd;
     struct sockaddr_in servaddr, cli;
-
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -120,12 +82,10 @@ int main()
     else
         printf("Socket creato con successo..\n");
     bzero(&servaddr, sizeof(servaddr));
-
     // assign IP, PORT
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     servaddr.sin_port = htons(PORT);
-
     // connect the client socket to server socket
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("connessione al server fallita...\n");
@@ -137,6 +97,6 @@ int main()
         seeddim=menu(sockfd);
     printf("seed:%d\n", seeddim[0]);
     printf("dimension:%d\n", seeddim[1]);
-    ClientGame(sockfd,seeddim[1],seeddim[1]);
+    client_game(sockfd,seeddim[1]);
     close(sockfd);
 }

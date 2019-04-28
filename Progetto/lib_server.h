@@ -12,7 +12,6 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <pthread.h>
-#include <string.h>
 #include <arpa/inet.h>
 #include <signal.h>
 #include <limits.h>
@@ -73,17 +72,12 @@ int ListSize(PlayerList L);
 PlayerList searchbySD(int sd,PlayerList L);
 //ServerGame functions
 int **create_position_map(int dim);
-int CheckFree(int x,int y,int **position,int width,int height);
-int CheckBomb(int coord[2],int **map);
-int CheckWin(PlayerList L,int dim);
-int **initPositions(int **board,int **positions,int dim,PlayerList P,int connfd);
+int check_free(int x,int y,int **position,int dim);
+int check_bomb(int coord[2],int **map);
+int check_win(PlayerList L,int dim);
+int **init_positions(int **board,int **positions,int dim,PlayerList P,int connfd);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
-void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime);
-
-//Client functions
-int *UpdatePos(int *position,int moveflag);
-void print_gamepos(int width,int height,int *position);
-void ClientGame(int sd,int width,int height);
+void server_game(int **board,int **positions,PlayerList L,int dim,PlayerList P,PlayerList Dead,int *GameTime);
 
 #define MAX 80
 #define PORT 8080

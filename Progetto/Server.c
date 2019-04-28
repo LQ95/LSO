@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "lib_server.h"
 #include "scan_int/scan_int.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
@@ -91,8 +91,8 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=initPositions(board,positions,seeddim[1],searchbySD(connfd,P),connfd);
-    ServerGame(board,positions,P,seeddim[1],seeddim[1],searchbySD(connfd,P),Deaths,GlobalGameTime);
+    positions=init_positions(board,positions,seeddim[1],searchbySD(connfd,P),connfd);
+    server_game(board,positions,P,seeddim[1],searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
 int **create_board(int seed,int dim){
@@ -113,8 +113,7 @@ int **create_board(int seed,int dim){
     return board;
 }
 
-void ServerLog(char *data)
-{
+void server_log(char *data){
 	int fd,size;
 	size=sizeof(data);
 	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR);
@@ -125,10 +124,7 @@ void ServerLog(char *data)
 	close(fd);
 }
 
-
-
-int main()
-{
+int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
@@ -152,11 +148,9 @@ int main()
     else
         printf("La creazione del socket ha avuto successo..\n");
     bzero(&servaddr, sizeof(servaddr));
-
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
-
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
         printf("socket bind fallito...\n");
         exit(0);
@@ -176,7 +170,6 @@ int main()
     int **positions=create_position_map(dim);
     int *GlobalGametime=malloc(sizeof(int));
     while (1){
-
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {

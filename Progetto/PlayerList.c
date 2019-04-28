@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "lib_server.h"
 
 PlayerList CreateList(int sd,int ID)
 {
@@ -24,7 +24,7 @@ PlayerList insert(PlayerList L,int sd)
 	int IDnum=rand()%50000;
 	PlayerList tmp=L;
 	if(L!=NULL)
-	{	
+	{
 		while(tmp->next!=NULL )
 		{
 			tmp=tmp->next;
@@ -38,7 +38,7 @@ PlayerList insert(PlayerList L,int sd)
 	}
 	else L=CreateList(sd,IDnum);
 	return L;
-}  
+}
 
 PlayerList insertHead(PlayerList L,int sd)
 {
@@ -51,7 +51,7 @@ PlayerList insertHead(PlayerList L,int sd)
 	PlayerList tmp=CreateList(sd,IDnum);
 	tmp->next=L;
 	return tmp;
-	
+
 }
 
 PlayerList eliminate(int ID,PlayerList L)
