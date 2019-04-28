@@ -31,9 +31,9 @@ int CheckBomb(int coord[2],int **map)
 	if(map[coord[0]][coord[1]]==0)return 1;
 	else return 0;
 }
-int CheckWin(PlayerList L,int height,int width)
+int CheckWin(PlayerList L,int dim)
 {
-	if(L->P.position[0]>=width-1) return 1;
+	if(L->P.position[0]>=dim-1) return 1;
 	else return 0;
 }
 int **initPositions(int **board,int **positions,int dim,PlayerList P,int connfd)
@@ -155,7 +155,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]--;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-							if (CheckWin(P,height,width)==1)
+							if (CheckWin(P,height)==1)
 								{
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -193,7 +193,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[0]++;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-							if (CheckWin(P,height,width)==1)
+							if (CheckWin(P,height)==1)
 								{
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -230,7 +230,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[1]++;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-							if (CheckWin(P,height,width)==1)
+							if (CheckWin(P,height)==1)
 								{
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);
@@ -268,7 +268,7 @@ void ServerGame(int **board,int **positions,PlayerList L,int width,int height,Pl
 							positions[P->P.position[0]][P->P.position[1]]=0;
 							P->P.position[1]--;
 							positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-							if (CheckWin(P,height,width)==1)
+							if (CheckWin(P,height)==1)
 								{
 									sprintf(buf, "%d", WIN);
 									write(P->P.socket_desc,buf,SignalSize);

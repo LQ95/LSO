@@ -95,28 +95,17 @@ void *sendseed(void *arg){
     ServerGame(board,positions,P,seeddim[1],seeddim[1],searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
-void print_board(int **board){
-    int i=0;
-    int j=0;
-    for(i=0;i<10;i++){
-        for(j=0;j<10;j++){
-            printf("|%d|",board[i][j]);
-        }
-        printf("\n");
-    }
-}
-
 int **create_board(int seed,int dim){
     int **board=calloc(sizeof(int*),dim);
     int i=0;
-    for(int i=0;i<10;i++){
+    for(int i=0;i<dim;i++){
         board[i]=calloc(sizeof(int),dim);
     }
     //inserisco le mine a seconda del seed, 1 nella matrice rappresenta una mina
     int x=0;
     int y=0;
-    for(x=0;x<10;x++){
-        for(y=0;y<10;y++)
+    for(x=0;x<dim;x++){
+        for(y=0;y<dim;y++)
                 if((seed*x*y)%5==2)
             board[x][y]=1;
         }

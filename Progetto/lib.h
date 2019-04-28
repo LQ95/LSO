@@ -75,7 +75,7 @@ PlayerList searchbySD(int sd,PlayerList L);
 int **create_position_map(int dim);
 int CheckFree(int x,int y,int **position,int width,int height);
 int CheckBomb(int coord[2],int **map);
-int CheckWin(PlayerList L,int height,int width);
+int CheckWin(PlayerList L,int dim);
 int **initPositions(int **board,int **positions,int dim,PlayerList P,int connfd);
 char *display(PlayerList L,int flag,PlayerList deaths,char *data);
 void ServerGame(int **board,int **positions,PlayerList L,int width,int height,PlayerList P,PlayerList Dead,int *GameTime);
