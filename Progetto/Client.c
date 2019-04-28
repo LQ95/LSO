@@ -15,6 +15,7 @@ void genrcv(int sockfd){
 }
 
 void sign_up(int connfd){
+    clear();
     char username[10];
     char pass1[10];
     char pass2[10];
@@ -59,6 +60,7 @@ int *menu(int connfd){
     write(connfd,choice,sizeof(choice));
     if(choice[0]==2){
         sign_up(connfd);
+        clear();
         printf("Nuovo utente Registrato!\n\n");
     }
     int succ_login=0;
