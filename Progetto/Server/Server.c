@@ -1,5 +1,5 @@
 #include "lib_server.h"
-#include "scan_int/scan_int.h"
+#include "../scan_int/scan_int.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{

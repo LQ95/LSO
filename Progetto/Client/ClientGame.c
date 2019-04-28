@@ -17,7 +17,7 @@ int *update_pos(int *position,int moveflag){
 }
 
 void print_gamepos(int dim,int *position){
-	clear();
+	clear_screen();
 	int x,y;
         printf("x:%d y:%d\n",position[0],position[1]);
 	for(y=dim;y>-1;y--){
@@ -47,7 +47,7 @@ else return;
 }
 
 void client_game(int sd,int dim){
-    clear();
+    clear_screen();
 	int game_status,displaysize,moveflag,ID,*position;
 	game_status=LOGIN_OK;
 	char input;

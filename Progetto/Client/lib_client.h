@@ -3,7 +3,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
-
+#include <ncurses.h>
 
 #define PORT 8080
 #define SA struct sockaddr
@@ -12,7 +12,7 @@
 #define SignalSize sizeof(char)*SIGSIZE
 #define DISPLAYSIGSIZE 5
 #define DisplaySignalSize sizeof(char)*DISPLAYSIGSIZE
-#define clear() printf("\033[H\033[J")
+#define clear_screen() printf("\033[H\033[J")
 
 //these are codes that the client sends the server
 #define MOVE_LEFT 4900

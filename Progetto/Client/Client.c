@@ -1,5 +1,5 @@
 #include "lib_client.h"
-#include "scan_int/scan_int.h"
+#include "../scan_int/scan_int.h"
 
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
@@ -15,7 +15,7 @@ void genrcv(int sockfd){
 }
 
 void sign_up(int connfd){
-    clear();
+    clear_screen();
     char username[10];
     char pass1[10];
     char pass2[10];
@@ -54,13 +54,13 @@ int *menu(int connfd){
     int dim[1];
     int *out;
     out=malloc(sizeof(int)*2);
-    clear();
+    clear_screen();
     printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
     choice[0]=scan_int(1,2);
     write(connfd,choice,sizeof(choice));
     if(choice[0]==2){
         sign_up(connfd);
-        clear();
+        clear_screen();
         printf("Nuovo utente Registrato!\n\n");
     }
     int succ_login=0;
