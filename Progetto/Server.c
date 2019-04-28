@@ -91,8 +91,8 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=initPositions(board,positions,seeddim[0],searchbySD(connfd,P),connfd);
-    ServerGame(board,positions,P,seeddim[0],seeddim[0],searchbySD(connfd,P),Deaths,GlobalGameTime);
+    positions=initPositions(board,positions,seeddim[1],searchbySD(connfd,P),connfd);
+    ServerGame(board,positions,P,seeddim[1],seeddim[1],searchbySD(connfd,P),Deaths,GlobalGameTime);
 }
 
 void print_board(int **board){
