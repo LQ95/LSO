@@ -29,15 +29,15 @@ int check_bomb(int coord[2],int **map){
 	else return 0;
 }
 
-int check_win(PlayerList L,int dim){
+int check_win(player_list L,int dim){
 	if(L->P.position[0]>=dim-1) return 1;
 	else return 0;
 }
 
-int **init_positions(int **board,int **positions,int dim,PlayerList P,int connfd){
+int **init_positions(int **board,int **positions,int dim,player_list P,int connfd){
 	//assign starting positions to all players so that they can start the race
 	//tell players their own starting postions
-	int n_players=ListSize(P);
+	int n_players=list_size(P);
 	if(n_players<dim--){
 	srand(time(NULL));
 	int nwrite;
@@ -68,11 +68,11 @@ int **init_positions(int **board,int **positions,int dim,PlayerList P,int connfd
 	return positions;
 }
 
-char *display(PlayerList L,int flag,PlayerList deaths,char *data){
+char *display(player_list L,int flag,player_list deaths,char *data){
 	data=malloc(sizeof(char)*BUFDIM);
 	char entry[40];
 	int i=1;
-	PlayerList tmp=L;
+	player_list tmp=L;
 	if (flag==0){
 		sprintf(entry,"User List \n");
 		strcat(data,entry);
@@ -115,12 +115,12 @@ char *display(PlayerList L,int flag,PlayerList deaths,char *data){
 //WIP
 //it basically takes a list of players,and communicates with them for ever move that they make
 //the width and height parameters are meant to be same height and width measurements for the board
-//PlayerList needs to be compiled and linked to this file for this function to work properly
-//L is the PlayerList shared among ALL threads
-//P is the PlayerList representing the player executing an instance of this subroutine in one of the threads
-void server_game(int **board,int **positions,PlayerList L,int dim,PlayerList P,PlayerList Dead,int *GameTime){
+//player_list needs to be compiled and linked to this file for this function to work properly
+//L is the player_list shared among ALL threads
+//P is the player_list representing the player executing an instance of this subroutine in one of the threads
+void server_game(int **board,int **positions,player_list L,int dim,player_list P,player_list Dead,int *GameTime){
 	int session_status,eliminated=0,nread;
-	PlayerList tmp=L;
+	player_list tmp=L;
 	int nextmove;
 	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
 	char *displaybuf;

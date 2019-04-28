@@ -4,8 +4,8 @@ pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{
 	int **posmap;
-	PlayerList L;
-	PlayerList Dead;
+	player_list L;
+	player_list Dead;
     int seed;
     int connfd;
 	int *GameTime;
@@ -63,8 +63,8 @@ void *sendseed(void *arg){
 	int **board,**positions;
 	int *GlobalGameTime;
     struct thread_data *tmp=arg;
-	PlayerList P=tmp->L;
-	PlayerList Deaths=tmp->Dead;
+	player_list P=tmp->L;
+	player_list Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
@@ -91,8 +91,8 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=init_positions(board,positions,seeddim[1],searchbySD(connfd,P),connfd);
-    server_game(board,positions,P,seeddim[1],searchbySD(connfd,P),Deaths,GlobalGameTime);
+    positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
+    server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
 }
 
 int **create_board(int seed,int dim){
@@ -165,8 +165,8 @@ int main(){
     }
     else
         printf("Server listening..\n");
-    PlayerList Players=NULL;
-    PlayerList Deaths=NULL;
+    player_list Players=NULL;
+    player_list Deaths=NULL;
     int **positions=create_position_map(dim);
     int *GlobalGametime=malloc(sizeof(int));
     while (1){

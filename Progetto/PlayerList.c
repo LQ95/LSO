@@ -1,9 +1,8 @@
 #include "lib_server.h"
 
-PlayerList CreateList(int sd,int ID)
-{
+player_list CreateList(int sd,int ID){
 	srand(time(NULL));
-	PlayerList L;
+	player_list L;
 	int IDnumber;
 	L=malloc(sizeof(PlayerNode));
 	if(ID!=0)IDnumber=rand();
@@ -18,21 +17,15 @@ PlayerList CreateList(int sd,int ID)
 }
 
 //a player is inserted into the list right after connection the the server, so all we know and need is his/her socket descriptor
-PlayerList insert(PlayerList L,int sd)
-{
+player_list insert(player_list L,int sd){
 	srand(time(NULL));
 	int IDnum=rand()%50000;
-	PlayerList tmp=L;
-	if(L!=NULL)
-	{
-		while(tmp->next!=NULL )
-		{
+	player_list tmp=L;
+	if(L!=NULL){
+        while(tmp->next!=NULL )
 			tmp=tmp->next;
-		}
 		while(search(IDnum,L)!=NULL)
-		{
 			IDnum=IDnum+111;
-		}
 		tmp->next=CreateList(sd,IDnum);
 		return L;
 	}
@@ -40,66 +33,52 @@ PlayerList insert(PlayerList L,int sd)
 	return L;
 }
 
-PlayerList insertHead(PlayerList L,int sd)
-{
+player_list insertHead(player_list L,int sd){
 	srand(time(NULL));
 	int IDnum=rand();
 	while(search(IDnum,L)!=NULL)
-	{
 		IDnum=rand();
-	}
-	PlayerList tmp=CreateList(sd,IDnum);
+	player_list tmp=CreateList(sd,IDnum);
 	tmp->next=L;
 	return tmp;
-
 }
 
-PlayerList eliminate(int ID,PlayerList L)
-{
-	if(L!=NULL)
-	{
-		if(L->next!=NULL)
-		{
-			PlayerList tmp;
-			if(L->next->P.ID==ID)
-				{
-					tmp=L->next;
-					L->next=tmp->next;
-					free(tmp);
-					return L;
-				}
+player_list eliminate(int ID,player_list L){
+	if(L!=NULL){
+		if(L->next!=NULL){
+			player_list tmp;
+			if(L->next->P.ID==ID){
+                tmp=L->next;
+                L->next=tmp->next;
+                free(tmp);
+                return L;
+            }
 			else return eliminate(ID,L->next);
 		}
 	}
 	return L;
 }
 
-PlayerList eliminate_disconnect(int ID,PlayerList L)
-{
-	if(L!=NULL)
-	{
-		if(L->next!=NULL)
-		{
-			PlayerList tmp;
-			if(L->next->P.ID==ID)
-				{
-					tmp=L->next;
-					L->next=tmp->next;
-					close(L->P.socket_desc);
-					free(tmp);
-					return L;
-				}
+player_list eliminate_disconnect(int ID,player_list L){
+	if(L!=NULL){
+		if(L->next!=NULL){
+			player_list tmp;
+			if(L->next->P.ID==ID){
+                tmp=L->next;
+                L->next=tmp->next;
+                close(L->P.socket_desc);
+                free(tmp);
+                return L;
+            }
 			else return eliminate(ID,L->next);
 		}
 	}
 	return L;
 }
-PlayerList search(int IDnumber,PlayerList L)
-{
-	PlayerList tmp=L;
+player_list search(int IDnumber,player_list L){
+	player_list tmp=L;
 	int found=0;
-	while(tmp!=NULL &&found==0)
-	{
+	while(tmp!=NULL &&found==0){
 		if(tmp->P.ID ==IDnumber) found=1;
 		else tmp=tmp->next;
 	}
@@ -107,12 +86,10 @@ PlayerList search(int IDnumber,PlayerList L)
 	else return NULL;
 }
 
-PlayerList searchbySD(int sd,PlayerList L)
-{
-	PlayerList tmp=L;
+player_list search_by_SD(int sd,player_list L){
+	player_list tmp=L;
 	int found=0;
-	while(tmp!=NULL &&found==0)
-	{
+	while(tmp!=NULL &&found==0){
 		if(tmp->P.socket_desc==sd) found=1;
 		else tmp=tmp->next;
 	}
@@ -120,22 +97,18 @@ PlayerList searchbySD(int sd,PlayerList L)
 	else return NULL;
 }
 
-int ListSize(PlayerList L)
-{
+int list_size(player_list L){
 		int s=0;
-		PlayerList tmp=L;
-		while(tmp!=NULL)
-		{
+		player_list tmp=L;
+		while(tmp!=NULL){
 			tmp=tmp->next;
 			s++;
 		}
 	return s;
 }
-void FreeList(PlayerList L)
-{
-	PlayerList tmp=L;
-	while(tmp->next!=NULL )
-	{
+void free_list(player_list L){
+	player_list tmp=L;
+	while(tmp->next!=NULL ){
 		L=tmp;
 		tmp=tmp->next;
 		free(L);
