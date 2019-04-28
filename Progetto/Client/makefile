@@ -1,3 +1,4 @@
 CC=gcc
 CFLAGS=-lncurses
-Client: Client.c ClientGame.c ../scan_int/scan_int.c
+Client: 
+	$(CC) Client.c ClientGame.c ../scan_int/scan_int.c $(CFLAGS) -o Client.out

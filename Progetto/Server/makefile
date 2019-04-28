@@ -1,3 +1,4 @@
 CC=gcc
 CFLAGS=-pthread
-Server:  Server.c ServerGame.c PlayerList.c ../scan_int/scan_int.c
+Server:  
+	$(CC) Server.c ServerGame.c PlayerList.c ../scan_int/scan_int.c $(CFLAGS) -o Server.out
