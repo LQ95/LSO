@@ -53,6 +53,7 @@ int *menu(int connfd){
     int dim[1];
     int *out;
     out=malloc(sizeof(int)*2);
+    clear();
     printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
     choice[0]=scan_int(1,2);
     write(connfd,choice,sizeof(choice));

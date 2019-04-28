@@ -128,9 +128,7 @@ int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
-    printf("selezionare dimensione griglia (min:10)\n");
-    int dim=scan_int(10,INT_MAX);
-    dim++;
+
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -164,10 +162,15 @@ int main(){
         exit(0);
     }
     else
+        printf("selezionare dimensione griglia (min:10)\n");
+        int dim=scan_int(10,INT_MAX);
+        printf("dimensione griglia: %d\n",dim);
+        dim++;
         printf("Server listening..\n");
+        struct thread_data thread_sd;
+        int **positions=create_position_map(dim);
     player_list Players=NULL;
     player_list Deaths=NULL;
-    int **positions=create_position_map(dim);
     int *GlobalGametime=malloc(sizeof(int));
     while (1){
     len = sizeof(cli);
@@ -178,7 +181,6 @@ int main(){
     }
     else{
         printf("server accept avvenuto con successo...\n");
-        struct thread_data thread_sd;
         *GlobalGametime=rand()%MAXGAMETIME;
         Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
