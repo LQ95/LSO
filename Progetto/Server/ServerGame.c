@@ -73,6 +73,7 @@ char *display(player_list L,int flag,player_list deaths,char *data){
 	char entry[40];
 	int i=1;
 	player_list tmp=L;
+	strcpy(data,"");
 	if (flag==0){
 		sprintf(entry,"User List \n");
 		strcat(data,entry);
