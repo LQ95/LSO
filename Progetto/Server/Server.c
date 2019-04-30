@@ -78,6 +78,10 @@ void *sendseed(void *arg){
     int choice[1];
     read(connfd,choice,sizeof(choice));
     //1=login 2=sign up
+    if (choice[0]==3){
+        close(connfd);
+        return NULL;
+    }
     if(choice[0]==2){
         sign_up(connfd);
     }

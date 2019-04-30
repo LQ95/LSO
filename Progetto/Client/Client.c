@@ -151,6 +151,7 @@ int *menu(int connfd){
     out=malloc(sizeof(int)*2);
     const char *choicesarray[]={"Login", "Sign Up", "Exit"};
     initscr();
+    raw();
     noecho();
     keypad(stdscr,TRUE);
     //raw();
@@ -162,6 +163,10 @@ int *menu(int connfd){
         sign_up(connfd);
         clear_screen();
         printw("Nuovo utente Registrato!\n\n");
+    }
+    if(choice[0]==3){
+        close(connfd);
+        return NULL;
     }
     succ_login=login(connfd);
     while(!succ_login){
@@ -197,8 +202,11 @@ int main(){
         printf("connesso al server..\n");
         int *seeddim;
         seeddim=menu(sockfd);
-    printf("seed:%d\n", seeddim[0]);
-    printf("dimension:%d\n", seeddim[1]);
-    client_game(sockfd,seeddim[1]);
-    close(sockfd);
+        if(seeddim!=NULL){
+            printf("seed:%d\n", seeddim[0]);
+            printf("dimension:%d\n", seeddim[1]);
+            client_game(sockfd,seeddim[1]);
+            close(sockfd);
+    }
+    return 0;
 }
