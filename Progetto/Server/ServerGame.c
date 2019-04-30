@@ -36,35 +36,31 @@ int check_win(player_list L,int dim){
 
 int **init_positions(int **board,int **positions,int dim,player_list P,int connfd){
 	//assign starting positions to all players so that they can start the race
-	//tell players their own starting postions
-	int n_players=list_size(P);
-	if(n_players<dim--){
-	srand(time(NULL));
+	//tell players their own starting postions,that are always on a random point in the first column
+	srand(time(NULL));	
 	int nwrite;
 	char buf[SIGSIZE];
 	int x,y;
 	x=0;
-	y=n_players;
+	y=rand()%dim;
 	positions[x][y]=P->P.ID;
 	P->P.position[0]=x;
 	P->P.position[1]=y;
 	sprintf(buf, "%d", x);
-	if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0){
+	if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+		{
 			perror("write 1:");
 			exit(-1);
 		}
 	sprintf(buf, "%d", y);
-	if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0){
+	if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+			{
 				perror("write 2:");
 				exit(-1);
 			}
 	board[x][y]=0;
-	if(x<dim-1) board[x+1][y]=0;
+	if(x<dim-1) board[x+1][y]=0;   //if those cells aren not out of  bounds free them of bombs
 	if(y<dim-1)board[x][y+1]=0;
-	}
-	else{
-        close(connfd);
-	}
 	return positions;
 }
 
