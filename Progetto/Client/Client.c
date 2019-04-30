@@ -146,7 +146,6 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
 int *menu(int connfd){
     int selection,row=1, col=3, arraylength=3, width=3, menulength=3;
     int choice[1];
-    int login
     int *out;
     int succ_login=0;
     out=malloc(sizeof(int)*2);
@@ -164,6 +163,7 @@ int *menu(int connfd){
         clear_screen();
         printw("Nuovo utente Registrato!\n\n");
     }
+    succ_login=login(connfd);
     while(!succ_login){
         printf("login errato\n");
         succ_login=login(connfd);
