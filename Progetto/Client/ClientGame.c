@@ -17,7 +17,6 @@ int *update_pos(int *position,int moveflag){
 }
 
 void print_gamepos(int dim,int *position){
-	clear_screen();
 	int x,y;
         printf("x:%d y:%d\n",position[0],position[1]);
 	for(y=dim;y>-1;y--){
@@ -100,6 +99,7 @@ void client_game(int sd,int dim){
 			write(sd,buf,SignalSize);
 			break;
 		}
+		clear_screen();
 		read(sd,buf,SignalSize);
 		game_status=atoi(buf);
 		print_status(game_status);
