@@ -30,8 +30,14 @@ int login(int connfd){
     char password[10];
     char point_user[10];
     char point_pass[10];
-    read(connfd,username,sizeof(username));
-    read(connfd,password,sizeof(password));
+    if(read(connfd,username,sizeof(username))==0){
+        close(connfd);
+        return -1;
+    }
+    if(read(connfd,password,sizeof(password))==0){
+        close(connfd);
+        return -1;
+    }
     FILE *fp=fopen("login_credentials.db","r");
 
     while(fgets(point_user,sizeof(point_user),fp)) {
@@ -76,7 +82,10 @@ void *sendseed(void *arg){
     board=create_board(seeddim[0],seeddim[1]);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
-    read(connfd,choice,sizeof(choice));
+    if(read(connfd,choice,sizeof(choice))==0){
+        close(connfd);
+        return NULL;
+    }
     //1=login 2=sign up
     if (choice[0]==3){
         close(connfd);
@@ -87,6 +96,9 @@ void *sendseed(void *arg){
     }
     while(!login_successful[0]){
         login_successful[0]=login(connfd);
+        if(login_successful[0]==-1){
+            return NULL;
+        }
         pthread_mutex_lock(&sem);
         write(connfd,login_successful,sizeof(login_successful));
         pthread_mutex_unlock(&sem);
@@ -199,5 +211,5 @@ int main(){
         }
     }
     close(sockfd);
-return 0;
+    return 0;
 }

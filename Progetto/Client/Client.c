@@ -151,7 +151,6 @@ int *menu(int connfd){
     out=malloc(sizeof(int)*2);
     const char *choicesarray[]={"Login", "Sign Up", "Exit"};
     initscr();
-    raw();
     noecho();
     keypad(stdscr,TRUE);
     //raw();

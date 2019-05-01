@@ -128,6 +128,10 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END){
 		nread=read(P->P.socket_desc,buf,SignalSize);
+		if(nread==0){
+            close(P->P.socket_desc);
+            return;
+		}
 		nextmove=atoi(buf);
 		switch(nextmove){
             case NULL_MOVE:
@@ -273,6 +277,10 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
         }
     if(eliminated==0){
         nread=read(P->P.socket_desc,buf,SignalSize);
+        if(nread==0){
+            close(P->P.socket_desc);
+            return;
+        }
         nextmove=atoi(buf);
         switch(nextmove){
             case DISPLAY_USERS:
