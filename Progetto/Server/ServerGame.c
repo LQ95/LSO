@@ -36,35 +36,31 @@ int check_win(player_list L,int dim){
 
 int **init_positions(int **board,int **positions,int dim,player_list P,int connfd){
 	//assign starting positions to all players so that they can start the race
-	//tell players their own starting postions
-	int n_players=list_size(P);
-	if(n_players<dim--){
-	srand(time(NULL));
+	//tell players their own starting postions,that are always on a random point in the first column
+	srand(time(NULL));	
 	int nwrite;
 	char buf[SIGSIZE];
 	int x,y;
 	x=0;
-	y=n_players;
+	y=rand()%dim;
 	positions[x][y]=P->P.ID;
 	P->P.position[0]=x;
 	P->P.position[1]=y;
 	sprintf(buf, "%d", x);
-	if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0){
+	if ((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+		{
 			perror("write 1:");
 			exit(-1);
 		}
 	sprintf(buf, "%d", y);
-	if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0){
+	if((nwrite=write(P->P.socket_desc,buf,SignalSize))<0)
+			{
 				perror("write 2:");
 				exit(-1);
 			}
 	board[x][y]=0;
-	if(x<dim-1) board[x+1][y]=0;
+	if(x<dim-1) board[x+1][y]=0;   //if those cells aren not out of  bounds free them of bombs
 	if(y<dim-1)board[x][y+1]=0;
-	}
-	else{
-        close(connfd);
-	}
 	return positions;
 }
 
@@ -284,28 +280,28 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
         nextmove=atoi(buf);
         switch(nextmove){
             case DISPLAY_USERS:
-            //we get a string with a variating size from this subroutine
-            displaybuf=display(L,0,NULL,displaybuf);
-            sprintf(displaysize,"%lu",strlen(displaybuf));
-            // so we calculate it's size and send it back to the client along with the string itself
-            write(P->P.socket_desc,displaysize,DisplaySignalSize);
-            write(P->P.socket_desc,displaybuf,strlen(displaybuf));
-            break;
+					//we get a string with a variating size from this subroutine
+					displaybuf=display(L,0,NULL,displaybuf);
+					sprintf(displaysize,"%lu",strlen(displaybuf));
+					// so we calculate it's size and send it back to the client along with the string itself
+					write(P->P.socket_desc,displaysize,DisplaySignalSize);
+					write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+					break;
             case DISPLAY_USER_LOCATIONS:
-                displaybuf=display(L,1,NULL,displaybuf);
-                sprintf(displaysize,"%lu",strlen(displaybuf));
-                write(P->P.socket_desc,displaysize,DisplaySignalSize);
-                write(P->P.socket_desc,displaybuf,strlen(displaybuf));
-                break;
-                case DISPLAY_USER_DEATHS:
+					displaybuf=display(L,1,NULL,displaybuf);
+					sprintf(displaysize,"%lu",strlen(displaybuf));
+					write(P->P.socket_desc,displaysize,DisplaySignalSize);
+					write(P->P.socket_desc,displaybuf,strlen(displaybuf));
+					break;
+            case DISPLAY_USER_DEATHS:
                     displaybuf=display(L,2,Dead,displaybuf);
                     sprintf(displaysize,"%lu",strlen(displaybuf));
                     write(P->P.socket_desc,displaysize,DisplaySignalSize);
                     write(P->P.socket_desc,displaybuf,strlen(displaybuf));
                     break;
-                case DISPLAY_REMAINING_TIME:
+            case DISPLAY_REMAINING_TIME:
                     break;
-                case NULL_MOVE:
+            case NULL_MOVE:
                     break;
         }
         *GameTime=(*GameTime)-1;

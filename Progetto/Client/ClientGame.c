@@ -17,7 +17,6 @@ int *update_pos(int *position,int moveflag){
 }
 
 void print_gamepos(int dim,int *position){
-	clear_screen();
 	int x,y;
         printf("x:%d y:%d\n",position[0],position[1]);
 	for(y=dim;y>-1;y--){
@@ -66,40 +65,41 @@ void client_game(int sd,int dim){
 		while ((getchar()) != '\n'); //this is used to clean stdin
 		switch(input){
 			case 'w':
-			sprintf(buf, "%d", MOVE_UP);
-			moveflag=MOVE_UP;
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", MOVE_UP);
+				moveflag=MOVE_UP;
+				write(sd,buf,SignalSize);
+				break;
 			case 's':
-			sprintf(buf, "%d", MOVE_DOWN);
-			moveflag=MOVE_DOWN;
-			write(sd,buf,SignalSize);
+				sprintf(buf, "%d", MOVE_DOWN);
+				moveflag=MOVE_DOWN;
+				write(sd,buf,SignalSize);
 			break;
 			case 'a':
-			sprintf(buf, "%d", MOVE_LEFT);
-			moveflag=MOVE_LEFT;
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", MOVE_LEFT);
+				moveflag=MOVE_LEFT;
+				write(sd,buf,SignalSize);
+				break;
 			case 'd':
-			sprintf(buf, "%d", MOVE_RIGHT);
-			moveflag=MOVE_RIGHT;
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", MOVE_RIGHT);
+				moveflag=MOVE_RIGHT;
+				write(sd,buf,SignalSize);
+				break;
 			case 'm':
-			sprintf(buf, "%d", QUIT);
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", QUIT);
+				write(sd,buf,SignalSize);
+				break;
 			case '0':
-			sprintf(buf, "%d", NULL_MOVE);
-			moveflag=0;
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", NULL_MOVE);
+				moveflag=0;
+				write(sd,buf,SignalSize);
+				break;
 			default:
-			sprintf(buf, "%d", NULL_MOVE);
-			moveflag=0;
-			write(sd,buf,SignalSize);
-			break;
+				sprintf(buf, "%d", NULL_MOVE);
+				moveflag=0;
+				write(sd,buf,SignalSize);
+				break;
 		}
+		clear_screen();
 		read(sd,buf,SignalSize);
 		game_status=atoi(buf);
 		print_status(game_status);
@@ -112,30 +112,30 @@ void client_game(int sd,int dim){
 			while ((getchar()) != '\n');
 			switch(input){
 				case '1':
-				sprintf(buf, "%d", DISPLAY_USERS);
-				sprintf(answer, "%d", DISPLAY_USERS);
-				write(sd,buf,SignalSize);
-				break;
+					sprintf(buf, "%d", DISPLAY_USERS);
+					sprintf(answer, "%d", DISPLAY_USERS);
+					write(sd,buf,SignalSize);
+					break;
 				case '2':
-				sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
-				sprintf(answer, "%d", DISPLAY_USER_LOCATIONS);
-				write(sd,buf,SignalSize);
-				break;
+					sprintf(buf, "%d", DISPLAY_USER_LOCATIONS);
+					sprintf(answer, "%d", DISPLAY_USER_LOCATIONS);
+					write(sd,buf,SignalSize);
+					break;
 				case '3':
-				sprintf(buf, "%d", DISPLAY_USER_DEATHS);
-				sprintf(answer, "%d", DISPLAY_USER_DEATHS);
-				write(sd,buf,SignalSize);
-				break;
+					sprintf(buf, "%d", DISPLAY_USER_DEATHS);
+					sprintf(answer, "%d", DISPLAY_USER_DEATHS);
+					write(sd,buf,SignalSize);
+					break;
 				case '4':
-				sprintf(buf, "%d", DISPLAY_REMAINING_TIME);
-				sprintf(answer, "%d", DISPLAY_REMAINING_TIME);
-				write(sd,buf,SignalSize);
-				break;
+					sprintf(buf, "%d", DISPLAY_REMAINING_TIME);
+					sprintf(answer, "%d", DISPLAY_REMAINING_TIME);
+					write(sd,buf,SignalSize);
+					break;
 				default:
-				sprintf(buf, "%d", NULL_MOVE);
-				sprintf(answer, "%d", NULL_MOVE);
-				write(sd,buf,SignalSize);
-				break;
+					sprintf(buf, "%d", NULL_MOVE);
+					sprintf(answer, "%d", NULL_MOVE);
+					write(sd,buf,SignalSize);
+					break;
 			}
 		if(strcmp(answer,"3000")!=0){
 				printf("\ndisplaying:");
