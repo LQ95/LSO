@@ -15,7 +15,50 @@ int *update_pos(int *position,int moveflag){
 	}
 	return position;
 }
-
+/*IntList CreatePositionList(char *PositionVector)
+{
+char *pos,coord;
+int position[2];
+const char delim1[2]="|";
+IntList PosList=NULL;
+pos=strtok(PositionVector,delim1);
+while(pos!=NULL)
+	{
+		coord=pos[0];
+		position[0]=atoi(&coord);           //qua bisogna cambiare strtok con strtok_r perche' strtok non e' thread-safe
+		coord=pos[2];
+		position[1]=atoi(&coord);
+		PosList=add(PosList,position);
+		pos=strtok(NULL,delim1);
+		
+	}
+Print(PosList);
+return PosList;
+}
+void print_gamepos(int width,int height,int *position,char *PositionVector)
+{
+	int x,y;
+	IntList positions;
+	int pos[2];
+	//use strtok to transfer positions from the vector to the list
+	positions=CreatePositionList(PositionVector);
+        printf("\n");
+	for(y=height;y>-1;y--)
+	{
+		for(x=0;x<width;x++)
+		{
+			pos[0]=x;
+			pos[1]=y;
+			if(x==position[0] && y==position[1])printf(".■");
+			else if(IntSearch(positions,pos)==1 )
+				{
+				printf(".▄");
+				}
+			else printf(". ");
+		}
+		printf("\n");
+	}
+}*/
 void print_gamepos(int dim,int *position){
 	int x,y;
         printf("x:%d y:%d\n",position[0],position[1]);
@@ -158,6 +201,10 @@ void client_game(int sd,int dim){
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
 	//TODO reads that read an array of positions
+	/*read(sd,buf,DisplaySignalSize);
+	displaysize=atoi(buf);
+	read(sd,buf,displaysize);
+	printf("%s\n",buf);*/
 	print_gamepos(dim,position);
 	}
     printf("\n%s\n",GameOverMsg);
