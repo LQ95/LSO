@@ -48,22 +48,126 @@ int login(int connfd){
     return succ[0];
 }
 
+int barmenu(const char **array,const int row, const int col, const int arraylength, const int width, int menulength, int selection){
+        int counter,offset=0,ky=0;
+        char formatstring[7];
+        curs_set(0);
+
+        if (arraylength < menulength)
+                menulength=arraylength;
+
+        if (selection > menulength)
+                offset=selection-menulength+1;
+
+        sprintf(formatstring,"%%-%ds",width); // remove - sign to right-justify the menu items
+
+        while(ky != 27)
+                {
+                for (counter=0; counter < menulength; counter++)
+                        {
+                        if (counter+offset==selection)
+                                attron(A_REVERSE);
+                        mvprintw(row+counter,col,formatstring,array[counter+offset]);
+                        attroff(A_REVERSE);
+                        }
+
+                ky=getch();
+
+                switch(ky)
+                        {
+                        case KEY_UP:
+                                if (selection)
+                                        {
+                                        selection--;
+                                        if (selection < offset)
+                                                offset--;
+                                        }
+                                break;
+                        case KEY_DOWN:
+                                if (selection < arraylength-1)
+                                        {
+                                        selection++;
+                                        if (selection > offset+menulength-1)
+                                                offset++;
+                                        }
+                                break;
+                        case KEY_HOME:
+                                selection=0;
+                                offset=0;
+                                break;
+                        case KEY_END:
+                                selection=arraylength-1;
+                                offset=arraylength-menulength;
+                                break;
+                        case KEY_PPAGE:
+                                selection-=menulength;
+                                if (selection < 0)
+                                        selection=0;
+                                offset-=menulength;
+                                if (offset < 0)
+                                        offset=0;
+                                break;
+                        case KEY_NPAGE:
+                                selection+=menulength;
+                                if (selection > arraylength-1)
+                                        selection=arraylength-1;
+                                offset+=menulength;
+                                if (offset > arraylength-menulength)
+                                        offset=arraylength-menulength;
+                                break;
+                        case 10: //enter
+                                return selection;
+                                break;
+                        case KEY_F(1): // function key 1
+                                return -1;
+                        case 27: //esc
+                                // esc twice to get out, otherwise eat the chars that don't work
+                                //from home or end on the keypad
+                                ky=getch();
+                                if (ky == 27)
+                                        {
+                                        curs_set(0);
+                                        mvaddstr(9,77,"   ");
+                                        return -1;
+                                        }
+                                else
+                                        if (ky=='[')
+                                                {
+                                                getch();
+                                                getch();
+                                                }
+                                        else
+                                                ungetch(ky);
+                        }
+                }
+        return -1;
+    }
+
 int *menu(int connfd){
+    int selection,row=1, col=3, arraylength=3, width=3, menulength=3;
     int choice[1];
-    int seed[1];
-    int dim[1];
     int *out;
+    int succ_login=0;
     out=malloc(sizeof(int)*2);
-    clear_screen();
-    printf("benvenuto!\n1.Effettuare il login\n2.Crea un nuono utente\n");
-    choice[0]=scan_int(1,2);
+    const char *choicesarray[]={"Login", "Sign Up", "Exit"};
+    initscr();
+    raw();
+    noecho();
+    keypad(stdscr,TRUE);
+    //raw();
+    choice[0]=barmenu(choicesarray,row,col,arraylength,width,menulength,0);
+    choice[0]++;
     write(connfd,choice,sizeof(choice));
-    if(choice[0]==2){
+    endwin();
+     if(choice[0]==2){
         sign_up(connfd);
         clear_screen();
-        printf("Nuovo utente Registrato!\n\n");
+        printw("Nuovo utente Registrato!\n\n");
     }
-    int succ_login=0;
+    if(choice[0]==3){
+        close(connfd);
+        return NULL;
+    }
     succ_login=login(connfd);
     while(!succ_login){
         printf("login errato\n");
@@ -98,8 +202,11 @@ int main(){
         printf("connesso al server..\n");
         int *seeddim;
         seeddim=menu(sockfd);
-    printf("seed:%d\n", seeddim[0]);
-    printf("dimension:%d\n", seeddim[1]);
-    client_game(sockfd,seeddim[1]);
-    close(sockfd);
+        if(seeddim!=NULL){
+            printf("seed:%d\n", seeddim[0]);
+            printf("dimension:%d\n", seeddim[1]);
+            client_game(sockfd,seeddim[1]);
+            close(sockfd);
+    }
+    return 0;
 }
