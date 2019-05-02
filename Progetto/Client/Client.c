@@ -91,53 +91,9 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
                                                 offset++;
                                         }
                                 break;
-                        case KEY_HOME:
-                                selection=0;
-                                offset=0;
-                                break;
-                        case KEY_END:
-                                selection=arraylength-1;
-                                offset=arraylength-menulength;
-                                break;
-                        case KEY_PPAGE:
-                                selection-=menulength;
-                                if (selection < 0)
-                                        selection=0;
-                                offset-=menulength;
-                                if (offset < 0)
-                                        offset=0;
-                                break;
-                        case KEY_NPAGE:
-                                selection+=menulength;
-                                if (selection > arraylength-1)
-                                        selection=arraylength-1;
-                                offset+=menulength;
-                                if (offset > arraylength-menulength)
-                                        offset=arraylength-menulength;
-                                break;
                         case 10: //enter
                                 return selection;
                                 break;
-                        case KEY_F(1): // function key 1
-                                return -1;
-                        case 27: //esc
-                                // esc twice to get out, otherwise eat the chars that don't work
-                                //from home or end on the keypad
-                                ky=getch();
-                                if (ky == 27)
-                                        {
-                                        curs_set(0);
-                                        mvaddstr(9,77,"   ");
-                                        return -1;
-                                        }
-                                else
-                                        if (ky=='[')
-                                                {
-                                                getch();
-                                                getch();
-                                                }
-                                        else
-                                                ungetch(ky);
                         }
                 }
         return -1;

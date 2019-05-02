@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ncurses.h>
-#include "./intList/intlist.h"
+#include "./IntList/intlist.h"
 
 #define PORT 8080
 #define SA struct sockaddr
