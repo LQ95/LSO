@@ -56,7 +56,7 @@ while(tmp!=NULL)
 return found;
 }
 
-void  (IntList L)
+void PrintList(IntList L)
 {
 	IntList tmp;
 	tmp=L;
