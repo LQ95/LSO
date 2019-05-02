@@ -9,6 +9,6 @@ typedef struct Node{
 typedef ListNode *IntList;
 IntList add(IntList L,int *el);
 IntList addHead(IntList L,int *el);
-void Print(IntList L);
+void PrintList(IntList L);
 int IntSearch(IntList L,int *el);
 #endif

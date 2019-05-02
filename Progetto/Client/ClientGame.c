@@ -1,5 +1,4 @@
 #include "lib_client.h"
-
 int *update_pos(int *position,int moveflag){
 	if (moveflag==MOVE_UP){
 		position[1]++;
@@ -15,27 +14,29 @@ int *update_pos(int *position,int moveflag){
 	}
 	return position;
 }
-/*IntList CreatePositionList(char *PositionVector)
+IntList CreatePositionList(char *PositionVector)
 {
-char *pos,coord;
+char *pos,*coord;
 int position[2];
 const char delim1[2]="|";
+const char delim2[2]=":";
 IntList PosList=NULL;
-pos=strtok(PositionVector,delim1);
+pos=strtok_r(PositionVector,delim1,&PositionVector);
 while(pos!=NULL)
 	{
-		coord=pos[0];
-		position[0]=atoi(&coord);           //qua bisogna cambiare strtok con strtok_r perche' strtok non e' thread-safe
-		coord=pos[2];
-		position[1]=atoi(&coord);
+		printf("Debug: %s %s ",PositionVector,pos);
+		coord=strtok_r(pos,delim2,&pos);
+		position[0]=atoi(coord);           //qua bisogna cambiare strtok con strtok_r perche' strtok non e' thread-safe
+		coord=strtok_r(pos,delim2,&pos);
+		position[1]=atoi(coord);
 		PosList=add(PosList,position);
-		pos=strtok(NULL,delim1);
+		pos=strtok_r(PositionVector,delim1,&PositionVector);
 		
 	}
-Print(PosList);
+PrintList(PosList);
 return PosList;
 }
-void print_gamepos(int width,int height,int *position,char *PositionVector)
+void print_gamepos(int dim,int *position,char *PositionVector)
 {
 	int x,y;
 	IntList positions;
@@ -43,9 +44,9 @@ void print_gamepos(int width,int height,int *position,char *PositionVector)
 	//use strtok to transfer positions from the vector to the list
 	positions=CreatePositionList(PositionVector);
         printf("\n");
-	for(y=height;y>-1;y--)
+	for(y=dim;y>-1;y--)
 	{
-		for(x=0;x<width;x++)
+		for(x=0;x<dim;x++)
 		{
 			pos[0]=x;
 			pos[1]=y;
@@ -54,17 +55,6 @@ void print_gamepos(int width,int height,int *position,char *PositionVector)
 				{
 				printf(".▄");
 				}
-			else printf(". ");
-		}
-		printf("\n");
-	}
-}*/
-void print_gamepos(int dim,int *position){
-	int x,y;
-        printf("x:%d y:%d\n",position[0],position[1]);
-	for(y=dim;y>-1;y--){
-		for(x=0;x<dim;x++){
-			if(x==position[0] && y==position[1])printf(".■");
 			else printf(". ");
 		}
 		printf("\n");
@@ -201,11 +191,11 @@ void client_game(int sd,int dim){
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
 	//TODO reads that read an array of positions
-	/*read(sd,buf,DisplaySignalSize);
+	read(sd,buf,DisplaySignalSize);
 	displaysize=atoi(buf);
 	read(sd,buf,displaysize);
-	printf("%s\n",buf);*/
-	print_gamepos(dim,position);
+	printf("%s\n",buf);
+	print_gamepos(dim,position,buf);
 	}
     printf("\n%s\n",GameOverMsg);
     return;

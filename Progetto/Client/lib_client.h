@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ncurses.h>
+#include "./intList/intlist.h"
 
 #define PORT 8080
 #define SA struct sockaddr
@@ -39,5 +40,5 @@
 
 //Client functions
 int *update_pos(int *position,int moveflag);
-void print_gamepos(int dim,int *position);
+void print_gamepos(int dim,int *position,char *PositionVector);
 void client_game(int sd,int dim);

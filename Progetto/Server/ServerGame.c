@@ -121,6 +121,7 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
 	int nextmove;
 	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
 	char *displaybuf;
+	char PlayerPos[12];
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END){
 		nread=read(P->P.socket_desc,buf,SignalSize);
@@ -306,19 +307,18 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
         }
         *GameTime=(*GameTime)-1;
         //TODO writes that send an array of positions
-		/*				strcpy(buf, "");
-				while(tmp!=NULL)
-					{
-						sprintf(PlayerPos,"%d:%d|",tmp->P.position[0],tmp->P.position[1]);
-						strcat(buf,PlayerPos);
-						tmp=tmp->next;
-					}
-				tmp=L;
-				sprintf(displaysize,"%lu",strlen(buf));
-				printf("buffer:%s\n",buf);
-				write(P->P.socket_desc,displaysize,DisplaySignalSize);
-				write(P->P.socket_desc,buf,strlen(buf));
-		*/
+	strcpy(buf, "");
+	while(tmp!=NULL)
+		{
+			sprintf(PlayerPos,"%d:%d|",tmp->P.position[0],tmp->P.position[1]);
+			strcat(buf,PlayerPos);
+			tmp=tmp->next;
+		}
+	tmp=L;
+	sprintf(displaysize,"%lu",strlen(buf));
+	printf("buffer:%s\n",buf);
+	write(P->P.socket_desc,displaysize,DisplaySignalSize);
+	write(P->P.socket_desc,buf,strlen(buf));
         if (*GameTime<=0) session_status=SESSION_END;
         }
         else session_status=SESSION_END;

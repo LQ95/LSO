@@ -66,3 +66,31 @@ void PrintList(IntList L)
 			tmp=tmp->next;
 		}
 }
+void EliminateElement(int *el,IntList L)
+{
+	IntList tmp,next;
+	tmp=L;
+while(tmp->next!=NULL)
+	{
+	if (el[0]==tmp->info[0] && el[1]==tmp->info[1])
+		{
+			next=tmp->next;
+			tmp->next=tmp->next->next;
+			free(el);
+			free(next);
+			return;
+		}
+	else tmp=tmp->next;
+	}
+
+}
+void FreeList(IntList L)
+{
+	IntList tmp;
+	tmp=L;
+	while(tmp!=NULL)
+		{
+			EliminateElement(tmp->info,L);
+			tmp=tmp->next;
+		}
+}
