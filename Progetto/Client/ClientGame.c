@@ -86,6 +86,7 @@ void client_game(int sd,int dim){
 	char buf[BUFDIM];
 	char GameOverMsg[35];
 	char *answer=calloc(6,sizeof(char));
+	char *flexiblebuf=malloc(0,sizeof(char));
 	position=malloc(sizeof(int)*2);
 	read(sd,buf,SignalSize);
 	position[0]=atoi(buf);
@@ -190,9 +191,12 @@ void client_game(int sd,int dim){
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
-	//TODO reads that read an array of positions
+	//read an array of positions
 	read(sd,buf,DisplaySignalSize);
 	displaysize=atoi(buf);
+	flexiblebuf=realloc(flexiblebuf,displaysize*sizeof(char));
+	nread=read(sd,flexiblebuf,displaysize);           //trying to avoid memory problems
+	printf("tramesso: %s lungo:%d \n",flexiblebuf,nread);
 	read(sd,buf,displaysize);
 	printf("%s\n",buf);
 	print_gamepos(dim,position,buf);

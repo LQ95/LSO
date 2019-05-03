@@ -306,7 +306,7 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     break;
         }
         *GameTime=(*GameTime)-1;
-        //TODO writes that send an array of positions
+        //send an array of positions
 	strcpy(buf, "");
 	while(tmp!=NULL)
 		{
