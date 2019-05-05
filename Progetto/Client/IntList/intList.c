@@ -15,15 +15,13 @@ IntList add(IntList L,int *el)
 	{
 		IntList tmp;
 		tmp=L;
+		PrintList(tmp);
 		while(tmp->next!=NULL)
 			{
 				tmp=tmp->next;
 			}
 	
-		tmp->next=malloc(sizeof(ListNode));
-		tmp->info[0]=el[0]; 
-		tmp->info[1]=el[1];
-		tmp->next->next=NULL;
+		tmp->next=create(el);
 	}
 	else if(L==NULL) L=create(el);
 	return L;
@@ -47,7 +45,7 @@ int IntSearch(IntList L,int *el)
 {
 int found=0;
 IntList tmp=L;
-while(tmp!=NULL)
+while(tmp!=NULL && found==0)
 	{
 		if(el[0]==tmp->info[0] && el[1]==tmp->info[1])
 			 found=1;
@@ -58,13 +56,16 @@ return found;
 
 void PrintList(IntList L)
 {
-	IntList tmp;
-	tmp=L;
-	while(tmp!=NULL)
-		{
-			printf("x:%d y:%d ",tmp->info[0],tmp->info[1]);
-			tmp=tmp->next;
-		}
+if(L!=NULL){
+		IntList tmp;
+		tmp=L;
+		while(tmp!=NULL)
+			{
+				printf("x:%d y:%d \n",tmp->info[0],tmp->info[1]);
+				tmp=tmp->next;
+			}
+	}
+else printf("null\n");
 }
 void EliminateElement(int *el,IntList L)
 {

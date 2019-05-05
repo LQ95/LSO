@@ -155,7 +155,6 @@ int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
-
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -176,7 +175,7 @@ int main(){
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
-	int optval = 1;
+    int optval = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
         printf("socket bind fallito...\n");

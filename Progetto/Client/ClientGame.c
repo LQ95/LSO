@@ -17,20 +17,22 @@ int *update_pos(int *position,int moveflag){
 IntList CreatePositionList(char *PositionVector)
 {
 char *pos,*coord;
+char *next=NULL;
+char *next2=NULL;
 int position[2];
 const char delim1[2]="|";
 const char delim2[2]=":";
 IntList PosList=NULL;
-pos=strtok_r(PositionVector,delim1,&PositionVector);
+pos=strtok_r(PositionVector,delim1,&next);
 while(pos!=NULL)
 	{
-		printf("Debug: %s %s ",PositionVector,pos);
-		coord=strtok_r(pos,delim2,&pos);
-		position[0]=atoi(coord);           //qua bisogna cambiare strtok con strtok_r perche' strtok non e' thread-safe
-		coord=strtok_r(pos,delim2,&pos);
-		position[1]=atoi(coord);
+		coord=strtok_r(pos,delim2,&next2);
+		position[0]=atoi(coord);          
+		coord=strtok_r(NULL,delim2,&next2);
+		next2=NULL;
+		position[1]=atoi(coord); 
 		PosList=add(PosList,position);
-		pos=strtok_r(PositionVector,delim1,&PositionVector);
+		pos=strtok_r(NULL,delim1,&next);
 		
 	}
 PrintList(PosList);
@@ -80,13 +82,13 @@ else return;
 
 void client_game(int sd,int dim){
     clear_screen();
-	int game_status,displaysize,moveflag,ID,*position;
+	int game_status,displaysize,moveflag,ID,*position,nread;
 	game_status=LOGIN_OK;
 	char input;
 	char buf[BUFDIM];
 	char GameOverMsg[35];
 	char *answer=calloc(6,sizeof(char));
-	char *flexiblebuf=malloc(0,sizeof(char));
+	char *flexiblebuf=malloc(sizeof(char));
 	position=malloc(sizeof(int)*2);
 	read(sd,buf,SignalSize);
 	position[0]=atoi(buf);
@@ -191,15 +193,14 @@ void client_game(int sd,int dim){
 		}
 	//sends and receives signals from the server,prints the map after every move as long as it participates in the game
 	printf("\n");
-	//read an array of positions
+	strcpy(buf,"");
+	//TODO reads that read an array of positions
 	read(sd,buf,DisplaySignalSize);
 	displaysize=atoi(buf);
 	flexiblebuf=realloc(flexiblebuf,displaysize*sizeof(char));
 	nread=read(sd,flexiblebuf,displaysize);           //trying to avoid memory problems
 	printf("tramesso: %s lungo:%d \n",flexiblebuf,nread);
-	read(sd,buf,displaysize);
-	printf("%s\n",buf);
-	print_gamepos(dim,position,buf);
+	print_gamepos(dim,position,flexiblebuf);
 	}
     printf("\n%s\n",GameOverMsg);
     return;

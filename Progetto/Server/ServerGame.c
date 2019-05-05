@@ -306,7 +306,7 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     break;
         }
         *GameTime=(*GameTime)-1;
-        //send an array of positions
+        //TODO writes that send an array of positions
 	strcpy(buf, "");
 	while(tmp!=NULL)
 		{
@@ -316,7 +316,6 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
 		}
 	tmp=L;
 	sprintf(displaysize,"%lu",strlen(buf));
-	printf("buffer:%s\n",buf);
 	write(P->P.socket_desc,displaysize,DisplaySignalSize);
 	write(P->P.socket_desc,buf,strlen(buf));
         if (*GameTime<=0) session_status=SESSION_END;
