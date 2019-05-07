@@ -143,7 +143,7 @@ int **create_board(int seed,int dim){
 void server_log(char *data){
 	int fd,size;
 	size=sizeof(data);
-	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR);
+	fd=open("Log.txt",O_RDWR|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
 	if(write(fd,data,size)<0)
 	{
 		perror("errore nella compilazione del log");
