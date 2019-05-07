@@ -58,7 +58,7 @@ typedef struct list{
 	struct list *next;
 }PlayerNode;
 typedef PlayerNode *player_list;
-void ServerLog(char *data);
+void server_log(char *data);
 int **create_board(int seed,int dim);
 
 //player_list functions

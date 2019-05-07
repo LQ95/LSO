@@ -142,7 +142,7 @@ int **create_board(int seed,int dim){
 
 void server_log(char *data){
 	int fd,size;
-	size=sizeof(data);
+	size=strlen(data)*sizeof(char);
 	fd=open("Log.txt",O_RDWR|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
 	if(write(fd,data,size)<0)
 	{
@@ -155,7 +155,11 @@ int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
+    time_t *ConnectionTime=malloc(sizeof(time_t));
+    char PlayerTimestamp[70];
+    char PlayerAddress[60];
     pthread_t tid;
+    char log[200];
     struct sockaddr_in servaddr, cli;
     FILE *db;
 	db=fopen("login_credentials.db","r+");
@@ -219,7 +223,13 @@ int main(){
         thread_sd.GameTime=GlobalGametime;
         thread_sd.dim=dim;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
+	time(ConnectionTime);
+	strcpy(PlayerTimestamp,ctime(ConnectionTime));
+	strcpy(PlayerAddress,inet_ntoa(cli.sin_addr));
+	sprintf(log,"Connessione a:%s da :%s\n",PlayerTimestamp,PlayerAddress);
+	server_log(log);
         pthread_create(&tid,NULL,sendseed,&thread_sd);
+	strcpy(log, "");
         }
     }
     close(sockfd);
