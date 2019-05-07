@@ -118,17 +118,21 @@ char *display(player_list L,int flag,player_list deaths,char *data){
 void server_game(int **board,int **positions,player_list L,int dim,player_list P,player_list Dead,int *GameTime){
 	int session_status,eliminated=0,nread;
 	player_list tmp=L;
+	time_t *EndTimestamp=malloc(sizeof(time_t));
 	int nextmove;
-	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE];
+	char buf[BUFDIM],displaysize[DISPLAYSIGSIZE],LogData[230];
 	char *displaybuf;
-	char PlayerPos[12];
+	char PlayerPos[12],PlayerTime[60];
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END){
 		nread=read(P->P.socket_desc,buf,SignalSize);
 		if(nread==0){
-            close(P->P.socket_desc);
-            return;
-		}
+		    strcpy(PlayerTime,ctime(EndTimestamp));
+		    sprintf(LogData,"giocatore %d disconnesso %s\n",P->P.ID,PlayerTime);
+		    server_log(LogData);
+            	    close(P->P.socket_desc);
+            	    return;
+			    }
 		nextmove=atoi(buf);
 		switch(nextmove){
             case NULL_MOVE:
@@ -142,6 +146,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                         positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
                         if (check_win(P,dim)==1){
                                 sprintf(buf, "%d", WIN);
+		   		strcpy(PlayerTime,ctime(EndTimestamp));
+		   		sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		   		server_log(LogData);
                                 write(P->P.socket_desc,buf,SignalSize);
                                 eliminated=1;
                                 *GameTime=0;
@@ -154,6 +161,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                 }
                 else if(check_bomb(P->P.position,board)==0){
                     sprintf(buf, "%d", ELIMINATED);
+		    strcpy(PlayerTime,ctime(EndTimestamp));
+		    sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		    server_log(LogData);
                     write(P->P.socket_desc,buf,SignalSize);
                     Dead=insert(Dead,P->P.socket_desc);
                     positions[P->P.position[0]][P->P.position[1]]=0;
@@ -174,6 +184,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
                     if (check_win(P,dim)==1){
                         sprintf(buf, "%d", WIN);
+		   	strcpy(PlayerTime,ctime(EndTimestamp));
+		   	sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		   	server_log(LogData);
                         write(P->P.socket_desc,buf,SignalSize);
                         eliminated=1;
                         *GameTime=0;
@@ -186,6 +199,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
             }
             else if(check_bomb(P->P.position,board)==0){
                 sprintf(buf, "%d", ELIMINATED);
+		strcpy(PlayerTime,ctime(EndTimestamp));
+		sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		server_log(LogData);
                 write(P->P.socket_desc,buf,SignalSize);
                 Dead=insert(Dead,P->P.socket_desc);
                 positions[P->P.position[0]][P->P.position[1]]=0;
@@ -206,6 +222,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
                     if (check_win(P,dim)==1){
                         sprintf(buf, "%d", WIN);
+		   	strcpy(PlayerTime,ctime(EndTimestamp));
+		   	sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		   	server_log(LogData);
                         write(P->P.socket_desc,buf,SignalSize);
                         eliminated=1;
                         *GameTime=0;
@@ -218,6 +237,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                 }
                 else if(check_bomb(P->P.position,board)==0){
                     sprintf(buf, "%d", ELIMINATED);
+		    strcpy(PlayerTime,ctime(EndTimestamp));
+		    sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		    server_log(LogData);
                     write(P->P.socket_desc,buf,SignalSize);
                     Dead=insert(Dead,P->P.socket_desc);
                     positions[P->P.position[0]][P->P.position[1]]=0;
@@ -238,6 +260,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
                     if (check_win(P,dim)==1){
                         sprintf(buf, "%d", WIN);
+		   	strcpy(PlayerTime,ctime(EndTimestamp));
+		   	sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		   	server_log(LogData);
                         write(P->P.socket_desc,buf,SignalSize);
                         eliminated=1;
                         *GameTime=0;
@@ -250,6 +275,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                 }
                 else if(check_bomb(P->P.position,board)==0){
                     sprintf(buf, "%d", ELIMINATED);
+		    strcpy(PlayerTime,ctime(EndTimestamp));
+		    sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+		    server_log(LogData);
                     write(P->P.socket_desc,buf,SignalSize);
                     Dead=insert(Dead,P->P.socket_desc);
                     positions[P->P.position[0]][P->P.position[1]]=0;
@@ -264,10 +292,13 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                 }
                 break;
             case QUIT:
+		strcpy(PlayerTime,ctime(EndTimestamp));
+		sprintf(LogData,"giocatore %d ha abbandonato la partita %s\n",P->P.ID,PlayerTime);
+		server_log(LogData);
                 tmp=eliminate_disconnect(P->P.ID,L);
                 eliminated=1;
                 break;
-				default:
+	    default:
                 sprintf(buf, "%d", LOGIN_OK);
                 write(P->P.socket_desc,buf,SignalSize);
                 break;
@@ -275,6 +306,9 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
     if(eliminated==0){
         nread=read(P->P.socket_desc,buf,SignalSize);
         if(nread==0){
+	    strcpy(PlayerTime,ctime(EndTimestamp));
+	    sprintf(LogData,"giocatore %d disconnesso %s\n",P->P.ID,PlayerTime);
+	    server_log(LogData);
             close(P->P.socket_desc);
             return;
         }
@@ -322,4 +356,7 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
         }
         else session_status=SESSION_END;
 	}
+strcpy(PlayerTime,ctime(EndTimestamp));
+sprintf(LogData,"giocatore %d posizione a fine sessione: x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+server_log(LogData);
 }
