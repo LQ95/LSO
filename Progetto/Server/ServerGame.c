@@ -18,25 +18,25 @@ int **create_position_map(int dim){
 int check_free(int x,int y,int **position,int dim){
 	if((x>=0 && y>=0) && (x<dim && y<dim))
 			{
-				if(position[x][y]==0) return 1;
+				if(position[x][y]==0) return 1;    //check the position matrix,returns 1 if the position checked holds any value different than 0
 			}
 	else return 0;
 }
 
 int check_bomb(int coord[2],int **map){
 
-	if(map[coord[0]][coord[1]]==0)return 1;
+	if(map[coord[0]][coord[1]]==0)return 1;  //returns 1 if thee is no bomb 0 if there is
 	else return 0;
 }
 
 int check_win(player_list L,int dim){
-	if(L->P.position[0]>=dim-1) return 1;
+	if(L->P.position[0]>=dim-1) return 1;   //returns 1 if the player is in the last column
 	else return 0;
 }
 
 int **init_positions(int **board,int **positions,int dim,player_list P,int connfd){
-	//assign starting positions to all players so that they can start the race
-	//tell players their own starting postions,that are always on a random point in the first column
+	//assign a starting position to one player at a time so that he/she can start the race
+	//write said starting position ,that is always on a random point in the first column,on the the player's socket
 	srand(time(NULL));	
 	int nwrite;
 	char buf[SIGSIZE];
@@ -95,6 +95,7 @@ char *display(player_list L,int flag,player_list deaths,char *data){
 		return data;
 		}
 	else if (flag==2){
+		//user deaths
 		sprintf(entry,"User deaths \n");
 		strcat(data,entry);
 		tmp=deaths;
@@ -104,6 +105,10 @@ char *display(player_list L,int flag,player_list deaths,char *data){
 				tmp=tmp->next;
 				i++;
 			}
+		else if (flag==3){
+		//remaining time,incomplete
+		sprintf(entry,"remaining time \n");
+		strcat(data,entry);
 		return data;
 		}
 	else sprintf(data," Error:invalid display function flag");
@@ -125,7 +130,7 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
 	char PlayerPos[12],PlayerTime[60];
 	session_status=LOGIN_OK;
 	while(session_status!=SESSION_END){
-		nread=read(P->P.socket_desc,buf,SignalSize);
+		nread=read(P->P.socket_desc,buf,SignalSize); //read a code from the client 
 		if(nread==0){
 					strcpy(PlayerTime,ctime(EndTimestamp));
 					sprintf(LogData,"giocatore %d disconnesso %s\n",P->P.ID,PlayerTime);
@@ -133,49 +138,49 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
             	    close(P->P.socket_desc);
             	    return;
 					}
-		nextmove=atoi(buf);
+		nextmove=atoi(buf); //convert the code into an int
 		switch(nextmove){
-            case NULL_MOVE:
+            case NULL_MOVE: //no movement means you can continue on 
                 sprintf(buf, "%d", LOGIN_OK);
                 write(P->P.socket_desc,buf,SignalSize);
                 break;
-            case MOVE_LEFT:
-                if(check_free(P->P.position[0]-1,P->P.position[1],positions,dim)!=0  && check_bomb(P->P.position,board)!=0){
-                        positions[P->P.position[0]][P->P.position[1]]=0;
-                        P->P.position[0]--;
-                        positions[P->P.position[0]][P->P.position[1]]=P->P.ID;
-                        if (check_win(P,dim)==1){
+            case MOVE_LEFT: //one of the four codes for actual movement 
+                if(check_free(P->P.position[0]-1,P->P.position[1],positions,dim)!=0  && check_bomb(P->P.position,board)!=0){ //if the position you want to move to is free and there are no bombs there,you move there
+                        positions[P->P.position[0]][P->P.position[1]]=0; //free previously occupied position
+                        P->P.position[0]--;//change position data in the list
+                        positions[P->P.position[0]][P->P.position[1]]=P->P.ID; //occupy te new position in the position matrix
+                        if (check_win(P,dim)==1){ //we check for a win right after movement that we know to be legitimate,if it is we log the win ,tell the player,and put the global game time to 0
                                 sprintf(buf, "%d", WIN);
 								strcpy(PlayerTime,ctime(EndTimestamp));
-								sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+								sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime); 
 								server_log(LogData);
                                 write(P->P.socket_desc,buf,SignalSize);
                                 eliminated=1;
                                 *GameTime=0;
                         }
                         else{
-                                sprintf(buf, "%d", MOVE_OK);
+                                sprintf(buf, "%d", MOVE_OK); //else,we jut tell the player that they actually moved
                                 write(P->P.socket_desc,buf,SignalSize);
                             }
                         break;
                 }
-                else if(check_bomb(P->P.position,board)==0){
+                else if(check_bomb(P->P.position,board)==0){ //if there was a bomb,we eliminate the player
                     sprintf(buf, "%d", ELIMINATED);
-					strcpy(PlayerTime,ctime(EndTimestamp));
+					strcpy(PlayerTime,ctime(EndTimestamp)); //log his/her death
 					sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
 					server_log(LogData);
-                    write(P->P.socket_desc,buf,SignalSize);
-                    Dead=insert(Dead,P->P.socket_desc);
-                    positions[P->P.position[0]][P->P.position[1]]=0;
+                    write(P->P.socket_desc,buf,SignalSize);//tell the player about his death
+                    Dead=insert(Dead,P->P.socket_desc);//insert him into a list of deaths and eliminate him from the main list
+                    positions[P->P.position[0]][P->P.position[1]]=0;//eliminate him from the position he occupied
                     tmp=eliminate(P->P.ID,L);
                     eliminated=1;
                     break;
                 }
                 else{
-                    sprintf(buf, "%d", SQUARE_OCCUPIED);
+                    sprintf(buf, "%d", SQUARE_OCCUPIED); //else, the square is occupied
                     write(P->P.socket_desc,buf,SignalSize);
                     break;
-                }
+                }           //the rest of the movement codes have the exact same logic as this but they obviously modify the position in a different way 
                 break;
             case MOVE_RIGHT:
                 if(check_free(P->P.position[0]+1,P->P.position[1],positions,dim)!=0 && check_bomb(P->P.position,board)!=0){
@@ -335,6 +340,10 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
                     write(P->P.socket_desc,displaybuf,strlen(displaybuf));
                     break;
             case DISPLAY_REMAINING_TIME:
+			        displaybuf=display(L,3,Dead,displaybuf);
+                    sprintf(displaysize,"%lu",strlen(displaybuf));
+                    write(P->P.socket_desc,displaysize,DisplaySignalSize);
+                    write(P->P.socket_desc,displaybuf,strlen(displaybuf));
                     break;
             case NULL_MOVE:
                     break;
