@@ -15,6 +15,25 @@ int **create_position_map(int dim){
 	return positions;
 }
 
+void GameLogging(int flag,player_list P)
+{
+	char LogData[230],PlayerTime[60];
+	time_t *EndTimestamp=malloc(sizeof(time_t));
+	strcpy(PlayerTime,ctime(EndTimestamp));
+	switch(flag){
+	case 1:	
+	sprintf(LogData,"giocatore %d disconnesso %s\n",P->P.ID,PlayerTime);
+	case 2:	
+	sprintf(LogData,"giocatore %d morto a x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+	case 3:		   		
+	sprintf(LogData,"giocatore %d ha vinto! x:%d y:%d %s\n",P->P.ID,P->P.position[0],P->P.position[1],PlayerTime);
+	case 4:	
+	sprintf(LogData,"giocatore %d ha abbandonato la partita %s\n",P->P.ID,PlayerTime);
+	}
+	
+	server_log(LogData);
+}
+
 int check_free(int x,int y,int **position,int dim){
 	if((x>=0 && y>=0) && (x<dim && y<dim))
 			{
