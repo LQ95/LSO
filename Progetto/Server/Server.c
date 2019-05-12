@@ -154,6 +154,7 @@ void server_log(char *data){
 int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
+	int global_status,game_status;
     int pid;
     time_t *ConnectionTime=malloc(sizeof(time_t));
     char PlayerTimestamp[70];
@@ -203,8 +204,10 @@ int main(){
         int **positions=create_position_map(dim);
     player_list Players=NULL;
     player_list Deaths=NULL;
+	global_status=SERVER_ISACTIVE;
+	game_status=SERVER_GAME_ISACTIVE;
     int *GlobalGametime=malloc(sizeof(int));
-    while (1){
+    while (game_status=SERVER_GAME_ISACTIVE){
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
