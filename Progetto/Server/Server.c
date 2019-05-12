@@ -207,7 +207,7 @@ int main(){
 	global_status=SERVER_ISACTIVE;
 	game_status=SERVER_GAME_ISACTIVE;
     int *GlobalGametime=malloc(sizeof(int));
-    while (game_status=SERVER_GAME_ISACTIVE){
+    while (game_status==SERVER_GAME_ISACTIVE){
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
