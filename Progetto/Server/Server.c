@@ -1,5 +1,6 @@
 #include "lib_server.h"
 #include "../scan_int/scan_int.h"
+#include "ncurses.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 struct thread_data{
@@ -20,7 +21,24 @@ struct monitor_data{
 
 void *activity_monitoring(void *arg)
 {
+	struct monitor_data *data=arg;
+	int *server_status=data->GameStatus;
+	int *game_status=data->ServerStatus;
+	int enter_press;
 	const char *message="Press Enter to terminate all server activities";
+	initscr();
+	noecho();
+	keypad(stdscr,TRUE);
+	enter_press=getch();
+	while(enter_press!=10)
+	{
+		printw("%s",message);
+		refresh();
+		enter_press=getch();
+	}
+	*game_status=SERVER_GAME_END;
+	*server_status=SERVER_END;
+	endwin();
 }
 
 int genseed()
@@ -223,34 +241,38 @@ int main(){
     status_data.GameStatus=global_status;
     status_data.ServerStatus=game_status;
     pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
+    //connection handling and game-related multithreading
     int *GlobalGametime=malloc(sizeof(int));
-    while (*game_status==SERVER_GAME_ISACTIVE && *global_status==SERVER_ISACTIVE){
-    len = sizeof(cli);
-    connfd = accept(sockfd, (SA*)&cli, &len);
-    if (connfd < 0) {
-        printf("server acccept fallito..\n");
-        exit(0);
-    }
-    else{
-        printf("server accept avvenuto con successo...\n");
-        *GlobalGametime=rand()%MAXGAMETIME;
-        Players=insert(Players,connfd);
-        thread_sd.connfd=connfd;
-        thread_sd.seed=seed[0];
-        thread_sd.L=Players;
-        thread_sd.Dead=Deaths;
-        thread_sd.posmap=positions;
-        thread_sd.GameTime=GlobalGametime;
-        thread_sd.dim=dim;
-        //printf("%d %d\n",thread_sd[0],thread_sd[1]);
-	time(ConnectionTime);
-	strcpy(PlayerTimestamp,ctime(ConnectionTime));
-	strcpy(PlayerAddress,inet_ntoa(cli.sin_addr));
-	sprintf(log,"Connessione a:%s da :%s\n",PlayerTimestamp,PlayerAddress);
-	server_log(log);
-        pthread_create(&tid,NULL,sendseed,&thread_sd);
-	strcpy(log, "");
-        }
+    while(*global_status==SERVER_ISACTIVE){
+    	while (*game_status==SERVER_GAME_ISACTIVE)
+	    {
+   		 len = sizeof(cli);
+   		 connfd = accept(sockfd, (SA*)&cli, &len);
+   	 	 if (connfd < 0) {
+       			 printf("server acccept fallito..\n");
+       			 exit(0);
+  		  }
+   		 else{
+     		   printf("server accept avvenuto con successo...\n");
+       		  *GlobalGametime=rand()%MAXGAMETIME;
+     		  Players=insert(Players,connfd);
+      		  thread_sd.connfd=connfd;
+      		  thread_sd.seed=seed[0];
+        	  thread_sd.L=Players;
+  	          thread_sd.Dead=Deaths;
+        	  thread_sd.posmap=positions;
+       		  thread_sd.GameTime=GlobalGametime;
+        	  thread_sd.dim=dim;
+        	  //printf("%d %d\n",thread_sd[0],thread_sd[1]);
+		  time(ConnectionTime);
+		  strcpy(PlayerTimestamp,ctime(ConnectionTime));
+		  strcpy(PlayerAddress,inet_ntoa(cli.sin_addr));
+		  sprintf(log,"Connessione a:%s da :%s\n",PlayerTimestamp,PlayerAddress);
+		  server_log(log);
+        	  pthread_create(&tid,NULL,sendseed,&thread_sd);
+		  strcpy(log, "");
+     	   }
+    	}
     }
     close(sockfd);
     return 0;
