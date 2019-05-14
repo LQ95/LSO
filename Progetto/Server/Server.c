@@ -13,6 +13,16 @@ struct thread_data{
     FILE *db;
 };
 
+struct monitor_data{
+	int *GameStatus;
+	int *ServerStatus;
+	};
+
+void *activity_monitoring(void *arg)
+{
+	const char *message="Press Enter to terminate all server activities";
+}
+
 int genseed()
 {
     //Crea un seed per la tavola di gioco
@@ -152,14 +162,16 @@ void server_log(char *data){
 }
 
 int main(){
-    //Creazione della connesione TCP
+    //Creazione della connessione TCP
     int sockfd, connfd, len;
-	int global_status,game_status;
+    int *global_status,*game_status;
+    global_status=malloc(sizeof(int));
+    game_status=malloc(sizeof(int));
     int pid;
     time_t *ConnectionTime=malloc(sizeof(time_t));
     char PlayerTimestamp[70];
     char PlayerAddress[60];
-    pthread_t tid;
+    pthread_t tid,monitor_tid;
     char log[200];
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -196,18 +208,23 @@ int main(){
     }
     else
         printf("selezionare dimensione griglia (min:10)\n");
-        int dim=scan_int(10,INT_MAX);
-        printf("dimensione griglia: %d\n",dim);
-        dim++;
-        printf("Server listening..\n");
-        struct thread_data thread_sd;
-        int **positions=create_position_map(dim);
+    int dim=scan_int(10,INT_MAX);
+    printf("dimensione griglia: %d\n",dim);
+    dim++;
+    printf("Server listening..\n");
+    struct thread_data thread_sd;
+    int **positions=create_position_map(dim);
     player_list Players=NULL;
     player_list Deaths=NULL;
-	global_status=SERVER_ISACTIVE;
-	game_status=SERVER_GAME_ISACTIVE;
+    //establishing a thread to monitor all server activity
+    struct monitor_data status_data;
+    *global_status=SERVER_ISACTIVE;
+    *game_status=SERVER_GAME_ISACTIVE;
+    status_data.GameStatus=global_status;
+    status_data.ServerStatus=game_status;
+    pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
     int *GlobalGametime=malloc(sizeof(int));
-    while (game_status==SERVER_GAME_ISACTIVE){
+    while (*game_status==SERVER_GAME_ISACTIVE && *global_status==SERVER_ISACTIVE){
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
