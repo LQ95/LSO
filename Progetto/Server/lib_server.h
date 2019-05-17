@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <stdio.h>
-#include <sys/socket.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <arpa/inet.h>

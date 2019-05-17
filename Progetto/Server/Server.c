@@ -17,6 +17,7 @@ struct thread_data{
 struct monitor_data{
 	int *GameStatus;
 	int *ServerStatus;
+	int pid;
 	};
 
 void *activity_monitoring(void *arg)
@@ -24,20 +25,28 @@ void *activity_monitoring(void *arg)
 	struct monitor_data *data=arg;
 	int *server_status=data->GameStatus;
 	int *game_status=data->ServerStatus;
+	int pid=data->pid;
 	int enter_press;
-	const char *message="Press Enter to terminate all server activities";
+	const char *message="Press Enter to terminate all server activities after the game is over\npress K to kill the process instantly";
 	initscr();
 	noecho();
 	keypad(stdscr,TRUE);
-	enter_press=getch();
+	enter_press=0;
+	mvprintw(100,100,"%s",message);
+	refresh();
 	while(enter_press!=10)
 	{
-		printw("%s",message);
-		refresh();
 		enter_press=getch();
+		switch(enter_press)
+			{
+			case'k':
+			kill(pid,SIGINT);
+			break;
+			case 10:
+			*game_status=SERVER_GAME_END;
+			*server_status=SERVER_END;
+			}
 	}
-	*game_status=SERVER_GAME_END;
-	*server_status=SERVER_END;
 	endwin();
 }
 
@@ -240,6 +249,7 @@ int main(){
     *game_status=SERVER_GAME_ISACTIVE;
     status_data.GameStatus=global_status;
     status_data.ServerStatus=game_status;
+    status_data.pid=getpid();
     pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
     //connection handling and game-related multithreading
     int *GlobalGametime=malloc(sizeof(int));
