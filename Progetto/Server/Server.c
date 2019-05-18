@@ -27,26 +27,41 @@ void *activity_monitoring(void *arg)
 	int *game_status=data->ServerStatus;
 	int pid=data->pid;
 	int enter_press;
-	const char *message="Press Enter to terminate all server activities after the game is over\npress K to kill the process instantly";
+	const char *message="Press Enter to terminate all server activities after the game is over\npress K to kill the process instantly,\nD to temoprarily interrupt or restart the game after the current match";
 	initscr();
 	noecho();
 	keypad(stdscr,TRUE);
+	curs_set(0);
 	enter_press=0;
 	mvprintw(100,100,"%s",message);
-	refresh();
 	while(enter_press!=10)
 	{
+		refresh();
 		enter_press=getch();
 		switch(enter_press)
 			{
-			case'k':
-			kill(pid,SIGINT);
-			break;
-			case 10:
-			*game_status=SERVER_GAME_END;
-			*server_status=SERVER_END;
+				case'k':
+					kill(pid,SIGINT);
+					break;
+				case 10:
+					mvprintw(100,100,"server activity will be stopped as soon as the current match is over");
+					*game_status=SERVER_GAME_END;
+					*server_status=SERVER_END;
+					break;
+				case'd':
+					if(*game_status=SERVER_GAME_END)
+						{
+							mvprintw(100,100,"the game has been restarted");
+							*game_status=SERVER_GAME_ISACTIVE;
+						}
+					else {
+						mvprintw(100,100,"the game has been stopped");
+						*game_status=SERVER_GAME_END;
+					     }
+					break;
 			}
 	}
+	refresh();
 	endwin();
 }
 
@@ -189,7 +204,7 @@ void server_log(char *data){
 }
 
 int main(){
-    //Creazione della connessione TCP
+    //variabili
     int sockfd, connfd, len;
     int *global_status,*game_status;
     global_status=malloc(sizeof(int));
@@ -200,6 +215,7 @@ int main(){
     char PlayerAddress[60];
     pthread_t tid,monitor_tid;
     char log[200];
+    //Creazione della connessione TCP
     struct sockaddr_in servaddr, cli;
     FILE *db;
 	db=fopen("login_credentials.db","r+");

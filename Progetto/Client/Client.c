@@ -161,6 +161,7 @@ int main(){
             printf("seed:%d\n", seeddim[0]);
             printf("dimension:%d\n", seeddim[1]);
             client_game(sockfd,seeddim[1]);
+	    //lobby_menu();
             close(sockfd);
     }
     return 0;
