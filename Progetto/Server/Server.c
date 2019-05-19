@@ -26,36 +26,36 @@ void *activity_monitoring(void *arg)
 	int *server_status=data->GameStatus;
 	int *game_status=data->ServerStatus;
 	int pid=data->pid;
-	int enter_press;
-	const char *message="Press Enter to terminate all server activities after the game is over\npress K to kill the process instantly,\nD to temoprarily interrupt or restart the game after the current match";
+	int enter_press=0;
+	const char *message="Server Monitoring is now active.\nPress Enter to terminate all server activities after the game is over\nPress K to kill the process instantly\nPress D to temporarily interrupt or restart the game after the current match\n";
 	initscr();
 	noecho();
 	keypad(stdscr,TRUE);
 	curs_set(0);
-	enter_press=0;
-	mvprintw(100,100,"%s",message);
+	printw(message);
 	while(enter_press!=10)
 	{
-		refresh();
 		enter_press=getch();
+		refresh();
+		//doupdate();
 		switch(enter_press)
 			{
 				case'k':
 					kill(pid,SIGINT);
 					break;
 				case 10:
-					mvprintw(100,100,"server activity will be stopped as soon as the current match is over");
+					printw("\nserver activity will be stopped as soon as the current match is over\n");
 					*game_status=SERVER_GAME_END;
 					*server_status=SERVER_END;
 					break;
 				case'd':
-					if(*game_status=SERVER_GAME_END)
+					if(*game_status==SERVER_GAME_END)
 						{
-							mvprintw(100,100,"the game has been restarted");
+							printw("\nthe game will be restarted after the current match\n");
 							*game_status=SERVER_GAME_ISACTIVE;
 						}
 					else {
-						mvprintw(100,100,"the game has been stopped");
+						printw("\nthe game will be temporarily stopped after the current match\n");
 						*game_status=SERVER_GAME_END;
 					     }
 					break;
