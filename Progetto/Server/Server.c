@@ -2,28 +2,6 @@
 #include "../scan_int/scan_int.h"
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
-struct thread_data{
-	int **posmap;
-	player_list L;
-	player_list Dead;
-    int seed;
-    int connfd;
-	int *GameTime;
-	int dim;
-    FILE *db;
-};
-
-int genseed()
-{
-    //Crea un seed per la tavola di gioco
-    srand(time(NULL));
-    int seed[1];
-    int n;
-    seed[0]=rand();
-    printf("seed: %d\n",seed[0]);
-    return seed[0];
-
-}
 
 int login(int connfd){
     char username[10];
@@ -71,21 +49,19 @@ int sign_up(int connfd){
         return 1;
 }
 
-void *sendseed(void *arg){
+void *send_dim(void *arg){
 	int **board,**positions;
 	int *GlobalGameTime;
     struct thread_data *tmp=arg;
-	player_list P=tmp->L;
-	player_list Deaths=tmp->Dead;
+	struct player_list **P=tmp->L;
+	struct player_list **Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
-    int seeddim[2];
-	seeddim[1]=tmp->dim;
+    int dim[1];
+	dim[0]=tmp->dim;
     int login_successful[1];
     login_successful[0]=0;
-    seeddim[0]=tmp->seed;
-    board=create_board(seeddim[0],seeddim[1]);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     if(read(connfd,choice,sizeof(choice))==0){
@@ -116,28 +92,10 @@ void *sendseed(void *arg){
             }
 
     pthread_mutex_lock(&sem);
-    write(connfd,seeddim, sizeof(seeddim));
+    write(connfd,dim, sizeof(dim));
     pthread_mutex_unlock(&sem);
     //positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
     //server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
-}
-
-int **create_board(int seed,int dim){
-    int **board=calloc(sizeof(int*),dim);
-    int i=0;
-    for(int i=0;i<dim;i++){
-        board[i]=calloc(sizeof(int),dim);
-    }
-    //inserisco le mine a seconda del seed, 1 nella matrice rappresenta una mina
-    int x=0;
-    int y=0;
-    for(x=0;x<dim;x++){
-        for(y=0;y<dim;y++)
-                if((seed*x*y)%5==2)
-            board[x][y]=1;
-        }
-    //DEBUG print_board(board);
-    return board;
 }
 
 void server_log(char *data){
@@ -182,8 +140,6 @@ int main(){
     }
     else
         printf("Socket bind ha avuto successo..\n");
-    int seed[1];
-    seed[0]=genseed();
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
@@ -195,8 +151,8 @@ int main(){
         printf("Server listening..\n");
         struct thread_data thread_sd;
         //int **positions=create_position_map(dim);
-    player_list Players=NULL;
-    player_list Deaths=NULL;
+    struct player_list **Players=malloc(sizeof(struct player_list*));
+    struct player_list **Deaths=malloc(sizeof(struct player_list*));
     int *GlobalGametime=malloc(sizeof(int));
     while (1){
     len = sizeof(cli);
@@ -210,14 +166,13 @@ int main(){
         *GlobalGametime=rand()%MAXGAMETIME;
         //Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
-        thread_sd.seed=seed[0];
         thread_sd.L=Players;
         thread_sd.Dead=Deaths;
         thread_sd.posmap=NULL;
         thread_sd.GameTime=GlobalGametime;
         thread_sd.dim=dim;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
-        pthread_create(&tid,NULL,sendseed,&thread_sd);
+        pthread_create(&tid,NULL,send_dim,&thread_sd);
         }
     }
     close(sockfd);

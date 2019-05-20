@@ -1,4 +1,15 @@
 #include "lib_server.h"
+
+int genseed(){
+    //Crea un seed per la tavola di gioco
+    srand(time(NULL));
+    int seed[1];
+    int n;
+    seed[0]=rand();
+    printf("seed: %d\n",seed[0]);
+    return seed[0];
+}
+
 //these subroutines handle the game itself
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
 /*int **create_position_map(int dim){

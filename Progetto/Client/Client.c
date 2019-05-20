@@ -1,6 +1,9 @@
 #include "lib_client.h"
 #include "../scan_int/scan_int.h"
 
+pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
@@ -149,7 +152,7 @@ struct data *menu(int connfd){
     struct data *out=malloc(sizeof(struct data));
     int selection,row=1, col=3, arraylength=3, width=3, menulength=3;
     int choice[1];
-    int seeddim[2];
+    int dim[1];
     int succ_login=0;
     const char *choicesarray[]={"Login", "Sign Up", "Exit"};
     initscr();
@@ -174,9 +177,8 @@ struct data *menu(int connfd){
         printf("login errato\n");
         succ_login=login(connfd,out);
         }
-    read(connfd, seeddim, sizeof(seeddim));
-    out->seed=seeddim[0];
-    out->dimension=seeddim[1];
+    read(connfd, dim, sizeof(dim));
+    out->dimension=dim[0];
     return out;
 }
 
@@ -206,7 +208,7 @@ int main(){
         struct data *send;
         send=menu(sockfd);
         if(send!=NULL){
-            printf("%s %d %d\n",send->name,send->seed,send->dimension);
+            printf("%s %d\n",send->name,send->dimension);
             close(sockfd);
     }
     return 0;

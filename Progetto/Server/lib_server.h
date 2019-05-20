@@ -45,20 +45,26 @@
 #define DISPLAY_USER_LOCATIONS 1344
 #define DISPLAY_USER_DEATHS 1345
 #define DISPLAY_REMAINING_TIME 1346
+
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
-typedef struct P{
+struct player_list{
 	int position[2];
 	int score;
 	int socket_desc;
-}Player;
-//seeing as there is the possibility of connecting players during the game,we need a data structure that can insert and remove an undertermined number of players
-typedef struct list{
-	Player P;
-	struct list *next;
-}PlayerNode;
-typedef PlayerNode *player_list;
+};
+
 void ServerLog(char *data);
 int **create_board(int seed,int dim);
+
+struct thread_data{
+	int **posmap;
+	struct player_list **L;
+	struct player_list **Dead;
+    int connfd;
+	int *GameTime;
+	int dim;
+    FILE *db;
+};
 
 //player_list functions
 /*player_list CreateList();
