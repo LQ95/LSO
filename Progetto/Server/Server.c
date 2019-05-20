@@ -10,6 +10,7 @@ struct thread_data{
     int seed;
     int connfd;
 	int *GameTime;
+	int *GameStatus;
 	int dim;
     FILE *db;
 };
@@ -125,12 +126,13 @@ int sign_up(int connfd){
 
 void *sendseed(void *arg){
 	int **board,**positions;
-	int *GlobalGameTime;
+	int *GlobalGameTime,*game_status;
     struct thread_data *tmp=arg;
 	player_list P=tmp->L;
 	player_list Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
+	game_status=tmp->GameStatus;
     int connfd=tmp->connfd;
     int seeddim[2];
 	seeddim[1]=tmp->dim;
@@ -289,6 +291,7 @@ int main(){
   	          thread_sd.Dead=Deaths;
         	  thread_sd.posmap=positions;
        		  thread_sd.GameTime=GlobalGametime;
+		  thread_sd.GameStatus=game_status;
         	  thread_sd.dim=dim;
         	  //printf("%d %d\n",thread_sd[0],thread_sd[1]);
 		  time(ConnectionTime);
