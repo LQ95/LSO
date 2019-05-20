@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ncurses.h>
+#include <pthread.h>
 
 #define PORT 8080
 #define SA struct sockaddr
@@ -36,7 +37,19 @@
 #define SQUARE_OCCUPIED 1222
 #define ELIMINATED 3805
 #define WIN 3883
+struct data{
+    char name[10];
+    int seed;
+    int dimension;
+    int ID;
+};
 
+struct player{
+    char name[10];
+    int position[2];
+    int score;
+    int ID;
+}
 //Client functions
 int *update_pos(int *position,int moveflag);
 void print_gamepos(int dim,int *position);

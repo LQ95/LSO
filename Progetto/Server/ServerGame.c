@@ -1,7 +1,7 @@
 #include "lib_server.h"
 //these subroutines handle the game itself
 //this subroutine is used to create a data structure that is used to know whether a player is in a certain spot or not.
-int **create_position_map(int dim){
+/*int **create_position_map(int dim){
     int x,y;
     int **positions=calloc(sizeof(int*),dim);
     int i=0;
@@ -315,3 +315,4 @@ void server_game(int **board,int **positions,player_list L,int dim,player_list P
         else session_status=SESSION_END;
 	}
 }
+*/

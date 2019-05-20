@@ -1,5 +1,5 @@
 #include "lib_server.h"
-
+/*
 player_list CreateList(int sd,int ID){
 	srand(time(NULL));
 	player_list L;
@@ -115,3 +115,4 @@ void free_list(player_list L){
 	}
 	free(tmp);
 }
+*/

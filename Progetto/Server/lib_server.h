@@ -49,7 +49,6 @@
 typedef struct P{
 	int position[2];
 	int score;
-	int ID;
 	int socket_desc;
 }Player;
 //seeing as there is the possibility of connecting players during the game,we need a data structure that can insert and remove an undertermined number of players
@@ -62,22 +61,22 @@ void ServerLog(char *data);
 int **create_board(int seed,int dim);
 
 //player_list functions
-player_list CreateList();
+/*player_list CreateList();
 player_list insert(player_list L,int sd);
 player_list eliminate(int ID,player_list L);
 player_list eliminate_disconnect(int ID,player_list L);
 player_list search(int ID,player_list L);
 void free_list(player_list L);
 int list_size(player_list L);
-player_list search_by_SD(int sd,player_list L);
+player_list search_by_SD(int sd,player_list L);*/
 //ServerGame functions
-int **create_position_map(int dim);
+/*int **create_position_map(int dim);
 int check_free(int x,int y,int **position,int dim);
 int check_bomb(int coord[2],int **map);
 int check_win(player_list L,int dim);
 int **init_positions(int **board,int **positions,int dim,player_list P,int connfd);
 char *display(player_list L,int flag,player_list deaths,char *data);
-void server_game(int **board,int **positions,player_list L,int dim,player_list P,player_list Dead,int *GameTime);
+void server_game(int **board,int **positions,player_list L,int dim,player_list P,player_list Dead,int *GameTime);*/
 
 #define MAX 80
 #define PORT 8080

@@ -54,7 +54,7 @@ int login(int connfd){
 }
 
 int sign_up(int connfd){
-    char username[10];
+        char username[10];
         char password[10];
         if(read(connfd,username,sizeof(username))==0){
             close(connfd);
@@ -118,8 +118,8 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
-    server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
+    //positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
+    //server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
 }
 
 int **create_board(int seed,int dim){
@@ -192,10 +192,9 @@ int main(){
         printf("selezionare dimensione griglia (min:10)\n");
         int dim=scan_int(10,INT_MAX);
         printf("dimensione griglia: %d\n",dim);
-        dim++;
         printf("Server listening..\n");
         struct thread_data thread_sd;
-        int **positions=create_position_map(dim);
+        //int **positions=create_position_map(dim);
     player_list Players=NULL;
     player_list Deaths=NULL;
     int *GlobalGametime=malloc(sizeof(int));
@@ -209,12 +208,12 @@ int main(){
     else{
         printf("server accept avvenuto con successo...\n");
         *GlobalGametime=rand()%MAXGAMETIME;
-        Players=insert(Players,connfd);
+        //Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
         thread_sd.seed=seed[0];
         thread_sd.L=Players;
         thread_sd.Dead=Deaths;
-        thread_sd.posmap=positions;
+        thread_sd.posmap=NULL;
         thread_sd.GameTime=GlobalGametime;
         thread_sd.dim=dim;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);

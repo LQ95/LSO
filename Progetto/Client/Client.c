@@ -33,7 +33,7 @@ void sign_up(int connfd){
     return;
     }
 
-int login(int connfd){
+int login(int connfd,struct data *out){
     int succ[1];
     succ[0]=0;
     char username[10];
@@ -45,6 +45,7 @@ int login(int connfd){
     write(connfd,username,sizeof(username));
     write(connfd,pass,sizeof(pass));
     read(connfd,succ,sizeof(succ));
+    strcpy(out->name,username);
     return succ[0];
 }
 
@@ -143,21 +144,22 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
         return -1;
     }
 
-int *menu(int connfd){
+struct data *menu(int connfd){
+    //lncurses stuff
+    struct data *out=malloc(sizeof(struct data));
     int selection,row=1, col=3, arraylength=3, width=3, menulength=3;
     int choice[1];
-    int *out;
+    int seeddim[2];
     int succ_login=0;
-    out=malloc(sizeof(int)*2);
     const char *choicesarray[]={"Login", "Sign Up", "Exit"};
     initscr();
     noecho();
     keypad(stdscr,TRUE);
-    //raw();
     choice[0]=barmenu(choicesarray,row,col,arraylength,width,menulength,0);
     choice[0]++;
     write(connfd,choice,sizeof(choice));
     endwin();
+     //sending data
      if(choice[0]==2){
         sign_up(connfd);
         clear_screen();
@@ -167,12 +169,14 @@ int *menu(int connfd){
         close(connfd);
         return NULL;
     }
-    succ_login=login(connfd);
+    succ_login=login(connfd,out);
     while(!succ_login){
         printf("login errato\n");
-        succ_login=login(connfd);
+        succ_login=login(connfd,out);
         }
-    read(connfd, out, sizeof(out));
+    read(connfd, seeddim, sizeof(seeddim));
+    out->seed=seeddim[0];
+    out->dimension=seeddim[1];
     return out;
 }
 
@@ -199,12 +203,10 @@ int main(){
     }
     else
         printf("connesso al server..\n");
-        int *seeddim;
-        seeddim=menu(sockfd);
-        if(seeddim!=NULL){
-            printf("seed:%d\n", seeddim[0]);
-            printf("dimension:%d\n", seeddim[1]);
-            client_game(sockfd,seeddim[1]);
+        struct data *send;
+        send=menu(sockfd);
+        if(send!=NULL){
+            printf("%s %d %d\n",send->name,send->seed,send->dimension);
             close(sockfd);
     }
     return 0;
