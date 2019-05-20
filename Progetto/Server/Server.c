@@ -170,8 +170,11 @@ void *sendseed(void *arg){
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
-    positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
-    server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
+	while (*game_status==SERVER_GAME_ISACTIVE)
+	    {
+			positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
+			server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
+		}
 }
 
 int **create_board(int seed,int dim){
@@ -270,8 +273,6 @@ int main(){
     //connection handling and game-related multithreading
     int *GlobalGametime=malloc(sizeof(int));
     while(*global_status==SERVER_ISACTIVE){
-    	while (*game_status==SERVER_GAME_ISACTIVE)
-	    {
    		 len = sizeof(cli);
    		 connfd = accept(sockfd, (SA*)&cli, &len);
    	 	 if (connfd < 0) {
@@ -298,7 +299,6 @@ int main(){
         	  pthread_create(&tid,NULL,sendseed,&thread_sd);
 		  strcpy(log, "");
      	   }
-    	}
     }
     close(sockfd);
     return 0;
