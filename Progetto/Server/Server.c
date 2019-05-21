@@ -176,6 +176,7 @@ void *sendseed(void *arg){
 	    {
 			positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
 			server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
+			write(connfd,*game_status,sizeof(int));
 		}
 }
 
