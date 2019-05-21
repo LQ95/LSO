@@ -133,7 +133,7 @@ int *menu(int connfd){
 }
 
 int main(){
-    int sockfd, connfd;
+    int sockfd, connfd,server_status;
     struct sockaddr_in servaddr, cli;
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -157,12 +157,18 @@ int main(){
         printf("connesso al server..\n");
         int *seeddim;
         seeddim=menu(sockfd);
+	server_status=SERVER_GAME_ISACTIVE;
         if(seeddim!=NULL){
             printf("seed:%d\n", seeddim[0]);
             printf("dimension:%d\n", seeddim[1]);
-            client_game(sockfd,seeddim[1]);
-	    //lobby_menu();
-            close(sockfd);
-    }
+	    while(server_status==SERVER_GAME_ISACTIVE)
+		{
+            		 client_game(sockfd,seeddim[1]);
+	   		 printf("Checking server status\n");
+	   		 read(sockfd,&server_status,sizeof(int));
+		
+	   	 }
+    	}
+    close(sockfd);
     return 0;
 }
