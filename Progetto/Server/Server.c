@@ -1,9 +1,19 @@
 #include "lib_server.h"
 #include "../scan_int/scan_int.h"
+
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
-int login(int connfd){
+int genseed(){
+    //Crea un seed per la tavola di gioco
+    srand(time(NULL));
+    int seed;
+    seed=rand();
+    printf("seed: %d\n",seed);
+    return seed;
+}
+
+int login(int connfd,struct thread_data *tmp){
     char username[10];
     char password[10];
     char point_user[10];
@@ -24,6 +34,7 @@ int login(int connfd){
         point_pass[strcspn(point_pass, "\n")] = 0;
         if(strcmp(username,point_user)==0 && strcmp(password,point_pass)==0){
             fclose(fp);
+            strcpy(tmp->name,username);
             return 1;
             }
     }
@@ -61,6 +72,7 @@ void *send_dim(void *arg){
     int dim[1];
 	dim[0]=tmp->dim;
     int login_successful[1];
+    int seed=tmp->seed[0];
     login_successful[0]=0;
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
@@ -79,7 +91,7 @@ void *send_dim(void *arg){
         }
     }
     while(!login_successful[0]){
-        login_successful[0]=login(connfd);
+        login_successful[0]=login(connfd,tmp);
         if(login_successful[0]==-1){
             return NULL;
         }
@@ -90,12 +102,11 @@ void *send_dim(void *arg){
         }
         pthread_mutex_unlock(&sem);
             }
-
+    printf("%s connesso\n",tmp->name);
     pthread_mutex_lock(&sem);
     write(connfd,dim, sizeof(dim));
     pthread_mutex_unlock(&sem);
-    //positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
-    //server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
+    server_game(tmp->name,connfd,100,P,Deaths,dim[0],seed);
 }
 
 void server_log(char *data){
@@ -113,10 +124,11 @@ int main(){
     //Creazione della connesione TCP
     int sockfd, connfd, len;
     int pid;
-
     pthread_t tid;
     struct sockaddr_in servaddr, cli;
     FILE *db;
+    int seed;
+    seed=genseed();
 	db=fopen("login_credentials.db","r+");
 	if(!db){
         printf("nessun utente registrato, creazione database\n");
@@ -171,6 +183,7 @@ int main(){
         thread_sd.posmap=NULL;
         thread_sd.GameTime=GlobalGametime;
         thread_sd.dim=dim;
+        thread_sd.seed[0]=seed;
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,send_dim,&thread_sd);
         }

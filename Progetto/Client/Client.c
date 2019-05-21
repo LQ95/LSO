@@ -185,6 +185,7 @@ struct data *menu(int connfd){
 int main(){
     int sockfd, connfd;
     struct sockaddr_in servaddr, cli;
+    pthread_t tid;
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -207,8 +208,12 @@ int main(){
         printf("connesso al server..\n");
         struct data *send;
         send=menu(sockfd);
+        send->time=1;
+        send->connfd=connfd;
         if(send!=NULL){
             printf("%s %d\n",send->name,send->dimension);
+            //pthread_create(&tid,NULL,client_game_send,&send);
+            pthread_create(&tid,NULL,client_game_recv,&send);
             close(sockfd);
     }
     return 0;

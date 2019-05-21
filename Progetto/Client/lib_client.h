@@ -40,6 +40,8 @@
 struct data{
     char name[10];
     int dimension;
+    int time;
+    int connfd;
 };
 
 struct player{
@@ -47,9 +49,12 @@ struct player{
     int position[2];
     int score;
     int ID;
+    struct player *next;
 };
 
 //Client functions
 int *update_pos(int *position,int moveflag);
 void print_gamepos(int dim,int *position);
-void client_game(int sd,int dim);
+//clientgame stuff
+void *client_game_send(void *arg);
+void *client_game_recv(void *arg);

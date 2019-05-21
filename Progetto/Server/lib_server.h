@@ -48,9 +48,11 @@
 
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
 struct player_list{
+    char name[10];
 	int position[2];
 	int score;
 	int socket_desc;
+	struct player_list *next;
 };
 
 void ServerLog(char *data);
@@ -63,10 +65,14 @@ struct thread_data{
     int connfd;
 	int *GameTime;
 	int dim;
+	char name[10];
+    int seed[1];
     FILE *db;
 };
 
 //player_list functions
+struct player_list *add_player(int sockfd,struct player_list *in,char name[10],int dim);
+void print_list(struct player_list *in);
 /*player_list CreateList();
 player_list insert(player_list L,int sd);
 player_list eliminate(int ID,player_list L);
@@ -76,6 +82,7 @@ void free_list(player_list L);
 int list_size(player_list L);
 player_list search_by_SD(int sd,player_list L);*/
 //ServerGame functions
+void server_game(char name[10],int sockfd,int time,struct player_list **players,struct player_list **deaths,int dim,int seed);
 /*int **create_position_map(int dim);
 int check_free(int x,int y,int **position,int dim);
 int check_bomb(int coord[2],int **map);
