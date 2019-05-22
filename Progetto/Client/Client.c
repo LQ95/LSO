@@ -133,7 +133,7 @@ int *menu(int connfd){
 }
 
 int main(){
-    int sockfd, connfd,server_status;
+    int sockfd, connfd,server_status,client_status;
     struct sockaddr_in servaddr, cli;
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -158,16 +158,20 @@ int main(){
         int *seeddim;
         seeddim=menu(sockfd);
 	server_status=SERVER_GAME_ISACTIVE;
+	client_status=CHECK_IF_SERVER_ISACTIVE;
         if(seeddim!=NULL){
             printf("seed:%d\n", seeddim[0]);
             printf("dimension:%d\n", seeddim[1]);
-	    while(server_status==SERVER_GAME_ISACTIVE)
-		{
-            		 client_game(sockfd,seeddim[1]);
-	   		 printf("Checking server status\n");
-	   		 read(sockfd,&server_status,sizeof(int));
+	    while(client_status=CHECK_IF_SERVER_ISACTIVE){
+	   	 while(server_status==SERVER_GAME_ISACTIVE)
+			{
+            			 client_game(sockfd,seeddim[1]);
+	   		 	printf("Checking server status\n");
+	   			 read(sockfd,&server_status,sizeof(int));
 		
-	   	 }
+	   	 	}
+		//TODO ask if you want to check for server activity if server has been temprarily disconnected
+	    	}
     	}
     close(sockfd);
     return 0;

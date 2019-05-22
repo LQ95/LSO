@@ -176,7 +176,7 @@ void *sendseed(void *arg){
 	    {
 			positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
 			server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
-			write(connfd,*game_status,sizeof(int));
+			write(connfd,game_status,sizeof(int));
 		}
 }
 
@@ -209,6 +209,33 @@ void server_log(char *data){
 	close(fd);
 }
 
+int socket_setup(int sockfd,FILE *db)
+{
+	db=fopen("login_credentials.db","r+");
+	if(!db){
+       		 printf("nessun utente registrato, creazione database\n");
+       		 db=fopen("login_credentials.db","w+");
+	       }
+	fclose(db);
+    	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   	if (sockfd == -1) 
+		  {
+        	  	printf("Fallita creazione socket\n");
+       		 	 exit(0);
+  		  }
+    	else
+       	    printf("La creazione del socket ha avuto successo..\n");
+	return sockfd;
+}
+
+struct sockaddr_in address_setup(struct sockaddr_in servaddr)
+{
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port = htons(PORT);
+    return servaddr;
+}
 int main(){
     //variabili
     int sockfd, connfd, len;
@@ -224,23 +251,8 @@ int main(){
     //Creazione della connessione TCP
     struct sockaddr_in servaddr, cli;
     FILE *db;
-	db=fopen("login_credentials.db","r+");
-	if(!db){
-        printf("nessun utente registrato, creazione database\n");
-        db=fopen("login_credentials.db","w+");
-	}
-	fclose(db);
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        printf("Fallita creazione socket\n");
-        exit(0);
-    }
-    else
-        printf("La creazione del socket ha avuto successo..\n");
-    bzero(&servaddr, sizeof(servaddr));
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(PORT);
+    sockfd=socket_setup(sockfd,db);
+    servaddr=address_setup(servaddr);
     int optval = 1;
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
@@ -261,10 +273,6 @@ int main(){
     printf("dimensione griglia: %d\n",dim);
     dim++;
     printf("Server listening..\n");
-    struct thread_data thread_sd;
-    int **positions=create_position_map(dim);
-    player_list Players=NULL;
-    player_list Deaths=NULL;
     //establishing a thread to monitor all server activity
     struct monitor_data status_data;
     *global_status=SERVER_ISACTIVE;
@@ -274,6 +282,10 @@ int main(){
     status_data.pid=getpid();
     pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
     //connection handling and game-related multithreading
+    struct thread_data thread_sd;
+    int **positions=create_position_map(dim);
+    player_list Players=NULL;
+    player_list Deaths=NULL;
     int *GlobalGametime=malloc(sizeof(int));
     while(*global_status==SERVER_ISACTIVE){
    		 len = sizeof(cli);
