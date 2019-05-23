@@ -21,11 +21,18 @@ struct monitor_data{
 	int pid;
 	};
 
+struct game_monitor_data{
+	int *GameTime;
+	int *ServerStatus;
+	int *GlobalSeed;
+	};
+
+//Monitoring threads
 void *activity_monitoring(void *arg)
 {
 	struct monitor_data *data=arg;
-	int *server_status=data->GameStatus;
-	int *game_status=data->ServerStatus;
+	int *server_status=data->ServerStatus;
+	int *game_status=data->GameStatus;
 	int pid=data->pid;
 	int enter_press=0;
 	const char *message="Server Monitoring is now active.\nPress Enter to terminate all server activities after the game is over\nPress K to kill the process instantly\nPress D to temporarily interrupt or restart the game after the current match\n";
@@ -64,6 +71,20 @@ void *activity_monitoring(void *arg)
 	}
 	refresh();
 	endwin();
+}
+
+void *automatic_session_monitoring(void *arg)
+{
+ //monitors gametime and resets the global board generating seed after every game
+	struct game_monitor_data *data=arg;
+	int *game_time=data->GameTime;
+	int *server_status=data->ServerStatus;
+	int *seed=data->GlobalSeed;
+	/*while(*server_status==SERVER_END)
+		{
+			
+		}*/
+
 }
 
 int genseed()
@@ -139,7 +160,6 @@ void *sendseed(void *arg){
     int login_successful[1];
     login_successful[0]=0;
     seeddim[0]=tmp->seed;
-    board=create_board(seeddim[0],seeddim[1]);
     //printf("%d%d\n",connfd,seed[0]);
     int choice[1];
     if(read(connfd,choice,sizeof(choice))==0){
@@ -168,12 +188,12 @@ void *sendseed(void *arg){
         }
         pthread_mutex_unlock(&sem);
             }
-
     pthread_mutex_lock(&sem);
     write(connfd,seeddim, sizeof(seeddim));
     pthread_mutex_unlock(&sem);
 	while (*game_status==SERVER_GAME_ISACTIVE)
 	    {
+			board=create_board(seeddim[0],seeddim[1]);
 			positions=init_positions(board,positions,seeddim[1],search_by_SD(connfd,P),connfd);
 			server_game(board,positions,P,seeddim[1],search_by_SD(connfd,P),Deaths,GlobalGameTime);
 			write(connfd,game_status,sizeof(int));
@@ -236,6 +256,7 @@ struct sockaddr_in address_setup(struct sockaddr_in servaddr)
     servaddr.sin_port = htons(PORT);
     return servaddr;
 }
+
 int main(){
     //variabili
     int sockfd, connfd, len;
@@ -248,6 +269,8 @@ int main(){
     char PlayerAddress[60];
     pthread_t tid,monitor_tid;
     char log[200];
+    int seed[1];
+    seed[0]=genseed();
     //Creazione della connessione TCP
     struct sockaddr_in servaddr, cli;
     FILE *db;
@@ -261,8 +284,6 @@ int main(){
     }
     else
         printf("Socket bind ha avuto successo..\n");
-    int seed[1];
-    seed[0]=genseed();
     if ((listen(sockfd, 5)) != 0) {
         printf("Listen fallito...\n");
         exit(0);
@@ -273,12 +294,12 @@ int main(){
     printf("dimensione griglia: %d\n",dim);
     dim++;
     printf("Server listening..\n");
-    //establishing a thread to monitor all server activity
+    //establishing two threads to monitor all server activity
     struct monitor_data status_data;
     *global_status=SERVER_ISACTIVE;
     *game_status=SERVER_GAME_ISACTIVE;
-    status_data.GameStatus=global_status;
-    status_data.ServerStatus=game_status;
+    status_data.GameStatus=game_status;
+    status_data.ServerStatus=global_status;
     status_data.pid=getpid();
     pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
     //connection handling and game-related multithreading
