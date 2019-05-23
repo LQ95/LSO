@@ -132,6 +132,32 @@ int *menu(int connfd){
     return out;
 }
 
+int waiting_menu()
+{
+	int status=CHECK_IF_SERVER_ISACTIVE;
+	int choice=0;
+	initscr();
+    	noecho();
+   	keypad(stdscr,TRUE);
+	printw("Do you want to keep playing?(Y/N)\n");
+	while(choice!=0)
+		{
+		choice=getch();
+		switch(choice)
+			{
+			case 'y':
+				choice=0;
+				break;
+			case 'n':
+				status=END_CLIENT_ACTIVITY;
+				choice=0;
+				break;
+			}
+		}
+	endwin();
+	return status;
+}
+
 int main(){
     int sockfd, connfd,server_status,client_status;
     struct sockaddr_in servaddr, cli;
@@ -170,7 +196,7 @@ int main(){
 	   			 read(sockfd,&server_status,sizeof(int));
 		
 	   	 	}
-		//TODO ask if you want to check for server activity if server has been temprarily disconnected
+		client_status=waiting_menu();
 	    	}
     	}
     close(sockfd);
