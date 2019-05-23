@@ -162,7 +162,7 @@ int main(){
         if(seeddim!=NULL){
             printf("seed:%d\n", seeddim[0]);
             printf("dimension:%d\n", seeddim[1]);
-	    while(client_status=CHECK_IF_SERVER_ISACTIVE){
+	    while(client_status==CHECK_IF_SERVER_ISACTIVE){
 	   	 while(server_status==SERVER_GAME_ISACTIVE)
 			{
             			 client_game(sockfd,seeddim[1]);
