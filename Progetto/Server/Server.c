@@ -73,18 +73,22 @@ void *activity_monitoring(void *arg)
 	endwin();
 }
 
-void *automatic_session_monitoring(void *arg)
+void *automatic_game_monitoring(void *arg)
 {
- //monitors gametime and resets the global board generating seed after every game
+ //monitors gametime and resets the global board generating its seed after every game
 	struct game_monitor_data *data=arg;
 	int *game_time=data->GameTime;
 	int *server_status=data->ServerStatus;
 	int *seed=data->GlobalSeed;
 	/*while(*server_status==SERVER_END)
 		{
-			
+			if(*GameTime==0)
+			{
+				*GameTime=150
+				*GlobalSeed=genseed();
+			}
 		}*/
-
+//due to an imminent change in the server game implementation I am leaving this commented,for now
 }
 
 int genseed()
@@ -260,6 +264,7 @@ struct sockaddr_in address_setup(struct sockaddr_in servaddr)
 int main(){
     //variabili
     int sockfd, connfd, len;
+    int *GlobalGametime=malloc(sizeof(int));
     int *global_status,*game_status;
     global_status=malloc(sizeof(int));
     game_status=malloc(sizeof(int));
@@ -267,7 +272,7 @@ int main(){
     time_t *ConnectionTime=malloc(sizeof(time_t));
     char PlayerTimestamp[70];
     char PlayerAddress[60];
-    pthread_t tid,monitor_tid;
+    pthread_t tid,monitor_tid,game_monitor_tid;
     char log[200];
     int seed[1];
     seed[0]=genseed();
@@ -295,19 +300,25 @@ int main(){
     dim++;
     printf("Server listening..\n");
     //establishing two threads to monitor all server activity
+    //Monitor thread 1
     struct monitor_data status_data;
+    struct game_monitor_data game_data;
     *global_status=SERVER_ISACTIVE;
     *game_status=SERVER_GAME_ISACTIVE;
     status_data.GameStatus=game_status;
     status_data.ServerStatus=global_status;
     status_data.pid=getpid();
     pthread_create(&monitor_tid,NULL,activity_monitoring,&status_data);
+    //Monitor thread 2
+    game_data.GameTime=GlobalGametime;
+    game_data.ServerStatus=global_status;
+    game_data.GlobalSeed=seed;
+    pthread_create(&game_monitor_tid,NULL,automatic_game_monitoring,&game_data);
     //connection handling and game-related multithreading
     struct thread_data thread_sd;
     int **positions=create_position_map(dim);
     player_list Players=NULL;
     player_list Deaths=NULL;
-    int *GlobalGametime=malloc(sizeof(int));
     while(*global_status==SERVER_ISACTIVE){
    		 len = sizeof(cli);
    		 connfd = accept(sockfd, (SA*)&cli, &len);
