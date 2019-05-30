@@ -1,28 +1,49 @@
 #include "lib_server.h"
 
-struct player_list *create_player(int sockfd,char name[10],int dim){
+struct P *create_player(int sockfd,char name[10],int dim){
     srand(time(NULL));
-    struct player_list *out=malloc(sizeof(struct player_list));
+    struct P *out=malloc(sizeof(struct P));
     out->socket_desc=sockfd;
-    out->position[0]=0;
-    out->position[1]=(rand()%dim);
+    out->position[0]=(rand()%dim);
+    out->position[1]=0;
     out->score=0;
     strcpy(out->name,name);
     out->next=NULL;
 }
 
-struct player_list *add_player(int sockfd,struct player_list *in,char name[10],int dim){
-    struct player_list *out=create_player(sockfd,name,dim);
+struct P *add_player(int sockfd,struct P *in,char name[10],int dim){
+    struct P *out=create_player(sockfd,name,dim);
     out->next=in;
     return out;
 }
 
-struct player_list *disconnect(struct player_list *in){
-    struct player_list *tmp=in->next;
-    free(in);
-    return tmp;
+struct P *disconnect(struct P *Players,int ID){
+    pthread_mutex_lock(&sem);
+    if(Players==NULL){
+        pthread_mutex_unlock(&sem);
+        return NULL;
+    }
+    else if(Players->next==NULL){
+        free(Players);
+        Players=NULL;
+        pthread_mutex_unlock(&sem);
+        return NULL;
+    }
+    else{
+        if(Players->next->socket_desc==ID){
+            struct P *tmp=Players->next->next;
+            free(Players->next);
+            Players->next=tmp;
+            pthread_mutex_unlock(&sem);
+            return Players;
+        }
+        pthread_mutex_unlock(&sem);
+        Players->next=disconnect(Players->next,ID);
+    }
+    pthread_mutex_unlock(&sem);
+    return Players;
 }
-void print_list(struct player_list *in){
+void print_list(struct P *in){
     if(in!=NULL){
         printf("%d->",in->socket_desc);
         print_list(in->next);

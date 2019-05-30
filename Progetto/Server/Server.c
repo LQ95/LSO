@@ -64,8 +64,8 @@ void *send_dim(void *arg){
 	int **board,**positions;
 	int *GlobalGameTime;
     struct thread_data *tmp=arg;
-	struct player_list **P=tmp->L;
-	struct player_list **Deaths=tmp->Dead;
+	struct player_list *P=tmp->L;
+	struct player_list *Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
@@ -128,6 +128,10 @@ int main(){
     struct sockaddr_in servaddr, cli;
     FILE *db;
     int seed;
+    struct player_list *Players=malloc(sizeof(struct player_list));
+    Players->first=NULL;
+    struct player_list *Deaths=malloc(sizeof(struct player_list));
+    Deaths->first=NULL;
     seed=genseed();
 	db=fopen("login_credentials.db","r+");
 	if(!db){
@@ -163,8 +167,6 @@ int main(){
         printf("Server listening..\n");
         struct thread_data thread_sd;
         //int **positions=create_position_map(dim);
-    struct player_list **Players=malloc(sizeof(struct player_list*));
-    struct player_list **Deaths=malloc(sizeof(struct player_list*));
     int *GlobalGametime=malloc(sizeof(int));
     while (1){
     len = sizeof(cli);

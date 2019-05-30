@@ -59,7 +59,6 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
 
         if (arraylength < menulength)
                 menulength=arraylength;
-
         if (selection > menulength)
                 offset=selection-menulength+1;
 
@@ -77,19 +76,16 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
 
                 ky=getch();
 
-                switch(ky)
-                        {
+                switch(ky){
                         case KEY_UP:
-                                if (selection)
-                                        {
+                                if (selection){
                                         selection--;
                                         if (selection < offset)
                                                 offset--;
                                         }
                                 break;
                         case KEY_DOWN:
-                                if (selection < arraylength-1)
-                                        {
+                                if (selection < arraylength-1){
                                         selection++;
                                         if (selection > offset+menulength-1)
                                                 offset++;
@@ -128,15 +124,13 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
                                 // esc twice to get out, otherwise eat the chars that don't work
                                 //from home or end on the keypad
                                 ky=getch();
-                                if (ky == 27)
-                                        {
+                                if (ky == 27){
                                         curs_set(0);
                                         mvaddstr(9,77,"   ");
                                         return -1;
                                         }
                                 else
-                                        if (ky=='[')
-                                                {
+                                        if (ky=='['){
                                                 getch();
                                                 getch();
                                                 }
@@ -185,7 +179,7 @@ struct data *menu(int connfd){
 int main(){
     int sockfd, connfd;
     struct sockaddr_in servaddr, cli;
-    pthread_t tid;
+
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -209,11 +203,19 @@ int main(){
         struct data *send;
         send=menu(sockfd);
         send->time=1;
-        send->connfd=connfd;
+        send->connfd=sockfd;
         if(send!=NULL){
             printf("%s %d\n",send->name,send->dimension);
             //pthread_create(&tid,NULL,client_game_send,&send);
-            pthread_create(&tid,NULL,client_game_recv,&send);
+            pthread_t thread_receive;
+            pthread_create(&thread_receive,NULL,client_game_recv,send);
+            //pthread_join(thread_receive,NULL);
+            pthread_t thread_send;
+            pthread_create(&thread_send,NULL,client_game_send,send);
+            //pthread_join(thread_send,NULL);
+            while(1){
+
+            }
             close(sockfd);
     }
     return 0;

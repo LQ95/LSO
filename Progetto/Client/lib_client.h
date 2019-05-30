@@ -37,11 +37,17 @@
 #define SQUARE_OCCUPIED 1222
 #define ELIMINATED 3805
 #define WIN 3883
+extern pthread_mutex_t sem;
+extern pthread_cond_t c;
+
 struct data{
     char name[10];
     int dimension;
     int time;
     int connfd;
+    int **board;
+    int seed;
+    int *positions;
 };
 
 struct player{

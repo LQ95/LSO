@@ -45,23 +45,27 @@
 #define DISPLAY_USER_LOCATIONS 1344
 #define DISPLAY_USER_DEATHS 1345
 #define DISPLAY_REMAINING_TIME 1346
-
+extern pthread_mutex_t sem;
+extern pthread_cond_t c;
 //the socket descriptor in theis structure is the socket descriptor the server makes when the connection with the player is accepted
-struct player_list{
+struct P{
     char name[10];
 	int position[2];
 	int score;
 	int socket_desc;
-	struct player_list *next;
+	struct P *next;
+};
+
+struct player_list{
+    struct P *first;
 };
 
 void ServerLog(char *data);
-int **create_board(int seed,int dim);
 
 struct thread_data{
 	int **posmap;
-	struct player_list **L;
-	struct player_list **Dead;
+	struct player_list *L;
+	struct player_list *Dead;
     int connfd;
 	int *GameTime;
 	int dim;
@@ -71,8 +75,9 @@ struct thread_data{
 };
 
 //player_list functions
-struct player_list *add_player(int sockfd,struct player_list *in,char name[10],int dim);
-void print_list(struct player_list *in);
+struct P *add_player(int sockfd,struct P *in,char name[10],int dim);
+void print_list(struct P *in);
+struct P *disconnect(struct P *Players,int ID);
 /*player_list CreateList();
 player_list insert(player_list L,int sd);
 player_list eliminate(int ID,player_list L);
@@ -82,7 +87,8 @@ void free_list(player_list L);
 int list_size(player_list L);
 player_list search_by_SD(int sd,player_list L);*/
 //ServerGame functions
-void server_game(char name[10],int sockfd,int time,struct player_list **players,struct player_list **deaths,int dim,int seed);
+void server_game(char name[10],int sockfd,int time,struct player_list *players,struct player_list *deaths,int dim,int seed);
+
 /*int **create_position_map(int dim);
 int check_free(int x,int y,int **position,int dim);
 int check_bomb(int coord[2],int **map);
