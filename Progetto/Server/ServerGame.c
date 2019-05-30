@@ -32,7 +32,7 @@ void send_to_players(struct P *in,struct P *players,int mode){
             write(players->socket_desc,in->position,sizeof (in->position));
             tmp[0]=in->score;
             write(players->socket_desc,tmp,sizeof(tmp));
-            send_to_players(players->next,in,mode);
+            send_to_players(players->next,in,mode); //recursion happening here
     }
     return;
 }
@@ -41,6 +41,7 @@ void server_game(char name[10],int sockfd,int time,struct player_list *players,s
         //invio seed
         int send[1];
         int tmp[1];
+	char LogEntry[100];
         tmp[0]=0;
         printf("seed: %d\n",seed);
         send[0]=seed;
@@ -59,11 +60,15 @@ void server_game(char name[10],int sockfd,int time,struct player_list *players,s
     while(time>0){
         if(read(sockfd,tmp,sizeof(tmp))==0){
             players->first=disconnect(players->first,current->socket_desc);
+	    sprintf(LogEntry,"Un giocatore e' stato disconnesso ");
+	    server_log(LogEntry);
             return;
            //pthread_exit(NULL);
         }
         if(read(sockfd,current->position,sizeof(current->position))==0){
             players->first=disconnect(players->first,current->socket_desc);
+	    sprintf(LogEntry,"Un giocatore e' stato disconnesso ");
+	    server_log(LogEntry);
             return;
             //pthread_exit(NULL);
         }

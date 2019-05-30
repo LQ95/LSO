@@ -43,6 +43,18 @@ struct P *disconnect(struct P *Players,int ID){
     pthread_mutex_unlock(&sem);
     return Players;
 }
+
+struct P *search(int sockfd,struct P *list) //search function to make logging more accurate
+{
+	struct P * tmp=L;
+	int found=0;
+	while(tmp!=NULL &&found==0){
+		if(tmp->socket_desc==sd) found=1;
+		else tmp=tmp->next;
+	}
+	if(found==1) return tmp;
+}
+
 void print_list(struct P *in){
     if(in!=NULL){
         printf("%d->",in->socket_desc);
