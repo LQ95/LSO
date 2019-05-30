@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ncurses.h>
-#include "IntList/intlist.h"
+#include <pthread.h>
 
 #define PORT 8080
 #define SA struct sockaddr
@@ -39,9 +39,24 @@
 #define SQUARE_OCCUPIED 1222
 #define ELIMINATED 3805
 #define WIN 3883
-#define SERVER_GAME_ISACTIVE 9000
-#define SERVER_GAME_END 9200
+struct data{
+    char name[10];
+    int dimension;
+    int time;
+    int connfd;
+};
+
+struct player{
+    char name[10];
+    int position[2];
+    int score;
+    int ID;
+    struct player *next;
+};
+
 //Client functions
 int *update_pos(int *position,int moveflag);
-void print_gamepos(int dim,int *position,char *PositionVector);
-void client_game(int sd,int dim);
+void print_gamepos(int dim,int *position);
+//clientgame stuff
+void *client_game_send(void *arg);
+void *client_game_recv(void *arg);

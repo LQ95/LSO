@@ -1,6 +1,9 @@
 #include "lib_client.h"
 #include "../scan_int/scan_int.h"
 
+pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
 //the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
@@ -33,7 +36,7 @@ void sign_up(int connfd){
     return;
     }
 
-int login(int connfd){
+int login(int connfd,struct data *out){
     int succ[1];
     succ[0]=0;
     char username[10];
@@ -45,6 +48,7 @@ int login(int connfd){
     write(connfd,username,sizeof(username));
     write(connfd,pass,sizeof(pass));
     read(connfd,succ,sizeof(succ));
+    strcpy(out->name,username);
     return succ[0];
 }
 
@@ -99,21 +103,22 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
         return -1;
     }
 
-int *menu(int connfd){
+struct data *menu(int connfd){
+    //lncurses stuff
+    struct data *out=malloc(sizeof(struct data));
     int selection,row=1, col=3, arraylength=3, width=3, menulength=3;
     int choice[1];
-    int *out;
+    int dim[1];
     int succ_login=0;
-    out=malloc(sizeof(int)*2);
     const char *choicesarray[]={"Login", "Sign Up", "Exit"};
     initscr();
     noecho();
     keypad(stdscr,TRUE);
-    //raw();
     choice[0]=barmenu(choicesarray,row,col,arraylength,width,menulength,0);
     choice[0]++;
     write(connfd,choice,sizeof(choice));
     endwin();
+     //sending data
      if(choice[0]==2){
         sign_up(connfd);
         clear_screen();
@@ -123,12 +128,13 @@ int *menu(int connfd){
         close(connfd);
         return NULL;
     }
-    succ_login=login(connfd);
+    succ_login=login(connfd,out);
     while(!succ_login){
         printf("login errato\n");
-        succ_login=login(connfd);
+        succ_login=login(connfd,out);
         }
-    read(connfd, out, sizeof(out));
+    read(connfd, dim, sizeof(dim));
+    out->dimension=dim[0];
     return out;
 }
 
@@ -161,6 +167,7 @@ int waiting_menu()
 int main(){
     int sockfd, connfd,server_status,client_status;
     struct sockaddr_in servaddr, cli;
+    pthread_t tid;
     // socket create and varification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
@@ -181,24 +188,15 @@ int main(){
     }
     else
         printf("connesso al server..\n");
-        int *seeddim;
-        seeddim=menu(sockfd);
-	server_status=SERVER_GAME_ISACTIVE;
-	client_status=CHECK_IF_SERVER_ISACTIVE;
-        if(seeddim!=NULL){
-            printf("seed:%d\n", seeddim[0]);
-            printf("dimension:%d\n", seeddim[1]);
-	    while(client_status==CHECK_IF_SERVER_ISACTIVE){
-	   	 while(server_status==SERVER_GAME_ISACTIVE)
-			{
-            			 client_game(sockfd,seeddim[1]);
-	   		 	printf("Checking server status\n");
-	   			 read(sockfd,&server_status,sizeof(int));
-		
-	   	 	}
-		client_status=waiting_menu();
-	    	}
-    	}
-    close(sockfd);
+        struct data *send;
+        send=menu(sockfd);
+        send->time=1;
+        send->connfd=connfd;
+        if(send!=NULL){
+            printf("%s %d\n",send->name,send->dimension);
+            //pthread_create(&tid,NULL,client_game_send,&send);
+            pthread_create(&tid,NULL,client_game_recv,&send);
+            close(sockfd);
+    }
     return 0;
 }
