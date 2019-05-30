@@ -9,7 +9,6 @@
 #include <sys/types.h>
 #include <limits.h>
 #include <stdio.h>
-#include <sys/socket.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <arpa/inet.h>
@@ -17,6 +16,11 @@
 #include <limits.h>
 #define BUFDIM 1400
 #define MAXGAMETIME 4000
+//Server activity flags,used for the server's internal function
+#define SERVER_GAME_ISACTIVE 9000
+#define SERVER_GAME_END 9200
+#define SERVER_ISACTIVE 9300
+#define SERVER_END 9400
 //Signals
 //keep every single one of these at the same length!
 #define SIGSIZE 4

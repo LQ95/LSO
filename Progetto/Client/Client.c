@@ -91,30 +91,6 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
                                                 offset++;
                                         }
                                 break;
-                        case KEY_HOME:
-                                selection=0;
-                                offset=0;
-                                break;
-                        case KEY_END:
-                                selection=arraylength-1;
-                                offset=arraylength-menulength;
-                                break;
-                        case KEY_PPAGE:
-                                selection-=menulength;
-                                if (selection < 0)
-                                        selection=0;
-                                offset-=menulength;
-                                if (offset < 0)
-                                        offset=0;
-                                break;
-                        case KEY_NPAGE:
-                                selection+=menulength;
-                                if (selection > arraylength-1)
-                                        selection=arraylength-1;
-                                offset+=menulength;
-                                if (offset > arraylength-menulength)
-                                        offset=arraylength-menulength;
-                                break;
                         case 10: //enter
                                 return selection;
                                 break;
@@ -176,8 +152,34 @@ struct data *menu(int connfd){
     return out;
 }
 
+int waiting_menu()
+{
+	int status=CHECK_IF_SERVER_ISACTIVE;
+	int choice=0;
+	initscr();
+    	noecho();
+   	keypad(stdscr,TRUE);
+	printw("Do you want to keep playing?(Y/N)\n");
+	while(choice!=0)
+		{
+		choice=getch();
+		switch(choice)
+			{
+			case 'y':
+				choice=0;
+				break;
+			case 'n':
+				status=END_CLIENT_ACTIVITY;
+				choice=0;
+				break;
+			}
+		}
+	endwin();
+	return status;
+}
+
 int main(){
-    int sockfd, connfd;
+    int sockfd, connfd,server_status,client_status;
     struct sockaddr_in servaddr, cli;
 
     // socket create and varification

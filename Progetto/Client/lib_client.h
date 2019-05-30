@@ -14,7 +14,9 @@
 #define DISPLAYSIGSIZE 5
 #define DisplaySignalSize sizeof(char)*DISPLAYSIGSIZE
 #define clear_screen() printf("\033[H\033[J")
-
+//internal client flags
+#define END_CLIENT_ACTIVITY 805
+#define CHECK_IF_SERVER_ISACTIVE 705
 //these are codes that the client sends the server
 #define MOVE_LEFT 4900
 #define MOVE_RIGHT 5000

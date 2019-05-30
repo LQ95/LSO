@@ -62,12 +62,13 @@ int sign_up(int connfd){
 
 void *send_dim(void *arg){
 	int **board,**positions;
-	int *GlobalGameTime;
+	int *GlobalGameTime,*game_status;
     struct thread_data *tmp=arg;
 	struct player_list *P=tmp->L;
 	struct player_list *Deaths=tmp->Dead;
 	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
+	game_status=tmp->GameStatus;
     int connfd=tmp->connfd;
     int dim[1];
 	dim[0]=tmp->dim;
@@ -111,8 +112,8 @@ void *send_dim(void *arg){
 
 void server_log(char *data){
 	int fd,size;
-	size=sizeof(data);
-	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR);
+	size=strlen(data)*sizeof(char);
+	fd=open("Log.txt",O_RDWR|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
 	if(write(fd,data,size)<0)
 	{
 		perror("errore nella compilazione del log");
@@ -135,21 +136,52 @@ int main(){
     seed=genseed();
 	db=fopen("login_credentials.db","r+");
 	if(!db){
-        printf("nessun utente registrato, creazione database\n");
-        db=fopen("login_credentials.db","w+");
-	}
+       		 printf("nessun utente registrato, creazione database\n");
+       		 db=fopen("login_credentials.db","w+");
+	       }
 	fclose(db);
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == -1) {
-        printf("Fallita creazione socket\n");
-        exit(0);
-    }
-    else
-        printf("La creazione del socket ha avuto successo..\n");
+    	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   	if (sockfd == -1) 
+		  {
+        	  	printf("Fallita creazione socket\n");
+       		 	 exit(0);
+  		  }
+    	else
+       	    printf("La creazione del socket ha avuto successo..\n");
+	return sockfd;
+}
+
+struct sockaddr_in address_setup(struct sockaddr_in servaddr)
+{
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
+    return servaddr;
+}
+
+int main(){
+    //variabili
+    int sockfd, connfd, len;
+    int *GlobalGametime=malloc(sizeof(int));
+    int *global_status,*game_status;
+    global_status=malloc(sizeof(int));
+    game_status=malloc(sizeof(int));
+    int pid;
+    time_t *ConnectionTime=malloc(sizeof(time_t));
+    char PlayerTimestamp[70];
+    char PlayerAddress[60];
+    pthread_t tid,monitor_tid,game_monitor_tid;
+    char log[200];
+    int seed[1];
+    seed[0]=genseed();
+    //Creazione della connessione TCP
+    struct sockaddr_in servaddr, cli;
+    FILE *db;
+    sockfd=socket_setup(sockfd,db);
+    servaddr=address_setup(servaddr);
+    int optval = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
         printf("socket bind fallito...\n");
         exit(0);
