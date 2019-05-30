@@ -111,10 +111,17 @@ void *send_dim(void *arg){
 }
 
 void server_log(char *data){
+	time_t *ConnectionTime=malloc(sizeof(time_t));
+	char PlayerTimestamp[70];
+	time(ConnectionTime);
+	strcpy(PlayerTimestamp,ctime(ConnectionTime));
 	int fd,size;
-	size=strlen(data)*sizeof(char);
-	fd=open("Log.txt",O_RDWR|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
-	if(write(fd,data,size)<0)
+	size=sizeof(data);
+	char *logentry=malloc(size+100);
+	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
+	sprintf(logentry,"%s \n %s",data,PlayerTimestamp);
+	//printf("%s ",logentry);
+	if(write(fd,logentry,strlen(logentry))<0)
 	{
 		perror("errore nella compilazione del log");
 	}
@@ -168,9 +175,8 @@ int main(){
     global_status=malloc(sizeof(int));
     game_status=malloc(sizeof(int));
     int pid;
-    time_t *ConnectionTime=malloc(sizeof(time_t));
-    char PlayerTimestamp[70];
-    char PlayerAddress[60];
+    char player_address[60];
+    char connection_log[70];
     pthread_t tid,monitor_tid,game_monitor_tid;
     char log[200];
     int seed[1];
@@ -218,6 +224,9 @@ int main(){
         thread_sd.GameTime=GlobalGametime;
         thread_sd.dim=dim;
         thread_sd.seed[0]=seed;
+		strcpy(player_address,inet_ntoa(cli.sin_addr));
+		sprintf(connection_log,"Connessione da:%s",player_address);
+		server_log(connection_log);
         //printf("%d %d\n",thread_sd[0],thread_sd[1]);
         pthread_create(&tid,NULL,send_dim,&thread_sd);
         }
