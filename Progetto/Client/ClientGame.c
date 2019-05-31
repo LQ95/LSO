@@ -193,8 +193,7 @@ void *client_game_recv(void *arg){
     //riceve posizione iniziale
     int positions_temporary[2];
     read(connfd,positions_temporary,sizeof(positions_temporary));
-    int *positions;
-    positions=malloc(sizeof(int)*2);
+    int *positions=tmp->positions;
     positions[0]=positions_temporary[0];
     positions[1]=positions_temporary[1];
     printf("x=%d y=%d\n",positions[0],positions[1]);

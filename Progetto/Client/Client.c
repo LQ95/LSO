@@ -195,6 +195,7 @@ int main(){
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     servaddr.sin_port = htons(PORT);
+    int pos[2];
     // connect the client socket to server socket
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("connessione al server fallita...\n");
@@ -206,14 +207,15 @@ int main(){
         send=menu(sockfd);
         send->time=1;
         send->connfd=sockfd;
+	send->positions=malloc(sizeof(int)*2); 
         if(send!=NULL){
             printf("%s %d\n",send->name,send->dimension);
             //pthread_create(&tid,NULL,client_game_send,&send);
             pthread_t thread_receive;
             pthread_create(&thread_receive,NULL,client_game_recv,send);
-            //pthread_join(thread_receive,NULL);
             pthread_t thread_send;
             pthread_create(&thread_send,NULL,client_game_send,send);
+	    //pthread_join(thread_receive,NULL);
             //pthread_join(thread_send,NULL);
             while(1){
 
