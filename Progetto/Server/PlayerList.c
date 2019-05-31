@@ -46,10 +46,10 @@ struct P *disconnect(struct P *Players,int ID){
 
 struct P *search(int sockfd,struct P *list) //search function to make logging more accurate
 {
-	struct P * tmp=L;
+	struct P *tmp=list;
 	int found=0;
 	while(tmp!=NULL &&found==0){
-		if(tmp->socket_desc==sd) found=1;
+		if(tmp->socket_desc==sockfd) found=1;
 		else tmp=tmp->next;
 	}
 	if(found==1) return tmp;
