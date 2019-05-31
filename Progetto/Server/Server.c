@@ -118,7 +118,7 @@ void server_log(char *data){
 	size=sizeof(data);
 	char *logentry=malloc(size+100);
 	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
-	sprintf(logentry,"%s \n %s",data,PlayerTimestamp);
+	sprintf(logentry,"%s   %s \n",data,PlayerTimestamp);
 	//printf("%s ",logentry);
 	if(write(fd,logentry,strlen(logentry))<0)
 	{
@@ -132,6 +132,7 @@ int main(){
     int sockfd, connfd, len;
     int pid;
     pthread_t tid;
+    int *GlobalGametime=malloc(sizeof(int));
     char player_address[60];
     char connection_log[70];
     struct sockaddr_in servaddr, cli;
@@ -171,17 +172,18 @@ int main(){
     }
     else
         printf("selezionare dimensione griglia (min:10)\n");
-        int dim=scan_int(10,INT_MAX);
-        printf("dimensione griglia: %d\n",dim);
-        printf("Server listening..\n");
-        struct thread_data thread_sd;
-        //int **positions=create_position_map(dim);
-    int *GlobalGametime=malloc(sizeof(int));
+    int dim=scan_int(10,INT_MAX);
+    printf("setta un tempo di gioco (min:50)\n");
+    *GlobalGametime=scan_int(50,INT_MAX);
+    printf("dimensione griglia: %d\n",dim);
+    printf("Server listening..\n");
+    struct thread_data thread_sd;
+    //int **positions=create_position_map(dim);
     while (1){
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
-        printf("server acccept fallito..\n");
+        printf("server accept fallito..\n");
         exit(0);
     }
     else{

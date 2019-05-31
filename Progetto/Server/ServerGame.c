@@ -60,14 +60,14 @@ void server_game(char name[10],int sockfd,int time,struct player_list *players,s
     while(time>0){
         if(read(sockfd,tmp,sizeof(tmp))==0){
             players->first=disconnect(players->first,current->socket_desc);
-	    sprintf(LogEntry,"Un giocatore e' stato disconnesso ");
+	    sprintf(LogEntry,"giocatore:%s e' stato disconnesso",current->name);
 	    server_log(LogEntry);
             return;
            //pthread_exit(NULL);
         }
         if(read(sockfd,current->position,sizeof(current->position))==0){
             players->first=disconnect(players->first,current->socket_desc);
-	    sprintf(LogEntry,"Un giocatore e' stato disconnesso ");
+	    sprintf(LogEntry,"giocatore:%s e' stato disconnesso",current->name);
 	    server_log(LogEntry);
             return;
             //pthread_exit(NULL);
@@ -75,6 +75,7 @@ void server_game(char name[10],int sockfd,int time,struct player_list *players,s
        send_to_players(players->first,current,tmp[0]);
         if(tmp[0]==2){
             //player is dead
+	    sprintf(LogEntry,"giocatore:%s e' morto",current->name);
             deaths->first=add_player(current->socket_desc,deaths->first,current->name,dim);
             deaths->first->position[0]=current->position[0];
             deaths->first->position[1]=current->position[1];
@@ -83,5 +84,6 @@ void server_game(char name[10],int sockfd,int time,struct player_list *players,s
         //print_list(*players);
         //print_list(*deaths);
     }
-
+    sprintf(LogEntry,"La sessione e' finita");
+    server_log(LogEntry);
 }
