@@ -55,6 +55,15 @@ struct P *search(int sockfd,struct P *list) //search function to make logging mo
 	if(found==1) return tmp;
 }
 
+int list_size(struct P *list){
+		int s=0;
+		struct P *tmp=list;
+		while(tmp!=NULL){
+			tmp=tmp->next;
+			s++;
+		}
+	return s;
+}
 void print_list(struct P *in){
     if(in!=NULL){
         printf("%d->",in->socket_desc);

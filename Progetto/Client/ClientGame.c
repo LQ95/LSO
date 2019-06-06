@@ -1,5 +1,5 @@
 #include "lib_client.h"
-
+//receive the list of players
 struct player *receive_players(int connfd){
     int other_players[1];
     struct player *out=NULL;
@@ -17,7 +17,7 @@ struct player *receive_players(int connfd){
     }
     return out;
 }
-
+//print the list of players
 void print_players(struct player *in){
     if(in!=NULL){
         printf("%s: %d %d->",in->name,in->position[0],in->position[1]);
@@ -27,6 +27,7 @@ void print_players(struct player *in){
     else printf("fine\n");
     return;
 }
+//print the game map
 void print_board(int **board,int dim){
     clear();
     int x=dim-1;
@@ -45,7 +46,7 @@ void print_board(int **board,int dim){
         refresh();
     }
 }
-
+//fill the map with player information
 int **fill_board(struct player *in,struct player *deaths,int **board){
     if(in!=NULL){
         board[in->position[0]][in->position[1]]=1;
@@ -57,7 +58,7 @@ int **fill_board(struct player *in,struct player *deaths,int **board){
     }
     return board;
 }
-
+//create the map
 int **create_board(struct player *in,struct player *deaths,int dim){
     int **out;
     out=malloc(sizeof(int*)*dim);
@@ -68,6 +69,7 @@ int **create_board(struct player *in,struct player *deaths,int dim){
     out=fill_board(in,deaths,out);
     return out;
 }
+//send the position to the server
 void send_position(int new_x,int new_y,int connfd){
         int positions_send[2];
         positions_send[0]=new_x;
@@ -75,6 +77,14 @@ void send_position(int new_x,int new_y,int connfd){
         write(connfd,positions_send,sizeof(positions_send));
 }
 
+int check_playercollisions(int new_x,int new_y,int **board)
+{
+if(board[new_x][new_y]=1)
+return 1;
+else return 0;
+}
+
+//check for collisions with bombs
 int check_position(int connfd,int new_x,int new_y,int dim,int seed){
     int tmp[1];
     tmp[0]=0;
@@ -97,7 +107,7 @@ int check_position(int connfd,int new_x,int new_y,int dim,int seed){
     send_position(new_x,new_y,connfd);
     return tmp[0];
 }
-
+//respond to user input and send it to server?
 void *client_game_send(void *arg){
     struct data *tmp=arg;
     int *positions=tmp->positions;
@@ -148,29 +158,50 @@ void *client_game_send(void *arg){
         }
     }
 }
+//insert players into a list
 struct player *insert(struct player *in, struct player *new_player,int **board){
     if(in!=NULL){
-        if(in->ID=new_player->ID){
+        if(in->ID==new_player->ID){//if we pass a playe that we already know we just update him/her
             board[in->position[0]][in->position[1]]=0;
             board[new_player->position[0]][new_player->position[1]]=1;
             in->score=new_player->score;
             in->position[0]=new_player->position[0];
             in->position[1]=new_player->position[1];
-            free(new_player);
             }
-            else in->next=insert(in->next,new_player,board);
+            else {
+		in->next=insert(in->next,new_player,board);
+		return in;		
+		}
     }
-    else return new_player;
+    else
+	{ //otherwise we add him to the list
+	in=malloc(sizeof(struct player));
+	board[new_player->position[0]][new_player->position[1]]=1;
+	in->score=new_player->score;
+        in->position[0]=new_player->position[0];
+        in->position[1]=new_player->position[1];
+	in->ID=new_player->ID;
+	in->next=NULL;
+	return in;
+	}
+return in;
 }
+//receive info about other users' movements(but the list is not passed correctly)
 int receive_movement(struct player *in,int connfd,int **board){
     int id[1];
     int score[1];
     int status[1];
     int position[2];
+    int size[1];
+    int namelength[1];
+    read(connfd,size,sizeof(size));//read list size from the other side and iterate on it
     struct player *out;
     out=malloc(sizeof(struct player));
-    read(connfd,out->name,sizeof(out->name));
+    pthread_mutex_lock(&sem);
     read(connfd,status,sizeof(status));
+    while(size[0]>0){
+    read(connfd,out->name,sizeof(out->name));
+    printf("nome:%s\n",out->name);
     read(connfd,id,sizeof(id));
     read(connfd,position,sizeof(position));
     read(connfd,score,sizeof(score));
@@ -179,8 +210,12 @@ int receive_movement(struct player *in,int connfd,int **board){
     out->position[0]=position[0];
     out->position[1]=position[1];
     in=insert(in,out,board);
+    size[0]--;
+    }
+    pthread_mutex_unlock(&sem);
     return status[0];
 }
+//receiving thread
 void *client_game_recv(void *arg){
     initscr();
     pthread_mutex_lock(&sem);
@@ -207,14 +242,14 @@ void *client_game_recv(void *arg){
     pthread_mutex_unlock(&sem);
     print_board(board,dim);
     //receive data of the movements
-    //while(1){
     int status=0;
     while(status!=2||status!=3){
         status=receive_movement(other_players,connfd,board);
+	print_players(other_players);
         print_board(board,dim);
     }
 
-    //endwin();
+    endwin();
     //printf("seed: %d\n",seed[0]);
     //riceve dati degli altri giocatori
 }

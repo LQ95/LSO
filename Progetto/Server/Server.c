@@ -189,7 +189,6 @@ int main(){
     else{
         printf("server accept avvenuto con successo...\n");
         *GlobalGametime=rand()%MAXGAMETIME;
-        //Players=insert(Players,connfd);
         thread_sd.connfd=connfd;
         thread_sd.L=Players;
         thread_sd.Dead=Deaths;

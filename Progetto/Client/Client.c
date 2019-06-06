@@ -215,8 +215,8 @@ int main(){
             pthread_create(&thread_receive,NULL,client_game_recv,send);
             pthread_t thread_send;
             pthread_create(&thread_send,NULL,client_game_send,send);
-	    //pthread_join(thread_receive,NULL);
-            //pthread_join(thread_send,NULL);
+	    pthread_join(thread_receive,NULL);
+            pthread_join(thread_send,NULL);
             while(1){
 
             }

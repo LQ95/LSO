@@ -83,6 +83,7 @@ struct P *add_player(int sockfd,struct P *in,char name[10],int dim);
 void print_list(struct P *in);
 struct P *disconnect(struct P *Players,int ID);
 struct P *search(int sockfd,struct P *list);
+int list_size(struct P *list);
 /*player_list CreateList();
 player_list insert(player_list L,int sd);
 player_list eliminate(int ID,player_list L);
