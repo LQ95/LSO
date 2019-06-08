@@ -77,10 +77,16 @@ void send_position(int new_x,int new_y,int connfd){
         write(connfd,positions_send,sizeof(positions_send));
 }
 
-int check_playercollisions(int new_x,int new_y,int **board)
+int check_playercollisions(int new_x,int new_y,int **board,int dim)
 {
-if(board[new_x][new_y]=1)
-return 1;
+int pos;
+if( (new_x!=dim && new_x>-1) && (new_y!=dim && new_y>-1) )
+	{
+		pos=board[new_x][new_y];
+		if(pos!=0)
+		return 1;
+		else return 0;
+	}
 else return 0;
 }
 
@@ -124,6 +130,7 @@ void *client_game_send(void *arg){
         c=getch();
         switch(c){
             case KEY_UP:
+		if(check_playercollisions((positions[0])+1,positions[1],board,dim)==0)
                 positions[0]++;
                 if(positions[0]==dim){
                         positions[0]--;
@@ -131,6 +138,7 @@ void *client_game_send(void *arg){
                 else status=check_position(connfd,positions[0],positions[1],dim,seed);
                 break;
             case KEY_DOWN:
+		if(check_playercollisions((positions[0])-1,positions[1],board,dim)==0)
                 positions[0]--;
                 if(positions[0]==-1){
                         positions[0]++;
@@ -138,6 +146,7 @@ void *client_game_send(void *arg){
                 else status=check_position(connfd,positions[0],positions[1],dim,seed);
                 break;
             case KEY_LEFT:
+		if(check_playercollisions(positions[0],(positions[1])-1,board,dim)==0)
                 positions[1]--;
                 if(positions[1]==-1){
                         positions[1]++;
@@ -145,6 +154,7 @@ void *client_game_send(void *arg){
                 else status=check_position(connfd,positions[0],positions[1],dim,seed);
                 break;
             case KEY_RIGHT:
+		if(check_playercollisions(positions[0],(positions[1])+1,board,dim)==0)
                 positions[1]++;
                 if(positions[1]==dim){
                         positions[1]--;
@@ -236,7 +246,8 @@ void *client_game_recv(void *arg){
     struct player *deaths=receive_players(connfd);
     print_players(deaths);
     //create board
-    int **board=create_board(other_players,deaths,dim);
+    int **board=tmp->board;
+    fill_board(other_players,deaths,board); 
     tmp->seed=seed[0];
     tmp->positions=positions;
     pthread_mutex_unlock(&sem);

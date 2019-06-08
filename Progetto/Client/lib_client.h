@@ -66,3 +66,4 @@ void print_gamepos(int dim,int *position);
 //clientgame stuff
 void *client_game_send(void *arg);
 void *client_game_recv(void *arg);
+int **create_board(struct player *in,struct player *deaths,int dim);

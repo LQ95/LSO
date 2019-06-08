@@ -5,7 +5,7 @@ pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
 //the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
-//the moveflag variable is used to signal to the client how is has mmoved if it received the MOVE_OK signal
+//the moveflag variable is used to signal to the client how is has moved if it received the MOVE_OK signal
 //the ID variable is the client's Player ID in the current game(has to be sent from the server)
 
 void genrcv(int sockfd){
@@ -207,7 +207,8 @@ int main(){
         send=menu(sockfd);
         send->time=1;
         send->connfd=sockfd;
-	send->positions=malloc(sizeof(int)*2); 
+	send->positions=malloc(sizeof(int)*2);
+	send->board=create_board(NULL,NULL,send->dimension); 
         if(send!=NULL){
             printf("%s %d\n",send->name,send->dimension);
             //pthread_create(&tid,NULL,client_game_send,&send);
