@@ -4,10 +4,6 @@
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
-//the sd variable is the Client's own socket descriptor once it's been connected to the server,and the position and bomb matrices are passed by the server
-//the moveflag variable is used to signal to the client how is has moved if it received the MOVE_OK signal
-//the ID variable is the client's Player ID in the current game(has to be sent from the server)
-
 void genrcv(int sockfd){
     //riceve il seed dal server per generare la board
     int buff[1];
@@ -62,7 +58,7 @@ int barmenu(const char **array,const int row, const int col, const int arrayleng
         if (selection > menulength)
                 offset=selection-menulength+1;
 
-        sprintf(formatstring,"%%-%ds",width); // remove - sign to right-justify the menu items
+        sprintf(formatstring,"%%-%ds",width); // rimuovere il segno - per giustificare il menu' verso sinistra
 
         while(ky != 27)
                 {
@@ -132,7 +128,7 @@ struct data *menu(int connfd){
     choice[0]++;
     write(connfd,choice,sizeof(choice));
     endwin();
-     //sending data
+     //invia dati di login
      if(choice[0]==2){
         sign_up(connfd);
         clear_screen();
@@ -159,13 +155,14 @@ int waiting_menu()
 	initscr();
     	noecho();
    	keypad(stdscr,TRUE);
-	printw("Do you want to keep playing?(Y/N)\n");
+	printw("Vuoi continuare a giocare?(S/N)\n");
+	refresh();
 	while(choice!=0)
 		{
 		choice=getch();
 		switch(choice)
 			{
-			case 'y':
+			case 's':
 				choice=0;
 				break;
 			case 'n':
@@ -178,11 +175,23 @@ int waiting_menu()
 	return status;
 }
 
-int main(){
-    int sockfd, connfd,server_status,client_status;
-    struct sockaddr_in servaddr, cli;
+/*struct sockaddr_in lookup(char *hostname)
+{
+getservbyname(hostname);
+} 
 
-    // socket create and varification
+*/
+
+int main(int argc, char **argv){
+    int sockfd, connfd,server_status,client_status;
+    int dim[1];
+    int seed[1];
+    int *status;
+    int game_status;
+    struct sockaddr_in servaddr, cli;
+    client_status=CHECK_IF_SERVER_ISACTIVE;
+    game_status=CLIENTSESSION_OK;
+    // crea socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
         printf("Creazione del socket fallita...\n");
@@ -191,12 +200,13 @@ int main(){
     else
         printf("Socket creato con successo..\n");
     bzero(&servaddr, sizeof(servaddr));
-    // assign IP, PORT
+    // assegna IP e porta
     servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    if( argc >= 2 ) servaddr.sin_addr.s_addr = inet_addr(argv[1]);
+    else servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     servaddr.sin_port = htons(PORT);
     int pos[2];
-    // connect the client socket to server socket
+    // Connetti col server
     if (connect(sockfd, (SA*)&servaddr, sizeof(servaddr)) != 0) {
         printf("connessione al server fallita...\n");
         exit(0);
@@ -204,24 +214,41 @@ int main(){
     else
         printf("connesso al server..\n");
         struct data *send;
+	pthread_t thread_receive;
+	pthread_t thread_send;
         send=menu(sockfd);
-        send->time=1;
-        send->connfd=sockfd;
+	//riceve seed
+	read(sockfd,seed,sizeof(seed));
+	send->time=1;
+	send->status=malloc(sizeof(int));
+       	send->connfd=sockfd;
+	send->seed=seed[0];
 	send->positions=malloc(sizeof(int)*2);
-	send->board=create_board(NULL,NULL,send->dimension); 
-        if(send!=NULL){
-            printf("%s %d\n",send->name,send->dimension);
-            //pthread_create(&tid,NULL,client_game_send,&send);
-            pthread_t thread_receive;
-            pthread_create(&thread_receive,NULL,client_game_recv,send);
-            pthread_t thread_send;
-            pthread_create(&thread_send,NULL,client_game_send,send);
-	    pthread_join(thread_receive,NULL);
-            pthread_join(thread_send,NULL);
-            while(1){
-
-            }
+	send->board=create_board(NULL,NULL,send->dimension);
+	while(client_status==CHECK_IF_SERVER_ISACTIVE){ 
+		game_status=CLIENTSESSION_OK;//Se il client e' impostato come attivo questo flag fara' ricominciare il gioco
+		while(game_status==CLIENTSESSION_OK){ 
+        		if(send!=NULL){
+       		  	  printf("%s %d\n",send->name,send->dimension);
+   	    
+        	  	  pthread_create(&thread_receive,NULL,client_game_recv,send);
+        	   	  pthread_create(&thread_send,NULL,client_game_send,send);
+		   	  pthread_join(thread_receive,NULL);
+        	    	  pthread_join(thread_send,NULL);
+			  game_status=CLIENTSESSION_END;
+			}
+		    else {
+			  
+			  client_status=END_CLIENT_ACTIVITY;
+			 }
+		    }
+		    client_status=waiting_menu();
+		    read(sockfd, dim, sizeof(dim));
+		    send->dimension=dim[0];
+		    read(sockfd,seed,sizeof(seed));
+		    send->seed=seed[0];
+		    status[0]=1;
+		}
             close(sockfd);
-    }
     return 0;
 }

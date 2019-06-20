@@ -4,6 +4,23 @@
 pthread_mutex_t sem=PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t c = PTHREAD_COND_INITIALIZER;
 
+void print_server_data(int flag)
+{
+int hostname_ok;
+char hostname[256];
+struct hostent *host_data;
+char *Ip;
+hostname_ok=gethostname(hostname,sizeof(hostname));
+host_data=gethostbyname(hostname);
+Ip=inet_ntoa( *((struct in_addr*)host_data->h_addr_list[0]) );
+if (flag==0)printf("Hostname:%s    Ip;%s \n",hostname,Ip);
+else {
+	printw("Hostname:%s    Ip;%s \n",hostname,Ip);
+	refresh();
+     }
+
+}
+
 int genseed(){
     //Crea un seed per la tavola di gioco
     srand(time(NULL));
@@ -42,6 +59,96 @@ int login(int connfd,struct thread_data *tmp){
     return 0;
 }
 
+//monitoring threads
+
+void *activity_monitoring(void *arg)
+{
+	struct monitor *data=arg;
+	int *server_status=data->server_status;
+	int *game_status=data->game_status;
+	int *game_time=data->game_time;
+	int saved_gametime=*game_time;
+	int pid=data->pid;
+	int enter_press=0;
+	const char *message="Il monitoraggio del server e' attivo.\nPremi Invio per fare in modo che ilserver termini la sua attivita' dopo questa partita\nPremi K per killare istantanemanete il processo\nPremi D per interrompere o far ripartire le sessioni,dopo questa partita\nPremi S per visualizzare le informazioni sul server\n";
+	initscr();
+	noecho();
+	keypad(stdscr,TRUE);
+	curs_set(0);
+	printw(message);
+	while(enter_press!=10)
+	{
+		enter_press=getch();
+		refresh();
+		switch(enter_press)
+			{
+				case'k':
+					kill(pid,SIGINT);
+					break;
+				case 10:
+					printw("\nIl server si disattivera' dopo questa partita\n");
+					*game_status=SERVER_GAME_END;
+					*server_status=SERVER_END;
+					break;
+				case'd':
+					if(*game_status==SERVER_GAME_END)
+						{
+							printw("\nil gioco verra' avviato di nuovo dopo questa partita\n");
+							*game_status=SERVER_GAME_ISACTIVE;
+							*game_time=saved_gametime;
+						}
+					else {
+						printw("\nl gioco verra' disattivato dopo questa partita\n");
+						*game_status=SERVER_GAME_END;
+						*game_time=1;
+					     }
+					break;
+				case's':
+					print_server_data(1);
+					break;
+			}
+	}
+	refresh();
+	sleep(2);
+	endwin();
+pthread_exit(NULL);
+}
+
+void *clock_thread(void *arg)
+{
+struct monitor *tmp=arg;
+int *game_time=tmp->game_time;
+int saved_gametime=*game_time;
+int *session_stat=tmp->session_status;
+int *server_stat=tmp->server_status;
+int *game_stat=tmp->game_status;
+struct player_list *P=tmp->L;
+struct player_list *Deaths=tmp->Dead;
+while(*server_stat==SERVER_ISACTIVE)
+	{
+		while(*game_stat==SERVER_GAME_ISACTIVE)
+			{
+			while(*session_stat==SESSION_START)
+				{
+					sleep(1);
+					pthread_mutex_lock(&sem);
+					if(*game_time>0)
+						*game_time=(*game_time)-1;
+					else *session_stat=SESSION_END;
+					pthread_mutex_unlock(&sem);
+				}
+			pthread_mutex_lock(&sem);
+			*session_stat=SESSION_START;
+			freeList(P->first);
+			freeList(Deaths->first);
+			*game_time=saved_gametime;
+			//pthread_cond_broadcast(&c);
+			pthread_mutex_unlock(&sem);
+			}
+	}
+pthread_exit(NULL);
+}
+
 int sign_up(int connfd){
         char username[10];
         char password[10];
@@ -61,14 +168,17 @@ int sign_up(int connfd){
 }
 
 void *send_dim(void *arg){
-	int **board,**positions;
+	int **board;
 	int *GlobalGameTime;
+    pthread_mutex_t thread_sem;
+    pthread_mutex_init(&thread_sem,NULL);
     struct thread_data *tmp=arg;
 	struct player_list *P=tmp->L;
 	struct player_list *Deaths=tmp->Dead;
-	positions=tmp->posmap;
 	GlobalGameTime=tmp->GameTime;
     int connfd=tmp->connfd;
+    int *game_status=tmp->GameStatus;
+    int *session_status=tmp->session_status;
     int dim[1];
 	dim[0]=tmp->dim;
     int login_successful[1];
@@ -103,10 +213,18 @@ void *send_dim(void *arg){
         pthread_mutex_unlock(&sem);
             }
     printf("%s connesso\n",tmp->name);
-    pthread_mutex_lock(&sem);
-    write(connfd,dim, sizeof(dim));
-    pthread_mutex_unlock(&sem);
-    server_game(tmp->name,connfd,100,P,Deaths,dim[0],seed);
+    while(*game_status==SERVER_GAME_ISACTIVE)
+	{
+		while(*session_status==SESSION_START)
+		{
+    		pthread_mutex_lock(&sem);
+    		write(connfd,dim, sizeof(dim));
+    		pthread_mutex_unlock(&sem);
+    		server_game(tmp->name,connfd,GlobalGameTime,P,Deaths,dim[0],seed);
+		}
+		
+	}
+pthread_exit(NULL);
 }
 
 void server_log(char *data){
@@ -128,13 +246,27 @@ void server_log(char *data){
 }
 
 int main(){
-    //Creazione della connesione TCP
-    int sockfd, connfd, len;
+    //Variabili
+    int sockfd, connfd, len,optval;
     int pid;
-    pthread_t tid;
-    int *GlobalGametime=malloc(sizeof(int));
+    pthread_t tid,time_tid,monitor_tid;
+    int *server_status=malloc(sizeof(int));
+    int *game_status=malloc(sizeof(int));
+    int *session_status=malloc(sizeof(int));
+    int GlobalGametime[1];
     char player_address[60];
     char connection_log[70];
+    struct monitor monitor_data;
+    *server_status=SERVER_ISACTIVE;
+    *game_status=SERVER_GAME_ISACTIVE;
+    *session_status=SESSION_START; 
+    monitor_data.game_time=GlobalGametime;
+    monitor_data.session_status=session_status;
+    monitor_data.server_status=server_status;
+    monitor_data.game_status=game_status;
+    monitor_data.pid=getpid();
+    print_server_data(0);
+    //Creazione della connesione TCP
     struct sockaddr_in servaddr, cli;
     FILE *db;
     int seed;
@@ -142,6 +274,8 @@ int main(){
     Players->first=NULL;
     struct player_list *Deaths=malloc(sizeof(struct player_list));
     Deaths->first=NULL;
+    monitor_data.L=Players;
+    monitor_data.Dead=Deaths;
     seed=genseed();
 	db=fopen("login_credentials.db","r+");
 	if(!db){
@@ -160,6 +294,7 @@ int main(){
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servaddr.sin_port = htons(PORT);
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
     if ((bind(sockfd, (SA*)&servaddr, sizeof(servaddr))) != 0) {
         printf("socket bind fallito...\n");
         exit(0);
@@ -171,31 +306,34 @@ int main(){
         exit(0);
     }
     else
-        printf("selezionare dimensione griglia (min:10)\n");
-    int dim=scan_int(10,INT_MAX);
-    printf("setta un tempo di gioco (min:50)\n");
-    *GlobalGametime=scan_int(50,INT_MAX);
+        printf("selezionare dimensione griglia (min:10  max:50)\n");
+    int dim=scan_int(10,40);
+    printf("setta un tempo di gioco (min:50  max:360)\n");
+    GlobalGametime[0]=scan_int(50,360);
     printf("dimensione griglia: %d\n",dim);
     printf("Server listening..\n");
+    //Inizia due thread necessari per fare monitoring
+    pthread_create(&monitor_tid,NULL,activity_monitoring,&monitor_data);
+    pthread_create(&time_tid,NULL,clock_thread,&monitor_data);
+    //Gestisci connessioni e inizia la sessione
     struct thread_data thread_sd;
-    //int **positions=create_position_map(dim);
-    while (1){
+    while(*server_status==SERVER_ISACTIVE){
     len = sizeof(cli);
     connfd = accept(sockfd, (SA*)&cli, &len);
     if (connfd < 0) {
         printf("server accept fallito..\n");
         exit(0);
     }
-    else{
-        printf("server accept avvenuto con successo...\n");
-        *GlobalGametime=rand()%MAXGAMETIME;
+    else{ 
+        printw("server accept avvenuto con successo...\n");
         thread_sd.connfd=connfd;
         thread_sd.L=Players;
         thread_sd.Dead=Deaths;
-        thread_sd.posmap=NULL;
         thread_sd.GameTime=GlobalGametime;
+	thread_sd.GameStatus=game_status;
         thread_sd.dim=dim;
         thread_sd.seed[0]=seed;
+	thread_sd.session_status=session_status;
 	strcpy(player_address,inet_ntoa(cli.sin_addr));
 	sprintf(connection_log,"Connessione da:%s",player_address);
 	server_log(connection_log);

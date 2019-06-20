@@ -9,6 +9,7 @@ struct P *create_player(int sockfd,char name[10],int dim){
     out->score=0;
     strcpy(out->name,name);
     out->next=NULL;
+    return out;
 }
 
 struct P *add_player(int sockfd,struct P *in,char name[10],int dim){
@@ -53,8 +54,18 @@ struct P *search(int sockfd,struct P *list) //search function to make logging mo
 		else tmp=tmp->next;
 	}
 	if(found==1) return tmp;
+	else return NULL;
 }
 
+
+struct P *freeList(struct P *list)
+{
+if(list==NULL)
+	return NULL;
+freeList(list->next);
+free(list);
+return list;
+}
 int list_size(struct P *list){
 		int s=0;
 		struct P *tmp=list;
