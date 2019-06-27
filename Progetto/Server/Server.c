@@ -235,19 +235,17 @@ void *send_dim(void *arg){
 		printw("status:%d session status:%d\n",user_status,*session_status);
 		refresh();
 		}
-		if(user_status==2){
+		if(user_status==2){//se l-utente [morto aspetta la fine della sessione
 			pthread_mutex_lock(&sem);
 			pthread_cond_wait(&c,&sem);
 			user_status=1;
 			pthread_mutex_unlock(&sem);
 		}
-		else if(user_status==3)
+		else if(user_status==3)//se ha vinto la sessione finisce 
 			*GlobalGameTime=1;
 		user_status=1;
 		
 	}
-printw("%s ha terminato\n",tmp->name);
-refresh();
 pthread_exit(NULL);
 }
 
@@ -261,7 +259,6 @@ void server_log(char *data){
 	char *logentry=malloc(size+100);
 	fd=open("Log.txt",O_WRONLY|O_CREAT|O_APPEND,S_IRUSR|S_IWUSR);
 	sprintf(logentry,"%s   %s \n",data,PlayerTimestamp);
-	//printf("%s ",logentry);
 	if(write(fd,logentry,strlen(logentry))<0)
 	{
 		perror("errore nella compilazione del log");

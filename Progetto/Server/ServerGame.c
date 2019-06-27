@@ -52,12 +52,8 @@ int server_game(char name[10],int sockfd,int *time,struct player_list *players,s
         int tmp[1];
 	int timebuf[1];
 	char LogEntry[100];
-	printw("inizio\n");
-	refresh();
         tmp[0]=0;//status
 	//invio seed
-	printw("invio seed\n");
-	refresh();
         send[0]=seed;
         pthread_mutex_lock(&sem);
         write(sockfd,send,sizeof(send));
@@ -66,12 +62,8 @@ int server_game(char name[10],int sockfd,int *time,struct player_list *players,s
         players->first=add_player(sockfd,players->first,name,dim);
         current=players->first;
         //invio posizione iniziale
-	printw("invio pos iniziale\n");
-	refresh();
         write(sockfd,current->position,sizeof(current->position));
         //invio lista giocatori
-	printw("invio giocatori\n");
-	refresh();
         send_players(players->first,sockfd);
         send_players(deaths->first,sockfd);
         pthread_mutex_unlock(&sem);

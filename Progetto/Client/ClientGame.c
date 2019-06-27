@@ -51,7 +51,7 @@ if(time>=0)
 	{
 	printw("\n %d secondi mancanti per la fine della gara",time);
 	if (status==2) printw("\n sei morto \n");
-	else printw("\n continua \n");
+	else printw("\n\n");
 	refresh();
 	}
 }
@@ -298,8 +298,6 @@ void *client_game_recv(void *arg){
     //ricevi e manda dati finche' sei in gioco
     while(status[0]!=2 && status[0]!=3 && time[0]>0){
 	statusBuf[0]=status[0];
-	printw("mando status:%d\n",statusBuf[0]);
-    	refresh();
 	write(connfd,statusBuf,sizeof(statusBuf));
 	send_position(tmp->positions[0],tmp->positions[1],connfd);
 	statusBuf[0]=receive_movement(other_players,connfd,board);
@@ -311,8 +309,6 @@ void *client_game_recv(void *arg){
 	
     }
     statusBuf[0]=status[0];
-    printw("mando status:%d\n",statusBuf[0]);
-    refresh();
     sleep(2);
     write(connfd,statusBuf,sizeof(statusBuf));
     clear();
@@ -324,7 +320,6 @@ void *client_game_recv(void *arg){
     printf("Hai vinto.adesso verrai portato alla prossima sessione\n");
     else
 	{ 
-		endwin();
 		printf("tempo scaduto,adesso verrai portato alla prossima sessione");
 		status[0]=4;	
 	}

@@ -177,12 +177,19 @@ int waiting_menu()
 	return status;
 }
 
-/*struct sockaddr_in lookup(char *hostname)
+struct in_addr lookup(char *hostname)
 {
-getservbyname(hostname);
+struct in_addr IPaddress;
+struct hostent *info=gethostbyname(hostname);
+if(!info) {
+	herror("Host non trovato ");
+	exit(-1);
+	}
+inet_aton(info->h_addr_list[1],&IPaddress);
+return IPaddress;
 } 
 
-*/
+
 
 int main(int argc, char **argv){
     int sockfd, connfd,server_status,client_status;
@@ -204,7 +211,18 @@ int main(int argc, char **argv){
     bzero(&servaddr, sizeof(servaddr));
     // assegna IP e porta
     servaddr.sin_family = AF_INET;
-    if( argc >= 2 ) servaddr.sin_addr.s_addr = inet_addr(argv[1]);
+    if( argc >= 3 ) 
+	{
+	if(strcmp(argv[1],"IP")==0)
+	servaddr.sin_addr.s_addr = inet_addr(argv[2]);
+	else if(strcmp(argv[1],"Host")==0)
+	servaddr.sin_addr = lookup(argv[2]);
+	else 
+		{
+		printf("Argomenti non validi");
+		exit(-1);
+		}
+	}
     else servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     servaddr.sin_port = htons(PORT);
     int pos[2];

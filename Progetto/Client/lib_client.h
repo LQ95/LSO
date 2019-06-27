@@ -5,7 +5,7 @@
 #include <string.h>
 #include <ncurses.h>
 #include <pthread.h>
-#include <errno.h>
+#include <netdb.h>
 #define PORT 8080
 #define SA struct sockaddr
 #define BUFDIM 1400
