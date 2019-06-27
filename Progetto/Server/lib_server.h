@@ -70,7 +70,7 @@ struct P *search(int sockfd,struct P *list);
 int list_size(struct P *list);
 struct P *freeList(struct P *list);
 //ServerGame functions
-void server_game(char name[10],int sockfd,int *time,struct player_list *players,struct player_list *deaths,int dim,int seed);
+int server_game(char name[10],int sockfd,int *time,struct player_list *players,struct player_list *deaths,int dim,int seed);
 
 
 #define MAX 80

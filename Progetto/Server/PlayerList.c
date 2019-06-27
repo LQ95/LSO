@@ -62,10 +62,12 @@ struct P *freeList(struct P *list)
 {
 if(list==NULL)
 	return NULL;
-freeList(list->next);
+list->next=freeList(list->next);
 free(list);
+list=NULL;
 return list;
 }
+
 int list_size(struct P *list){
 		int s=0;
 		struct P *tmp=list;

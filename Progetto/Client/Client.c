@@ -151,7 +151,7 @@ struct data *menu(int connfd){
 int waiting_menu()
 {
 	int status=CHECK_IF_SERVER_ISACTIVE;
-	int choice=0;
+	int choice=1;
 	initscr();
     	noecho();
    	keypad(stdscr,TRUE);
@@ -168,6 +168,8 @@ int waiting_menu()
 			case 'n':
 				status=END_CLIENT_ACTIVITY;
 				choice=0;
+				break;
+			default:
 				break;
 			}
 		}
@@ -229,25 +231,27 @@ int main(int argc, char **argv){
 		game_status=CLIENTSESSION_OK;//Se il client e' impostato come attivo questo flag fara' ricominciare il gioco
 		while(game_status==CLIENTSESSION_OK){ 
         		if(send!=NULL){
-       		  	  printf("%s %d\n",send->name,send->dimension);
-   	    
+       		  	  //printf("connesso:%s dim griglia:%d\n",send->name,send->dimension);
         	  	  pthread_create(&thread_receive,NULL,client_game_recv,send);
         	   	  pthread_create(&thread_send,NULL,client_game_send,send);
+			  pthread_mutex_lock(&sem);
+			  pthread_cond_wait(&c,&sem);
+			  game_status=CLIENTSESSION_END;
+			  pthread_mutex_unlock(&sem);
 		   	  pthread_join(thread_receive,NULL);
         	    	  pthread_join(thread_send,NULL);
-			  game_status=CLIENTSESSION_END;
-			}
-		    else {
-			  
-			  client_status=END_CLIENT_ACTIVITY;
-			 }
+				}
+		    	else {
+			  	 game_status=CLIENTSESSION_END;
+				 client_status=END_CLIENT_ACTIVITY;
+			 	}
 		    }
 		    client_status=waiting_menu();
 		    read(sockfd, dim, sizeof(dim));
 		    send->dimension=dim[0];
 		    read(sockfd,seed,sizeof(seed));
 		    send->seed=seed[0];
-		    status[0]=1;
+		    send->status[0]=1;
 		}
             close(sockfd);
     return 0;

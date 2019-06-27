@@ -108,7 +108,6 @@ void send_position(int new_x,int new_y,int connfd){
         int positions_send[2];
         positions_send[0]=new_x;
         positions_send[1]=new_y;
-	printw("x: %d y: %d\n",new_x,new_y);
         write(connfd,positions_send,sizeof(positions_send));
 }
 
@@ -149,8 +148,6 @@ int check_position(int connfd,int new_x,int new_y,int dim,int seed){
     else{
         tmp[0]=1;
     }
-    /*write(connfd,tmp,sizeof(tmp));
-    send_position(new_x,new_y,connfd);*/
     return tmp[0];
 }
 //gestione input utene
@@ -204,7 +201,7 @@ void *client_game_send(void *arg){
         }
         if(*status==2||*status==3){
             //endwin();
-            pthread_exit(NULL);
+            pthread_exit(status);
         }
     }
 }
@@ -244,7 +241,7 @@ int receive_movement(struct player *in,int connfd,int **board){
     int position[2];
     int size[1];
     int namelength[1];
-    read(connfd,size,sizeof(size));//leggi quanto [ grande la lista
+    read(connfd,size,sizeof(size));//leggi quanto e' grande la lista
     struct player *out;
     out=malloc(sizeof(struct player));
     pthread_mutex_lock(&sem);
@@ -280,14 +277,20 @@ void *client_game_recv(void *arg){
     *status=1;
     int statusBuf[1];
     int positions_temporary[2];
+    printw("read posizioni\n");
+    refresh();
     read(connfd,positions_temporary,sizeof(positions_temporary));
     int *positions=tmp->positions;
     positions[0]=positions_temporary[0];
     positions[1]=positions_temporary[1];
+    printw("read giocatori\n");
+    refresh();
     struct player *other_players=receive_players(connfd);
     struct player *deaths=receive_players(connfd);
     //crea mappa
     int **board=tmp->board;
+    printw("riempio mappa\n");
+    refresh();
     fill_board(other_players,deaths,board);
     tmp->positions=positions;
     pthread_mutex_unlock(&sem);
@@ -295,22 +298,38 @@ void *client_game_recv(void *arg){
     //ricevi e manda dati finche' sei in gioco
     while(status[0]!=2 && status[0]!=3 && time[0]>0){
 	statusBuf[0]=status[0];
+	printw("mando status:%d\n",statusBuf[0]);
+    	refresh();
 	write(connfd,statusBuf,sizeof(statusBuf));
 	send_position(tmp->positions[0],tmp->positions[1],connfd);
-        statusBuf[0]=receive_movement(other_players,connfd,board);
+	statusBuf[0]=receive_movement(other_players,connfd,board);
 	statusBuf[0]=receive_movement(deaths,connfd,board);
 	read(connfd,time,sizeof(time));
 	print_players(other_players);
 	board=refresh_board(other_players,deaths,board,dim);
-        print_board(board,dim,time[0],status[0]);
+	print_board(board,dim,time[0],status[0]);
+	
     }
-
+    statusBuf[0]=status[0];
+    printw("mando status:%d\n",statusBuf[0]);
+    refresh();
+    sleep(2);
+    write(connfd,statusBuf,sizeof(statusBuf));
+    clear();
     endwin();
     printf("Fine sessione\n");
     if(status[0]==2)
     printf("Sei morto.Aspetta la prossima sessione se sei interessato a continuare\n");
     else if(status[0]==3)
     printf("Hai vinto.adesso verrai portato alla prossima sessione\n");
-    else printf("tempo scaduto,adesso verrai portato alla prossima sessione");
+    else
+	{ 
+		endwin();
+		printf("tempo scaduto,adesso verrai portato alla prossima sessione");
+		status[0]=4;	
+	}
+    pthread_mutex_lock(&sem);
+    pthread_cond_broadcast(&c); //segnala la fine della sessione al thread principale
+    pthread_mutex_unlock(&sem);
     pthread_exit(NULL);
 }

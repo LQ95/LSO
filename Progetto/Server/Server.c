@@ -70,7 +70,7 @@ void *activity_monitoring(void *arg)
 	int saved_gametime=*game_time;
 	int pid=data->pid;
 	int enter_press=0;
-	const char *message="Il monitoraggio del server e' attivo.\nPremi Invio per fare in modo che ilserver termini la sua attivita' dopo questa partita\nPremi K per killare istantanemanete il processo\nPremi D per interrompere o far ripartire le sessioni,dopo questa partita\nPremi S per visualizzare le informazioni sul server\n";
+	const char *message="Il monitoraggio del server e' attivo.\nPremi K per killare istantanemanete il processo server\nPremi D per interrompere o far ripartire le sessioni,dopo questa partita\nPremi S per visualizzare le informazioni sul server\nPremi T per visualizzare il tempo mancante\nPremi C per eliminare i messaggi stampati a schermo\nPremi E per azzerare il tempo\n";
 	initscr();
 	noecho();
 	keypad(stdscr,TRUE);
@@ -84,11 +84,6 @@ void *activity_monitoring(void *arg)
 			{
 				case'k':
 					kill(pid,SIGINT);
-					break;
-				case 10:
-					printw("\nIl server si disattivera' dopo questa partita\n");
-					*game_status=SERVER_GAME_END;
-					*server_status=SERVER_END;
 					break;
 				case'd':
 					if(*game_status==SERVER_GAME_END)
@@ -105,6 +100,16 @@ void *activity_monitoring(void *arg)
 					break;
 				case's':
 					print_server_data(1);
+					break;
+				case't':
+					printw("tempo rimanente:%d\n",*game_time);
+					break;
+				case'c':
+					clear();
+					printw(message);
+					break;
+				case'e':
+					*game_time=1;
 					break;
 			}
 	}
@@ -139,10 +144,12 @@ while(*server_stat==SERVER_ISACTIVE)
 				}
 			pthread_mutex_lock(&sem);
 			*session_stat=SESSION_START;
-			freeList(P->first);
-			freeList(Deaths->first);
+			if(P->first!=NULL)
+				P->first=freeList(P->first);
+			if(Deaths->first!=NULL)
+				Deaths->first=freeList(Deaths->first);
 			*game_time=saved_gametime;
-			//pthread_cond_broadcast(&c);
+			pthread_cond_broadcast(&c);
 			pthread_mutex_unlock(&sem);
 			}
 	}
@@ -170,6 +177,7 @@ int sign_up(int connfd){
 void *send_dim(void *arg){
 	int **board;
 	int *GlobalGameTime;
+    int user_status=1;
     pthread_mutex_t thread_sem;
     pthread_mutex_init(&thread_sem,NULL);
     struct thread_data *tmp=arg;
@@ -212,18 +220,34 @@ void *send_dim(void *arg){
         }
         pthread_mutex_unlock(&sem);
             }
-    printf("%s connesso\n",tmp->name);
-    while(*game_status==SERVER_GAME_ISACTIVE)
+    printw("%s connesso\n",tmp->name);
+    refresh();
+    while(*game_status==SERVER_GAME_ISACTIVE && user_status<4) //4 segnala la disconnessione dell'utente
 	{
-		while(*session_status==SESSION_START)
+		while(*session_status==SESSION_START && user_status<2)
 		{
+		printw("invio dim\n");
+		refresh();
     		pthread_mutex_lock(&sem);
     		write(connfd,dim, sizeof(dim));
     		pthread_mutex_unlock(&sem);
-    		server_game(tmp->name,connfd,GlobalGameTime,P,Deaths,dim[0],seed);
+    		user_status=server_game(tmp->name,connfd,GlobalGameTime,P,Deaths,dim[0],seed);
+		printw("status:%d session status:%d\n",user_status,*session_status);
+		refresh();
 		}
+		if(user_status==2){
+			pthread_mutex_lock(&sem);
+			pthread_cond_wait(&c,&sem);
+			user_status=1;
+			pthread_mutex_unlock(&sem);
+		}
+		else if(user_status==3)
+			*GlobalGameTime=1;
+		user_status=1;
 		
 	}
+printw("%s ha terminato\n",tmp->name);
+refresh();
 pthread_exit(NULL);
 }
 
@@ -277,7 +301,16 @@ int main(){
     monitor_data.L=Players;
     monitor_data.Dead=Deaths;
     seed=genseed();
-	db=fopen("login_credentials.db","r+");
+    //l'utente setta i dati per le future partite
+    printf("Benvenuto. prima che il server sia attivato e' necessario selezionare la dimensione della griglia di gioco (min:10  max:50)\n");
+    int dim=scan_int(10,40);
+    int setGameTime;
+    printf("setta un tempo di gioco (min:50  max:360)\n");
+    GlobalGametime[0]=scan_int(50,360);
+    setGameTime=GlobalGametime[0];
+    printf("dimensione griglia: %d\n",dim);
+    //controllo file database
+    db=fopen("login_credentials.db","r+");
 	if(!db){
         printf("nessun utente registrato, creazione database\n");
         db=fopen("login_credentials.db","w+");
@@ -306,11 +339,6 @@ int main(){
         exit(0);
     }
     else
-        printf("selezionare dimensione griglia (min:10  max:50)\n");
-    int dim=scan_int(10,40);
-    printf("setta un tempo di gioco (min:50  max:360)\n");
-    GlobalGametime[0]=scan_int(50,360);
-    printf("dimensione griglia: %d\n",dim);
     printf("Server listening..\n");
     //Inizia due thread necessari per fare monitoring
     pthread_create(&monitor_tid,NULL,activity_monitoring,&monitor_data);
@@ -326,6 +354,7 @@ int main(){
     }
     else{ 
         printw("server accept avvenuto con successo...\n");
+	if(Players->first==NULL)GlobalGametime[0]=setGameTime;
         thread_sd.connfd=connfd;
         thread_sd.L=Players;
         thread_sd.Dead=Deaths;

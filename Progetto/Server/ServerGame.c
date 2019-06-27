@@ -46,63 +46,75 @@ void send_to_players(struct P *in,struct P *players,int mode){
     }
     return;
 }
-//thread principale servergame
-void server_game(char name[10],int sockfd,int *time,struct player_list *players,struct player_list *deaths,int dim,int seed){
+//subroutine principale servergame
+int server_game(char name[10],int sockfd,int *time,struct player_list *players,struct player_list *deaths,int dim,int seed){
         int send[1];
         int tmp[1];
 	int timebuf[1];
 	char LogEntry[100];
+	printw("inizio\n");
+	refresh();
         tmp[0]=0;//status
 	//invio seed
+	printw("invio seed\n");
+	refresh();
         send[0]=seed;
         pthread_mutex_lock(&sem);
         write(sockfd,send,sizeof(send));
-	//aggiungo il giocatore alla lista dei giocatori e la invio
+	//aggiungo il giocatore alla lista dei giocatori
         struct P *current;
         players->first=add_player(sockfd,players->first,name,dim);
         current=players->first;
         //invio posizione iniziale
+	printw("invio pos iniziale\n");
+	refresh();
         write(sockfd,current->position,sizeof(current->position));
-        //invio altri giocatori
+        //invio lista giocatori
+	printw("invio giocatori\n");
+	refresh();
         send_players(players->first,sockfd);
         send_players(deaths->first,sockfd);
         pthread_mutex_unlock(&sem);
-    while(*time>0){
-        if(read(sockfd,tmp,sizeof(tmp))==0){//leggi status
+	timebuf[0]=*time;
+    while(timebuf[0]>0){
+        if(read(sockfd,tmp,sizeof(tmp))==0){//leggi status e gestisci la eventuale disconnessione
             players->first=disconnect(players->first,current->socket_desc);
 	    sprintf(LogEntry,"giocatore:%s e' stato disconnesso",current->name);
 	    server_log(LogEntry);
-            return;
+            return 4;
            //pthread_exit(NULL);
+        }
+	else if(tmp[0]==2){
+            //il giocatore e' morto
+	    sprintf(LogEntry,"giocatore:%s e' morto",current->name);
+            deaths->first=add_player(current->socket_desc,deaths->first,current->name,dim);
+            deaths->first->position[0]=current->position[0];
+            deaths->first->position[1]=current->position[1];
+            players->first=disconnect(players->first,current->socket_desc);
+	    if(players->first==NULL) *time=1;
+	    return tmp[0];
+        }
+        else if(tmp[0]==3){
+            //il giocatore ha vinto
+	    sprintf(LogEntry,"giocatore:%s ha vinto",current->name);
+	    players->first=disconnect(players->first,current->socket_desc);
+            *time=0;
+	    return tmp[0];
         }
         if(read(sockfd,current->position,sizeof(current->position))==0){//leggi posizione 
             players->first=disconnect(players->first,current->socket_desc);
 	    sprintf(LogEntry,"giocatore:%s e' stato disconnesso",current->name);
 	    server_log(LogEntry);
-            return;
+            return 4;
             //pthread_exit(NULL);
         }
        send_to_players(players->first,current,tmp[0]);//mando lista giocatori
        send_to_players(deaths->first,current,tmp[0]);//mando lista morti
        timebuf[0]=*time;
        write(sockfd,timebuf,sizeof(timebuf)); //send remaining time
-        if(tmp[0]==2){
-            //player is dead
-	    sprintf(LogEntry,"giocatore:%s e' morto",current->name);
-            deaths->first=add_player(current->socket_desc,deaths->first,current->name,dim);
-            deaths->first->position[0]=current->position[0];
-            deaths->first->position[1]=current->position[1];
-            players->first=disconnect(players->first,current->socket_desc);
-	    break;
-        }
-        else if(tmp[0]==3){
-            //player has won
-	    sprintf(LogEntry,"giocatore:%s ha vinto",current->name);
-	    players->first=disconnect(players->first,current->socket_desc);
-            *time=0;
-        }
         //print_list(*deaths);
     }
     sprintf(LogEntry,"La sessione e' finita");
     server_log(LogEntry);
+    return tmp[0];
 }
