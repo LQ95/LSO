@@ -51,6 +51,7 @@ if(time>=0)
 	{
 	printw("\n %d secondi mancanti per la fine della gara",time);
 	if (status==2) printw("\n sei morto \n");
+	else if (status==3) printw("\n hai vinto \n");
 	else printw("\n\n");
 	refresh();
 	}
@@ -68,12 +69,12 @@ int **refresh_board(struct player *in,struct player *deaths,int **board,int dim)
 	}
     }
     while(tmp!=NULL){ //itera attraverso i giocatori
-        board[tmp->position[0]][tmp->position[1]]=1;
+	board[tmp->position[0]][tmp->position[1]]=1;
         tmp=tmp->next;
     }
     tmp=deaths;
     while(tmp!=NULL){//itera attraverso i morti
-        board[tmp->position[0]][tmp->position[1]]=2;
+	board[tmp->position[0]][tmp->position[1]]=2;
         tmp=tmp->next;
     }
     return board;
@@ -131,18 +132,10 @@ int check_position(int connfd,int new_x,int new_y,int dim,int seed){
     tmp[0]=0;
     if(new_y==dim-1){
         //vittoria
-        clear();
-        printw("HAI VINTO!");
-	refresh();
-	sleep(2);
         tmp[0]=3;
     }
     else if((seed*new_x*new_y)%5==2){
         //morto
-        clear();
-        printw("GAME OVER");
-	refresh();
-	sleep(2);
         tmp[0]=2;
     }
     else{
@@ -309,7 +302,7 @@ void *client_game_recv(void *arg){
 	
     }
     statusBuf[0]=status[0];
-    sleep(2);
+    usleep(250);
     write(connfd,statusBuf,sizeof(statusBuf));
     clear();
     endwin();
@@ -320,7 +313,7 @@ void *client_game_recv(void *arg){
     printf("Hai vinto.adesso verrai portato alla prossima sessione\n");
     else
 	{ 
-		printf("tempo scaduto,adesso verrai portato alla prossima sessione");
+		printf("hai perso,adesso verrai portato alla prossima sessione");
 		status[0]=4;	
 	}
     pthread_mutex_lock(&sem);

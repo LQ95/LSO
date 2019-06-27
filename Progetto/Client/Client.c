@@ -270,6 +270,8 @@ int main(int argc, char **argv){
 		    read(sockfd,seed,sizeof(seed));
 		    send->seed=seed[0];
 		    send->status[0]=1;
+		    free(send->board);
+		    send->board=create_board(NULL,NULL,send->dimension);
 		}
             close(sockfd);
     return 0;

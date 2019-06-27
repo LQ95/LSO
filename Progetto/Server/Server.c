@@ -226,16 +226,14 @@ void *send_dim(void *arg){
 	{
 		while(*session_status==SESSION_START && user_status<2)
 		{
-		printw("invio dim\n");
 		refresh();
     		pthread_mutex_lock(&sem);
     		write(connfd,dim, sizeof(dim));
     		pthread_mutex_unlock(&sem);
     		user_status=server_game(tmp->name,connfd,GlobalGameTime,P,Deaths,dim[0],seed);
-		printw("status:%d session status:%d\n",user_status,*session_status);
 		refresh();
 		}
-		if(user_status==2){//se l-utente [morto aspetta la fine della sessione
+		if(user_status==2){//se l'utente e' morto aspetta la fine della sessione
 			pthread_mutex_lock(&sem);
 			pthread_cond_wait(&c,&sem);
 			user_status=1;
